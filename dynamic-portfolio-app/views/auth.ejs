@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= mode === "signup" ? "Sign Up" : "Login" %> | LiquiLink</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="auth-page">
+    <div class="aurora aurora--one"></div>
+    <div class="aurora aurora--two"></div>
+
+    <main class="container auth-wrap">
+      <section class="auth-card">
+        <p class="eyebrow"><%= mode === "signup" ? "Create Account" : "Welcome Back" %></p>
+        <h1>
+          <%= mode === "signup" ? "Sign up for LiquiLink" : "Log in to LiquiLink" %>
+        </h1>
+        <p class="hero-text">
+          <%= mode === "signup"
+            ? "We'll email you a 6-digit code to confirm your address before your account is created."
+            : "Sign in to continue creating and managing your portfolio pages." %>
+        </p>
+
+        <% if (error) { %>
+        <p class="auth-error"><%= error %></p>
+        <% } %>
+
+        <form action="<%= mode === 'signup' ? '/signup' : '/login' %>" method="POST" class="portfolio-form">
+          <% if (mode === "signup") { %>
+          <label>
+            Full Name
+            <input type="text" name="fullName" required />
+          </label>
+          <% } %>
+
+          <label>
+            Email
+            <input type="email" name="email" required />
+          </label>
+
+          <label>
+            Password
+            <input type="password" name="password" minlength="6" required />
+          </label>
+
+          <button type="submit" class="btn btn-primary">
+            <%= mode === "signup" ? "Send verification code" : "Login" %>
+          </button>
+        </form>
+
+        <p class="auth-switch">
+          <% if (mode === "signup") { %>
+          Already have an account? <a href="/login">Login</a>
+          <% } else { %>
+          New here? <a href="/signup">Create an account</a>
+          <% } %>
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

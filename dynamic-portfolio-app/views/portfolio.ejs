@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" class="portfolio-html font-scale--<%= portfolio.fontScale %>">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= portfolio.fullName %> | LiquiLink</title>
+    <meta
+      name="description"
+      content="Portfolio of <%= portfolio.fullName %>, <%= portfolio.role %>."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="<%= portfolio.googleFontHref %>" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      body.portfolio-page-root {
+        font-family: <%- portfolio.fontFamilyCss %>;
+      }
+    </style>
+  </head>
+  <body
+    class="theme-<%= portfolio.theme || 'dark' %> portfolio-page portfolio-page-root layout-<%= portfolio.layoutVariant || 'default' %>"
+    style="--bg: <%= portfolio.colorBg %>; --text: <%= portfolio.colorText %>; --accent: <%= portfolio.colorAccent %>; --accent-2: <%= portfolio.colorAccent %>; --card-bg: <%= portfolio.colorCard %>;"
+  >
+    <div class="aurora aurora--one"></div>
+    <div class="aurora aurora--two"></div>
+
+    <% if (portfolio.showNavbar) { %>
+    <header class="site-header">
+      <nav class="container nav">
+        <p class="brand"><%= portfolio.fullName %></p>
+        <ul class="nav-links">
+          <% portfolio.sectionOrder.forEach((sec) => { %>
+            <% if (sec === 'about') { %>
+          <li><a href="#about">About</a></li>
+            <% } else if (sec === 'projects') { %>
+          <li><a href="#projects">Projects</a></li>
+            <% } else if (sec === 'experience') { %>
+          <li><a href="#experience">Experience</a></li>
+            <% } %>
+          <% }) %>
+          <% if (portfolio.showFooterContact) { %>
+          <li><a href="#contact">Contact</a></li>
+          <% } %>
+        </ul>
+      </nav>
+    </header>
+    <% } %>
+
+    <main>
+      <% portfolio.sectionOrder.forEach((sec) => { %>
+        <% if (sec === 'hero') { %>
+          <%- include('partials/portfolio-section-hero', { portfolio }) %>
+        <% } else if (sec === 'about') { %>
+          <%- include('partials/portfolio-section-about', { portfolio }) %>
+        <% } else if (sec === 'projects') { %>
+          <%- include('partials/portfolio-section-projects', { portfolio }) %>
+        <% } else if (sec === 'experience') { %>
+          <%- include('partials/portfolio-section-experience', { portfolio }) %>
+        <% } %>
+      <% }) %>
+    </main>
+
+    <footer id="contact" class="footer <%= portfolio.showFooterContact ? '' : 'footer--no-contact' %>">
+      <% if (portfolio.showFooterContact) { %>
+      <div class="container footer-content">
+        <div>
+          <p class="eyebrow">Contact</p>
+          <h2>Let’s build something extraordinary.</h2>
+          <p class="footer-note">
+            Open to speaking engagements, mentorship, and product collaborations.
+          </p>
+        </div>
+        <div class="contact-links">
+          <% if (portfolio.email) { %>
+          <a href="mailto:<%= portfolio.email %>"
+            ><i class="fa-solid fa-envelope" aria-hidden="true"></i>Email</a
+          >
+          <% } %>
+          <% if (portfolio.linkedin) { %>
+          <a href="<%= portfolio.linkedin %>" target="_blank" rel="noreferrer"
+            ><i class="fa-brands fa-linkedin" aria-hidden="true"></i>LinkedIn</a
+          >
+          <% } %>
+          <% if (portfolio.youtube) { %>
+          <a href="<%= portfolio.youtube %>" target="_blank" rel="noreferrer"
+            ><i class="fa-brands fa-youtube" aria-hidden="true"></i>YouTube</a
+          >
+          <% } %>
+          <% if (portfolio.instagram) { %>
+          <a href="<%= portfolio.instagram %>" target="_blank" rel="noreferrer"
+            ><i class="fa-brands fa-instagram" aria-hidden="true"></i>Instagram</a
+          >
+          <% } %>
+          <% if (portfolio.twitter) { %>
+          <a href="<%= portfolio.twitter %>" target="_blank" rel="noreferrer"
+            ><i class="fa-brands fa-x-twitter" aria-hidden="true"></i>Twitter</a
+          >
+          <% } %>
+          <% if (portfolio.github) { %>
+          <a href="<%= portfolio.github %>" target="_blank" rel="noreferrer"
+            ><i class="fa-brands fa-github" aria-hidden="true"></i>GitHub</a
+          >
+          <% } %>
+        </div>
+      </div>
+      <% } %>
+      <p class="copyright">© 2026 <%= portfolio.fullName %>. All rights reserved.</p>
+    </footer>
+  </body>
+</html>

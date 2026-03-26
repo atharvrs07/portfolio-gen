@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upgrade to Pro | LiquiLink</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <style>
+      .purchase-popup-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(6, 10, 18, 0.72);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 999999;
+        padding: 20px;
+      }
+
+      .purchase-popup-overlay.show {
+        display: flex;
+      }
+
+      .purchase-popup {
+        width: min(100%, 560px);
+        border-radius: 28px;
+        padding: 28px;
+        background: rgba(20, 26, 40, 0.98);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+        color: #ffffff;
+        position: relative;
+        z-index: 1;
+      }
+
+      .purchase-popup-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+
+      .purchase-popup h2 {
+        margin: 0;
+        font-size: 2rem;
+        line-height: 1.1;
+      }
+
+      .purchase-popup p {
+        margin: 10px 0 0;
+        color: rgba(255, 255, 255, 0.78);
+        line-height: 1.6;
+      }
+
+      .purchase-popup-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+        width: 42px;
+        height: 42px;
+        border-radius: 999px;
+        font-size: 1.2rem;
+        border: none;
+        cursor: pointer;
+      }
+
+      .purchase-popup-price {
+        margin: 18px 0 6px;
+        font-size: 2rem;
+        font-weight: 800;
+        color: #ffffff;
+      }
+
+      .purchase-popup-subtext {
+        margin-bottom: 18px;
+        color: rgba(255, 255, 255, 0.72);
+      }
+
+      .purchase-popup-list {
+        margin: 18px 0 24px;
+        padding-left: 18px;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .purchase-popup-list li {
+        margin-bottom: 10px;
+        line-height: 1.5;
+      }
+
+      .purchase-popup-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+    </style>
+
+    <script>
+      const nextUrl = <%- JSON.stringify(next) %>;
+      const userName = <%- JSON.stringify(currentUser ? currentUser.fullName : "") %>;
+      const userEmail = <%- JSON.stringify(currentUser ? currentUser.email : "") %>;
+
+      function openPurchasePopup() {
+        const popup = document.getElementById("purchasePopupOverlay");
+        if (popup) popup.classList.add("show");
+      }
+
+      function closePurchasePopup() {
+        const popup = document.getElementById("purchasePopupOverlay");
+        if (popup) popup.classList.remove("show");
+      }
+
+      async function startRazorpayCheckout() {
+        const button = document.getElementById("continueRazorpayBtn");
+
+        if (typeof Razorpay === "undefined") {
+          alert("Razorpay script failed to load. Please refresh and try again.");
+          return;
+        }
+
+        try {
+          if (button) {
+            button.disabled = true;
+            button.textContent = "Opening...";
+          }
+
+          const orderRes = await fetch("/api/razorpay/order", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            }
+          });
+
+          const orderJson = await orderRes.json();
+
+          if (!orderJson.success) {
+            throw new Error(orderJson.error || "Failed to create Razorpay order.");
+          }
+
+          const options = {
+            key: orderJson.key_id,
+            amount: orderJson.amount,
+            currency: orderJson.currency,
+            name: "LiquiLink",
+            description: "Pro Plan - 30 Days (Rs <%= proPriceINR %>)",
+            order_id: orderJson.order_id,
+            prefill: {
+              name: userName,
+              email: userEmail
+            },
+            theme: {
+              color: "#88b3ff"
+            },
+            handler: async function (response) {
+              try {
+                const verifyRes = await fetch("/payment/verify", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json"
+                  },
+                  body: JSON.stringify({
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_signature: response.razorpay_signature,
+                    next: nextUrl
+                  })
+                });
+
+                const verifyJson = await verifyRes.json();
+
+                if (!verifyJson.success) {
+                  alert(verifyJson.error || "Payment verification failed.");
+                  if (button) {
+                    button.disabled = false;
+                    button.textContent = "Continue with Razorpay";
+                  }
+                  return;
+                }
+
+                window.location.href = verifyJson.next || "/dashboard";
+              } catch (err) {
+                alert("Something went wrong while verifying payment.");
+                if (button) {
+                  button.disabled = false;
+                  button.textContent = "Continue with Razorpay";
+                }
+              }
+            },
+            modal: {
+              ondismiss: function () {
+                if (button) {
+                  button.disabled = false;
+                  button.textContent = "Continue with Razorpay";
+                }
+              }
+            }
+          };
+
+          const rzp = new Razorpay(options);
+
+          rzp.on("payment.failed", function (payload) {
+            const message =
+              payload &&
+              payload.error &&
+              payload.error.description
+                ? payload.error.description
+                : "Payment failed.";
+            alert(message);
+
+            if (button) {
+              button.disabled = false;
+              button.textContent = "Continue with Razorpay";
+            }
+          });
+
+          rzp.open();
+        } catch (err) {
+          alert(err.message || "Unable to start Razorpay checkout.");
+          if (button) {
+            button.disabled = false;
+            button.textContent = "Continue with Razorpay";
+          }
+        }
+      }
+
+      window.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          closePurchasePopup();
+        }
+      });
+
+      window.addEventListener("click", function (event) {
+        const overlay = document.getElementById("purchasePopupOverlay");
+        if (event.target === overlay) {
+          closePurchasePopup();
+        }
+      });
+    </script>
+  </head>
+
+  <body class="pricing-page">
+    <div class="aurora aurora--one"></div>
+    <div class="aurora aurora--two"></div>
+
+    <main class="container pricing-modal-stage">
+      <div class="modal-backdrop">
+        <section class="upgrade-modal" role="dialog" aria-modal="true">
+          <p class="eyebrow">Pro Plan Required</p>
+          <h1>Unlock Pro to continue</h1>
+          <p class="hero-text">
+            You need the Pro Plan to edit your portfolios and create unlimited new ones.
+          </p>
+
+          <div class="upgrade-features">
+            <h2 class="upgrade-features-title">Why upgrade?</h2>
+            <ul class="upgrade-features-list">
+              <li>Edit any of your existing portfolios</li>
+              <li>Create unlimited portfolios</li>
+              <li>Get 30 days of Pro access after payment</li>
+              <li>Access future premium portfolio improvements faster</li>
+            </ul>
+          </div>
+
+          <div class="upgrade-modal-actions">
+            <button type="button" class="btn btn-primary" onclick="openPurchasePopup()">
+              Purchase
+            </button>
+            <a href="/dashboard" class="btn btn-ghost">Not now</a>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <div class="purchase-popup-overlay" id="purchasePopupOverlay">
+      <div class="purchase-popup" role="dialog" aria-modal="true" aria-labelledby="purchasePopupTitle">
+        <div class="purchase-popup-top">
+          <div>
+            <p class="eyebrow">LiquiLink Pro</p>
+            <h2 id="purchasePopupTitle">Complete your upgrade</h2>
+            <p>
+              Secure your Pro plan through Razorpay and unlock editing plus unlimited portfolio creation.
+            </p>
+          </div>
+
+          <button type="button" class="purchase-popup-close" onclick="closePurchasePopup()" aria-label="Close">
+            ✕
+          </button>
+        </div>
+
+        <div class="purchase-popup-price">Rs <%= proPriceINR %> / 30 days</div>
+        <div class="purchase-popup-subtext">
+          One successful payment unlocks Pro access for 30 days.
+        </div>
+
+        <ul class="purchase-popup-list">
+          <li>Edit any portfolio you own</li>
+          <li>Create unlimited portfolios during your Pro period</li>
+          <li>Secure payment through Razorpay</li>
+          <li>Redirects you right back to where you were going</li>
+        </ul>
+
+        <div class="purchase-popup-actions">
+          <button
+            type="button"
+            class="btn btn-primary"
+            id="continueRazorpayBtn"
+            onclick="startRazorpayCheckout()"
+          >
+            Continue with Razorpay
+          </button>
+
+          <button type="button" class="btn btn-ghost" onclick="closePurchasePopup()">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

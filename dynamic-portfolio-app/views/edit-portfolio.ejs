@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Portfolio | LiquiLink</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="form-page">
+    <div class="aurora aurora--one"></div>
+    <div class="aurora aurora--two"></div>
+    <main class="container form-wrap">
+      <section class="form-card">
+        <div class="form-topbar">
+          <p class="form-user">Editing: <%= portfolio.fullName %></p>
+          <a href="/dashboard" class="btn btn-ghost">Back to dashboard</a>
+        </div>
+
+        <p class="eyebrow">Edit Portfolio</p>
+        <h1>Update your portfolio content and style</h1>
+
+        <form action="/portfolio/<%= portfolio.portfolioId %>/edit" method="POST" class="portfolio-form">
+          <input type="hidden" name="sectionOrder" id="sectionOrderField" value="<%= portfolio.sectionOrder %>" />
+
+          <div class="grid-2">
+            <label>
+              Full Name
+              <input type="text" name="fullName" value="<%= portfolio.fullName %>" required />
+            </label>
+            <label>
+              Role
+              <input type="text" name="role" value="<%= portfolio.role %>" required />
+            </label>
+          </div>
+
+          <div class="grid-2">
+            <label>
+              Theme preset
+              <select id="themePreset" name="theme">
+                <option value="dark" <%= portfolio.theme === "dark" ? "selected" : "" %>>Dark</option>
+                <option value="light" <%= portfolio.theme === "light" ? "selected" : "" %>>Light</option>
+              </select>
+              <span class="hero-text" style="display:block;margin-top:0.35rem;font-size:0.86rem;font-weight:500;"
+                >Sets page contrast helpers and fills color fields below.</span
+              >
+            </label>
+            <div>
+              <p class="customize-preview-label" style="margin-bottom:0.35rem;">Live color preview</p>
+              <div class="customize-preview" id="colorPreview" style="--pv-bg:#05070d;--pv-text:#f5f8ff;--pv-accent:#88b3ff;--pv-card:#151d30;">
+                <p class="eyebrow" style="margin:0;color:var(--pv-accent);font-size:0.7rem;">Eyebrow</p>
+                <p style="margin:0;font-weight:800;font-size:1.1rem;color:var(--pv-text);">Headline</p>
+                <p style="margin:0;font-size:0.88rem;color:color-mix(in srgb,var(--pv-text) 60%,transparent);">
+                  Supporting line
+                </p>
+                <div style="display:flex;gap:0.45rem;flex-wrap:wrap;">
+                  <span
+                    style="display:inline-block;padding:0.35rem 0.75rem;border-radius:999px;font-weight:700;font-size:0.78rem;background:linear-gradient(120deg,var(--pv-accent),color-mix(in srgb,var(--pv-accent) 75%,white));color:#061018;"
+                    >Button</span
+                  >
+                  <span
+                    style="display:inline-block;padding:0.35rem 0.75rem;border-radius:0.65rem;font-size:0.78rem;background:linear-gradient(145deg,color-mix(in srgb,var(--pv-card) 88%,white),var(--pv-card));border:1px solid color-mix(in srgb,var(--pv-text) 20%,transparent);color:var(--pv-text);"
+                    >Card</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p class="eyebrow" style="margin-top:0.5rem;">Colors</p>
+          <div class="color-field-grid">
+            <label>
+              Background
+              <span class="color-input-row">
+                <input type="color" id="pick-colorBg" data-hex-field="colorBg" value="<%= portfolio.colorBg %>" />
+                <input type="text" name="colorBg" id="colorBg" value="<%= portfolio.colorBg %>" pattern="#[0-9A-Fa-f]{6}" maxlength="7" required />
+              </span>
+            </label>
+            <label>
+              Text
+              <span class="color-input-row">
+                <input type="color" id="pick-colorText" data-hex-field="colorText" value="<%= portfolio.colorText %>" />
+                <input type="text" name="colorText" id="colorText" value="<%= portfolio.colorText %>" pattern="#[0-9A-Fa-f]{6}" maxlength="7" required />
+              </span>
+            </label>
+            <label>
+              Accent
+              <span class="color-input-row">
+                <input type="color" id="pick-colorAccent" data-hex-field="colorAccent" value="<%= portfolio.colorAccent %>" />
+                <input type="text" name="colorAccent" id="colorAccent" value="<%= portfolio.colorAccent %>" pattern="#[0-9A-Fa-f]{6}" maxlength="7" required />
+              </span>
+            </label>
+            <label>
+              Card background
+              <span class="color-input-row">
+                <input type="color" id="pick-colorCard" data-hex-field="colorCard" value="<%= portfolio.colorCard %>" />
+                <input type="text" name="colorCard" id="colorCard" value="<%= portfolio.colorCard %>" pattern="#[0-9A-Fa-f]{6}" maxlength="7" required />
+              </span>
+            </label>
+          </div>
+
+          <p class="eyebrow" style="margin-top:0.5rem;">Layout</p>
+          <label>
+            Section order (drag to reorder)
+            <ul class="section-order-list" id="sectionOrderList" aria-label="Section order">
+              <% 
+                var labels = { hero: "Hero", about: "About", projects: "Projects", experience: "Experience" };
+                var orderParts = (portfolio.sectionOrder || "").split(",").map(function(s){ return s.trim(); }).filter(Boolean);
+                if (orderParts.length === 0) orderParts = ["hero", "about", "projects", "experience"];
+                orderParts.forEach(function(sec) { 
+              %>
+              <li class="section-order-item" draggable="true" data-section="<%= sec %>">
+                <i class="fa-solid fa-grip-vertical" aria-hidden="true"></i>
+                <span><%= labels[sec] || sec %></span>
+              </li>
+              <% }); %>
+            </ul>
+          </label>
+
+          <div class="grid-2">
+            <label>
+              Hero layout
+              <select name="heroLayout">
+                <option value="split" <%= portfolio.heroLayout === "split" ? "selected" : "" %>>Text left · card right</option>
+                <option value="split-reverse" <%= portfolio.heroLayout === "split-reverse" ? "selected" : "" %>>Card left · text right</option>
+                <option value="text-only" <%= portfolio.heroLayout === "text-only" ? "selected" : "" %>>Text only (full width)</option>
+                <option value="card-only" <%= portfolio.heroLayout === "card-only" ? "selected" : "" %>>Card only (full width)</option>
+                <option value="stacked" <%= portfolio.heroLayout === "stacked" ? "selected" : "" %>>Stacked · centered</option>
+              </select>
+            </label>
+            <label>
+              About cards
+              <select name="aboutLayout">
+                <option value="grid-3" <%= portfolio.aboutLayout === "grid-3" ? "selected" : "" %>>Grid · 3 columns</option>
+                <option value="grid-2" <%= portfolio.aboutLayout === "grid-2" ? "selected" : "" %>>Grid · 2 columns</option>
+                <option value="scroll" <%= portfolio.aboutLayout === "scroll" ? "selected" : "" %>>Horizontal scroll</option>
+              </select>
+            </label>
+            <label>
+              Projects
+              <select name="projectsLayout">
+                <option value="cols-3" <%= portfolio.projectsLayout === "cols-3" ? "selected" : "" %>>Grid · 3 columns</option>
+                <option value="cols-2" <%= portfolio.projectsLayout === "cols-2" ? "selected" : "" %>>Grid · 2 columns</option>
+                <option value="list" <%= portfolio.projectsLayout === "list" ? "selected" : "" %>>List</option>
+              </select>
+            </label>
+            <label>
+              Experience
+              <select name="experienceLayout">
+                <option value="timeline" <%= portfolio.experienceLayout === "timeline" ? "selected" : "" %>>Vertical timeline</option>
+                <option value="grid" <%= portfolio.experienceLayout === "grid" ? "selected" : "" %>>Card grid</option>
+                <option value="compact" <%= portfolio.experienceLayout === "compact" ? "selected" : "" %>>Compact list</option>
+              </select>
+            </label>
+            <label>
+              Top navigation
+              <select name="showNavbar">
+                <option value="1" <%= portfolio.showNavbar === "1" ? "selected" : "" %>>Show sticky navbar</option>
+                <option value="0" <%= portfolio.showNavbar === "0" ? "selected" : "" %>>Hide navbar</option>
+              </select>
+            </label>
+            <label>
+              Footer
+              <select name="showFooterContact">
+                <option value="1" <%= portfolio.showFooterContact === "1" ? "selected" : "" %>>Show contact section</option>
+                <option value="0" <%= portfolio.showFooterContact === "0" ? "selected" : "" %>>Hide contact section</option>
+              </select>
+            </label>
+          </div>
+
+          <p class="eyebrow" style="margin-top:0.5rem;">Typography</p>
+          <div class="grid-2">
+            <label>
+              Font
+              <select name="fontFamily">
+                <option value="inter" <%= portfolio.fontFamily === "inter" ? "selected" : "" %>>Inter</option>
+                <option value="poppins" <%= portfolio.fontFamily === "poppins" ? "selected" : "" %>>Poppins</option>
+                <option value="roboto" <%= portfolio.fontFamily === "roboto" ? "selected" : "" %>>Roboto</option>
+                <option value="playfair-display" <%= portfolio.fontFamily === "playfair-display" ? "selected" : "" %>>Playfair Display</option>
+                <option value="space-grotesk" <%= portfolio.fontFamily === "space-grotesk" ? "selected" : "" %>>Space Grotesk</option>
+              </select>
+            </label>
+            <label>
+              Font size
+              <select name="fontScale">
+                <option value="small" <%= portfolio.fontScale === "small" ? "selected" : "" %>>Small</option>
+                <option value="medium" <%= portfolio.fontScale === "medium" ? "selected" : "" %>>Medium (default)</option>
+                <option value="large" <%= portfolio.fontScale === "large" ? "selected" : "" %>>Large</option>
+              </select>
+            </label>
+          </div>
+
+          <label>
+            Headline
+            <input type="text" name="headline" value="<%= portfolio.headline %>" required />
+          </label>
+
+          <label>
+            Hero Description
+            <textarea name="heroText" rows="3" required><%= portfolio.heroText %></textarea>
+          </label>
+
+          <div class="grid-2">
+            <label>
+              Shipping Label
+              <input type="text" name="shippingTitle" value="<%= portfolio.shippingTitle %>" />
+            </label>
+            <label>
+              Shipping Heading
+              <input type="text" name="shippingHeading" value="<%= portfolio.shippingHeading %>" />
+            </label>
+          </div>
+
+          <label>
+            Shipping Description
+            <textarea name="shippingDescription" rows="3"><%= portfolio.shippingDescription %></textarea>
+          </label>
+
+          <label>
+            Shipping Bullet Points (one per line)
+            <textarea name="shippingPoints" rows="3"><%= portfolio.shippingPointsText %></textarea>
+          </label>
+
+          <label>
+            About Cards (format: title | description, one per line)
+            <textarea name="aboutCards" rows="4"><%= portfolio.aboutCardsText %></textarea>
+          </label>
+
+          <label>
+            Projects (format: title | platform | description, one per line)
+            <textarea name="projects" rows="5"><%= portfolio.projectsText %></textarea>
+          </label>
+
+          <label>
+            Experience (format: period | title | description, one per line)
+            <textarea name="experiences" rows="5"><%= portfolio.experiencesText %></textarea>
+          </label>
+
+          <div class="grid-2">
+            <label>
+              Email
+              <input type="email" name="email" value="<%= portfolio.email %>" />
+            </label>
+            <label>
+              LinkedIn URL
+              <input type="url" name="linkedin" value="<%= portfolio.linkedin %>" />
+            </label>
+            <label>
+              YouTube URL
+              <input type="url" name="youtube" value="<%= portfolio.youtube %>" />
+            </label>
+            <label>
+              Instagram URL
+              <input type="url" name="instagram" value="<%= portfolio.instagram %>" />
+            </label>
+            <label>
+              Twitter/X URL
+              <input type="url" name="twitter" value="<%= portfolio.twitter %>" />
+            </label>
+            <label>
+              GitHub URL
+              <input type="url" name="github" value="<%= portfolio.github %>" />
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+            Save Changes
+          </button>
+        </form>
+      </section>
+    </main>
+    <script>
+      (function () {
+        var THEME_PRESETS = {
+          dark: { colorBg: "#05070d", colorText: "#f5f8ff", colorAccent: "#88b3ff", colorCard: "#151d30" },
+          light: { colorBg: "#eef3ff", colorText: "#0f1a2f", colorAccent: "#356ed5", colorCard: "#ffffff" }
+        };
+
+        function normHex(v) {
+          if (!v || typeof v !== "string") return "#000000";
+          var s = v.trim();
+          if (!s.startsWith("#")) s = "#" + s;
+          if (!/^#[0-9A-Fa-f]{6}$/.test(s)) return "#000000";
+          return s.toLowerCase();
+        }
+
+        function wireColorPair(hexId, pickerId) {
+          var hexEl = document.getElementById(hexId);
+          var pickEl = document.getElementById(pickerId);
+          if (!hexEl || !pickEl) return;
+          function fromHex() {
+            var h = normHex(hexEl.value);
+            pickEl.value = h;
+            hexEl.value = h;
+            refreshPreview();
+          }
+          function fromPick() {
+            hexEl.value = normHex(pickEl.value);
+            refreshPreview();
+          }
+          hexEl.addEventListener("input", fromHex);
+          hexEl.addEventListener("change", fromHex);
+          pickEl.addEventListener("input", fromPick);
+          pickEl.addEventListener("change", fromPick);
+        }
+
+        function refreshPreview() {
+          var el = document.getElementById("colorPreview");
+          if (!el) return;
+          var bg = normHex(document.getElementById("colorBg").value);
+          var text = normHex(document.getElementById("colorText").value);
+          var accent = normHex(document.getElementById("colorAccent").value);
+          var card = normHex(document.getElementById("colorCard").value);
+          el.style.setProperty("--pv-bg", bg);
+          el.style.setProperty("--pv-text", text);
+          el.style.setProperty("--pv-accent", accent);
+          el.style.setProperty("--pv-card", card);
+          el.style.background =
+            "radial-gradient(circle at 20% 12%, color-mix(in srgb, " + bg + " 78%, " + accent + ") 0%, " + bg + " 65%)";
+        }
+
+        wireColorPair("colorBg", "pick-colorBg");
+        wireColorPair("colorText", "pick-colorText");
+        wireColorPair("colorAccent", "pick-colorAccent");
+        wireColorPair("colorCard", "pick-colorCard");
+
+        var themeSel = document.getElementById("themePreset");
+        themeSel.addEventListener("change", function () {
+          var p = THEME_PRESETS[themeSel.value];
+          if (!p) return;
+          ["colorBg", "colorText", "colorAccent", "colorCard"].forEach(function (k) {
+            var h = document.getElementById(k);
+            var pick = document.getElementById("pick-" + k);
+            if (h) h.value = p[k];
+            if (pick) pick.value = p[k];
+          });
+          refreshPreview();
+        });
+
+        refreshPreview();
+
+        var list = document.getElementById("sectionOrderList");
+        var field = document.getElementById("sectionOrderField");
+        var dragEl = null;
+
+        function syncOrderField() {
+          if (!list || !field) return;
+          var ids = [].map.call(list.querySelectorAll(".section-order-item"), function (li) {
+            return li.getAttribute("data-section");
+          });
+          field.value = ids.join(",");
+        }
+
+        if (list) {
+          list.addEventListener("dragstart", function (e) {
+            var t = e.target.closest(".section-order-item");
+            if (!t) return;
+            dragEl = t;
+            e.dataTransfer.effectAllowed = "move";
+            try {
+              e.dataTransfer.setData("text/plain", t.getAttribute("data-section"));
+            } catch (err) {}
+            t.style.opacity = "0.55";
+          });
+
+          list.addEventListener("dragend", function (e) {
+            var t = e.target.closest(".section-order-item");
+            if (t) t.style.opacity = "";
+            dragEl = null;
+          });
+
+          list.addEventListener("dragover", function (e) {
+            e.preventDefault();
+            var t = e.target.closest(".section-order-item");
+            if (!t || !dragEl || t === dragEl) return;
+            var rect = t.getBoundingClientRect();
+            var before = e.clientY < rect.top + rect.height / 2;
+            if (before) list.insertBefore(dragEl, t);
+            else list.insertBefore(dragEl, t.nextSibling);
+          });
+
+          list.addEventListener("drop", function (e) {
+            e.preventDefault();
+            syncOrderField();
+          });
+        }
+
+        document.querySelector("form.portfolio-form").addEventListener("submit", syncOrderField);
+        syncOrderField();
+      })();
+    </script>
+  </body>
+</html>

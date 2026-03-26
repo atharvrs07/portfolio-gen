@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify email | LiquiLink</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="auth-page">
+    <div class="aurora aurora--one"></div>
+    <div class="aurora aurora--two"></div>
+
+    <main class="container auth-wrap">
+      <section class="auth-card">
+        <p class="eyebrow">Verify your email</p>
+        <h1>Enter the code we sent you</h1>
+        <p class="hero-text">
+          We sent a 6-digit code to <strong><%= maskedEmail %></strong>. This confirms your inbox is real
+          before we create your account.
+        </p>
+
+        <% if (error) { %>
+        <p class="auth-error"><%= error %></p>
+        <% } %>
+
+        <% if (info) { %>
+        <p class="auth-info"><%= info %></p>
+        <% } %>
+
+        <form action="/signup/verify" method="POST" class="portfolio-form">
+          <label>
+            6-digit code
+            <input type="text" name="otp" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required placeholder="000000" />
+          </label>
+
+          <button type="submit" class="btn btn-primary">Verify &amp; continue</button>
+        </form>
+
+        <form action="/signup/resend" method="POST" class="portfolio-form" style="margin-top: 0.75rem;">
+          <button type="submit" class="btn btn-ghost" style="width: 100%;">Resend code</button>
+        </form>
+
+        <p class="auth-switch">
+          Wrong email? <a href="/signup/cancel">Start over</a>
+          ·
+          <a href="/login">Back to login</a>
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LiquiLink | A Link-in-bio builder</title>
+    <meta
+      name="description"
+      content="Create stunning link-in-bio page in minutes, free for starters, paid for pros."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="landing-page">
+    <div class="aurora aurora--one"></div>
+    <div class="aurora aurora--two"></div>
+
+    <main class="container landing">
+      <section class="landing-card">
+        <p class="eyebrow">Free</p>
+        <h1>
+          LiquiLink
+          <span>Make your link-in-bio feel premium.</span>
+        </h1>
+        <p class="hero-text">
+          Generate a portfolio in minutes. Submit your details once,
+          get a shareable URL like <span class="mono">liquilink.vercel.app/your-name</span>.
+        </p>
+
+        <div class="landing-actions">
+          <% if (currentUser) { %>
+          <a class="btn btn-primary" href="/dashboard">
+            <i class="fa-solid fa-table-columns" aria-hidden="true"></i>
+            Go to my dashboard
+          </a>
+          <a class="btn btn-ghost" href="/form.html">Create new portfolio</a>
+          <form action="/logout" method="POST">
+            <button type="submit" class="btn btn-ghost">Logout</button>
+          </form>
+          <% } else { %>
+          <a class="btn btn-primary" href="/signup">
+            <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
+            Create account to start
+          </a>
+          <a class="btn btn-ghost" href="/login">
+            <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i>
+            I already have an account
+          </a>
+          <% } %>
+        </div>
+
+        <div class="landing-metrics">
+          <div class="metric">
+            <p class="metric-number">1</p>
+            <p class="metric-label">Form submission</p>
+          </div>
+          <div class="metric">
+            <p class="metric-number">1</p>
+            <p class="metric-label">Unique link</p>
+          </div>
+          <div class="metric">
+            <p class="metric-number">∞</p>
+            <p class="metric-label">Share everywhere</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

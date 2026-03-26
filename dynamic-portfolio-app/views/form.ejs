@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Your Dynamic Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="form-page">
+    <div class="aurora aurora--one"></div>
+    <div class="aurora aurora--two"></div>
+
+    <main class="container form-wrap">
+      <section class="form-card">
+        <div class="form-topbar">
+          <p class="form-user">Logged in as <%= currentUser ? currentUser.fullName : "User" %></p>
+          <form action="/logout" method="POST">
+            <button type="submit" class="btn btn-ghost">Logout</button>
+          </form>
+        </div>
+
+        <p class="eyebrow">Dynamic Portfolio Generator</p>
+        <h1>Create your Apple-style portfolio</h1>
+        <p class="hero-text">
+          Fill this form and submit. Your data is saved to a database file and
+          you are redirected to your own portfolio page.
+        </p>
+
+        <form action="/create" method="POST" class="portfolio-form">
+          <div class="grid-2">
+            <label>
+              Full Name
+              <input type="text" name="fullName" placeholder="Aria Sterling" required />
+            </label>
+            <label>
+              Role
+              <input type="text" name="role" placeholder="Developer at Apple" required />
+            </label>
+          </div>
+
+          <div class="grid-2">
+            <label>
+              Theme
+              <select name="theme">
+                <option value="dark" selected>Dark</option>
+                <option value="light">Light</option>
+              </select>
+            </label>
+            <label>
+              Layout
+              <select name="layoutVariant">
+                <option value="default" selected>Default</option>
+                <option value="hero-reverse">Hero Reversed</option>
+                <option value="projects-first">Projects First</option>
+              </select>
+            </label>
+          </div>
+
+          <label>
+            Headline
+            <input
+              type="text"
+              name="headline"
+              placeholder="Crafting elegant software that feels magical."
+              required
+            />
+          </label>
+
+          <label>
+            Hero Description
+            <textarea
+              name="heroText"
+              rows="3"
+              placeholder="Short intro paragraph for the hero section"
+              required
+            ></textarea>
+          </label>
+
+          <div class="grid-2">
+            <label>
+              Shipping Label
+              <input type="text" name="shippingTitle" placeholder="Now Shipping" />
+            </label>
+            <label>
+              Shipping Heading
+              <input type="text" name="shippingHeading" placeholder="Apple Ecosystem Features" />
+            </label>
+          </div>
+
+          <label>
+            Shipping Description
+            <textarea
+              name="shippingDescription"
+              rows="3"
+              placeholder="Leading cross-platform experiences for iOS, macOS, and visionOS with clean architecture and consistent performance."
+            ></textarea>
+          </label>
+
+          <label>
+            Shipping Bullet Points (one per line)
+            <textarea name="shippingPoints" rows="3" placeholder="Point 1&#10;Point 2&#10;Point 3"></textarea>
+          </label>
+
+          <label>
+            About Cards (format: title | description, one per line)
+            <textarea
+              name="aboutCards"
+              rows="4"
+              placeholder="Design + Code | I bridge product and engineering...&#10;Performance Obsessed | I focus on launch-time and smooth UX..."
+            ></textarea>
+          </label>
+
+          <label>
+            Projects (format: title | platform | description, one per line)
+            <textarea
+              name="projects"
+              rows="5"
+              placeholder="Health Insight Dashboard | iOS | Built real-time analytics UX...&#10;Creative Workspace Suite | macOS | Built modular productivity suite..."
+            ></textarea>
+          </label>
+
+          <label>
+            Experience (format: period | title | description, one per line)
+            <textarea
+              name="experiences"
+              rows="5"
+              placeholder="2022 - Present | Senior Developer, Apple | Leading feature engineering...&#10;2019 - 2022 | Software Engineer | Delivered interaction patterns..."
+            ></textarea>
+          </label>
+
+          <div class="grid-2">
+            <label>
+              Email
+              <input type="email" name="email" placeholder="you@example.com" />
+            </label>
+            <label>
+              LinkedIn URL
+              <input type="url" name="linkedin" placeholder="https://www.linkedin.com/in/yourprofile" />
+            </label>
+            <label>
+              YouTube URL
+              <input type="url" name="youtube" placeholder="https://www.youtube.com/@yourchannel" />
+            </label>
+            <label>
+              Instagram URL
+              <input type="url" name="instagram" placeholder="https://www.instagram.com/yourprofile" />
+            </label>
+            <label>
+              Twitter/X URL
+              <input type="url" name="twitter" placeholder="https://x.com/yourprofile" />
+            </label>
+            <label>
+              GitHub URL
+              <input type="url" name="github" placeholder="https://github.com/yourprofile" />
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+            Create My Portfolio
+          </button>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,15 @@
+<section id="experience" class="container section">
+  <div class="section-title">
+    <p>Experience</p>
+    <h2>A brief timeline of my journey.</h2>
+  </div>
+  <div class="experience-root experience-layout--<%= portfolio.experienceLayout %>">
+    <% portfolio.experiences.forEach((item) => { %>
+    <article class="timeline-item experience-item">
+      <p class="timeline-date"><%= item.period %></p>
+      <h3><%= item.title %></h3>
+      <p><%= item.description %></p>
+    </article>
+    <% }) %>
+  </div>
+</section>

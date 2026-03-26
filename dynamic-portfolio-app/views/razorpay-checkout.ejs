@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout | LiquiLink Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="pricing-page">
+    <div class="aurora aurora--one"></div>
+    <div class="aurora aurora--two"></div>
+
+    <main class="container pricing-modal-stage">
+      <div class="modal-backdrop">
+        <section class="upgrade-modal" role="dialog" aria-modal="true">
+          <p class="eyebrow">Razorpay Checkout</p>
+          <h1>Opening payment window…</h1>
+          <p class="hero-text">
+            If it doesn’t open automatically, click the button below.
+          </p>
+          <div class="upgrade-modal-actions">
+            <button type="button" class="btn btn-primary" id="btnOpen">
+              Open Razorpay
+            </button>
+            <a href="<%= next %>" class="btn btn-ghost">Back</a>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+      const nextUrl = <%= JSON.stringify(next) %>;
+      const keyId = <%= JSON.stringify(razorpayKeyId) %>;
+      const amount = <%= amount %>;
+      const currency = <%= JSON.stringify(currency) %>;
+      const orderId = <%= JSON.stringify(orderId) %>;
+
+      async function verifyPayment(response) {
+        const verifyRes = await fetch("/payment/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+            next: nextUrl
+          })
+        });
+
+        const verifyJson = await verifyRes.json();
+
+        if (!verifyJson.success) {
+          alert(verifyJson.error || "Payment verification failed.");
+          return;
+        }
+
+        window.location.href = verifyJson.next || "/dashboard";
+      }
+
+      function openCheckout() {
+        if (!keyId) {
+          alert("Razorpay is not configured on the server.");
+          return;
+        }
+
+        if (typeof Razorpay === "undefined") {
+          alert("Razorpay checkout script failed to load. Please refresh and try again.");
+          return;
+        }
+
+        const options = {
+          key: keyId,
+          amount: amount,
+          currency: currency,
+          name: "LiquiLink",
+          description: "Pro Plan - 30 Days (Rs <%= proPriceINR %>)",
+          order_id: orderId,
+          theme: { color: "#88b3ff" },
+          handler: async function (response) {
+            try {
+              await verifyPayment(response);
+            } catch (err) {
+              alert("Something went wrong while verifying payment.");
+            }
+          },
+          modal: {
+            ondismiss: function () {
+              const button = document.getElementById("btnOpen");
+              if (button) {
+                button.disabled = false;
+                button.textContent = "Open Razorpay";
+              }
+            }
+          }
+        };
+
+        const rzp = new Razorpay(options);
+
+        rzp.on("payment.failed", function (payload) {
+          const message =
+            payload &&
+            payload.error &&
+            payload.error.description
+              ? payload.error.description
+              : "Payment failed.";
+          alert(message);
+
+          const button = document.getElementById("btnOpen");
+          if (button) {
+            button.disabled = false;
+            button.textContent = "Open Razorpay";
+          }
+        });
+
+        const button = document.getElementById("btnOpen");
+        if (button) {
+          button.disabled = true;
+          button.textContent = "Opening...";
+        }
+
+        rzp.open();
+      }
+
+      document.getElementById("btnOpen").addEventListener("click", openCheckout);
+
+      window.addEventListener("load", () => {
+        setTimeout(openCheckout, 200);
+      });
+    </script>
+  </body>
+</html>

@@ -42,7 +42,7 @@
           <li><a href="#about">About</a></li>
             <% } else if (sec === 'projects') { %>
           <li><a href="#projects">Projects</a></li>
-            <% } else if (sec === 'experience') { %>
+            <% } else if (sec === 'experience' && portfolio.hasExperience) { %>
           <li><a href="#experience">Experience</a></li>
             <% } %>
           <% }) %>
@@ -62,7 +62,7 @@
           <%- include('partials/portfolio-section-about', { portfolio }) %>
         <% } else if (sec === 'projects') { %>
           <%- include('partials/portfolio-section-projects', { portfolio }) %>
-        <% } else if (sec === 'experience') { %>
+        <% } else if (sec === 'experience' && portfolio.hasExperience) { %>
           <%- include('partials/portfolio-section-experience', { portfolio }) %>
         <% } %>
       <% }) %>

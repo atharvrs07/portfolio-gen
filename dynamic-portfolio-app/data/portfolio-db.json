@@ -129,28 +129,7 @@
           "description": "I have made my own portfolio, you are literally on this page and this is my portfolio."
         }
       ],
-      "experiences": [
-        {
-          "period": "2026 - Present",
-          "title": "AI Developer",
-          "description": "I now specialize in AI industry, building and testing new bots, using these bots to solve problems for the community."
-        },
-        {
-          "period": "2023 - 2025",
-          "title": "Professional Frontend and Backend Web Developer",
-          "description": "I utilized my Covid period efficiently, and leveled up my self, made many websites and published them. Mid 2025, I had built a powerful PC, it was all done by my self, and I still can't believe looking at my PC that I have made this."
-        },
-        {
-          "period": "2020-2022",
-          "title": "After Covid",
-          "description": "I learned about HTML and CSS, by this time, I had a great experience about developing websites, and had made over 1000+ websites. By Mid 2021, I received an old laptop but with great specs from my Aunt because my PC's motherboard somehow got shorted."
-        },
-        {
-          "period": "2017-2019",
-          "title": "Got interested in Computers",
-          "description": "During this time, I was growing up, and started to finally see the world around me properly, and built an amazing interest in computers, spending time watching on YouTube about different computers and laptops, until I was gifted my very first computer by the end of 2018."
-        }
-      ],
+      "experiences": [],
       "email": "atharvrs2010@gmail.com",
       "linkedin": "",
       "youtube": "https://www.youtube.com/@codewithatharv",
@@ -162,7 +141,7 @@
       "portfolioId": "emzfhqyk",
       "theme": "light",
       "layoutVariant": "hero-reverse",
-      "updatedAt": "2026-03-26T06:01:06.329Z",
+      "updatedAt": "2026-03-26T07:53:29.422Z",
       "sectionOrder": [
         "hero",
         "about",

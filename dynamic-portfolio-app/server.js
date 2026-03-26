@@ -332,12 +332,14 @@ function resolvePortfolioForView(record) {
   const fontFamily = normalizeFontFamily(record.fontFamily);
   const fontScale = normalizeFontScale(record.fontScale);
   const derivedVariant = deriveLayoutVariant(sectionOrder, heroLayout);
+  const hasExperience = Array.isArray(record.experiences) && record.experiences.length > 0;
 
   return {
     ...record,
     theme,
     layoutVariant: derivedVariant,
     sectionOrder,
+    hasExperience,
     heroLayout,
     aboutLayout: normalizeAboutLayout(record.aboutLayout),
     projectsLayout: normalizeProjectsLayout(record.projectsLayout),
@@ -504,27 +506,8 @@ function applyPortfolioDefaults(record) {
     ];
   }
 
-  if (!record.experiences || record.experiences.length === 0) {
-    record.experiences = [
-      {
-        period: "2022 - Present",
-        title: "Senior Developer, Apple",
-        description:
-          "Leading feature engineering initiatives across flagship consumer apps and driving performance standards across teams."
-      },
-      {
-        period: "2019 - 2022",
-        title: "Software Engineer, Product Innovation",
-        description:
-          "Delivered next-generation interaction patterns and collaborated on design systems for multi-device consistency."
-      },
-      {
-        period: "2016 - 2019",
-        title: "Frontend Engineer, Creative Tech Studio",
-        description:
-          "Built premium digital experiences for global brands, emphasizing craftsmanship, motion, and performance."
-      }
-    ];
+  if (!record.experiences) {
+    record.experiences = [];
   }
 }
 

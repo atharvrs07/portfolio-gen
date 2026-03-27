@@ -19,15 +19,10 @@
       referrerpolicy="no-referrer"
     />
     <link rel="stylesheet" href="/styles.css" />
-    <style>
-      body.portfolio-page-root {
-        font-family: <%- portfolio.fontFamilyCss %>;
-      }
-    </style>
   </head>
   <body
     class="theme-<%= portfolio.theme || 'dark' %> portfolio-page portfolio-page-root layout-<%= portfolio.layoutVariant || 'default' %>"
-    style="--bg: <%= portfolio.colorBg %>; --text: <%= portfolio.colorText %>; --accent: <%= portfolio.colorAccent %>; --accent-2: <%= portfolio.colorAccent %>; --card-bg: <%= portfolio.colorCard %>;"
+    style="font-family: <%- portfolio.fontFamilyCss %>; --bg: <%= portfolio.colorBg %>; --text: <%= portfolio.colorText %>; --accent: <%= portfolio.colorAccent %>; --accent-2: <%= portfolio.colorAccent %>; --card-bg: <%= portfolio.colorCard %>;"
   >
     <div class="aurora aurora--one"></div>
     <div class="aurora aurora--two"></div>
@@ -38,9 +33,9 @@
         <p class="brand"><%= portfolio.fullName %></p>
         <ul class="nav-links">
           <% portfolio.sectionOrder.forEach((sec) => { %>
-            <% if (sec === 'about') { %>
+            <% if (sec === 'about' && (portfolio.aboutCards || []).length > 0) { %>
           <li><a href="#about">About</a></li>
-            <% } else if (sec === 'projects') { %>
+            <% } else if (sec === 'projects' && (portfolio.projects || []).length > 0) { %>
           <li><a href="#projects">Projects</a></li>
             <% } else if (sec === 'experience' && portfolio.hasExperience) { %>
           <li><a href="#experience">Experience</a></li>
@@ -58,9 +53,9 @@
       <% portfolio.sectionOrder.forEach((sec) => { %>
         <% if (sec === 'hero') { %>
           <%- include('partials/portfolio-section-hero', { portfolio }) %>
-        <% } else if (sec === 'about') { %>
+        <% } else if (sec === 'about' && (portfolio.aboutCards || []).length > 0) { %>
           <%- include('partials/portfolio-section-about', { portfolio }) %>
-        <% } else if (sec === 'projects') { %>
+        <% } else if (sec === 'projects' && (portfolio.projects || []).length > 0) { %>
           <%- include('partials/portfolio-section-projects', { portfolio }) %>
         <% } else if (sec === 'experience' && portfolio.hasExperience) { %>
           <%- include('partials/portfolio-section-experience', { portfolio }) %>
@@ -73,9 +68,9 @@
       <div class="container footer-content">
         <div>
           <p class="eyebrow">Contact</p>
-          <h2>Let’s build something extraordinary.</h2>
+          <h2>Get In Touch With Me.</h2>
           <p class="footer-note">
-            Open to speaking engagements, mentorship, and product collaborations.
+            Just mail me or visit my social media profiles and follow me!
           </p>
         </div>
         <div class="contact-links">
@@ -114,5 +109,59 @@
       <% } %>
       <p class="copyright">© 2026 <%= portfolio.fullName %>. All rights reserved.</p>
     </footer>
+    <script>
+      (() => {
+        const pairs = Array.from(
+          document.querySelectorAll("[data-read-more-container]")
+        )
+          .map((container) => ({
+            text: container.querySelector("[data-read-more-text]"),
+            toggle: container.querySelector("[data-read-more-toggle]")
+          }))
+          .filter((item) => item.text && item.toggle);
+
+        if (!pairs.length) return;
+
+        const needsReadMore = (text) => {
+          const wasExpanded = text.classList.contains("text-expanded");
+          if (wasExpanded) return true;
+
+          const lineHeight =
+            parseFloat(window.getComputedStyle(text).lineHeight) || 0;
+          if (!lineHeight) {
+            return text.scrollHeight > text.clientHeight + 1;
+          }
+
+          text.classList.remove("text-clamp-3");
+          text.classList.add("text-expanded");
+          const naturalHeight = text.scrollHeight;
+          text.classList.remove("text-expanded");
+          text.classList.add("text-clamp-3");
+
+          return naturalHeight > lineHeight * 3 + 1;
+        };
+
+        const updateVisibility = () => {
+          pairs.forEach(({ text, toggle }) => {
+            if (text.classList.contains("text-expanded")) return;
+            toggle.hidden = !needsReadMore(text);
+          });
+        };
+
+        pairs.forEach(({ text, toggle }) => {
+          toggle.addEventListener("click", () => {
+            const willExpand = !text.classList.contains("text-expanded");
+            text.classList.toggle("text-expanded", willExpand);
+            text.classList.toggle("text-clamp-3", !willExpand);
+            toggle.textContent = willExpand ? "Read less" : "Read more";
+            toggle.setAttribute("aria-expanded", willExpand ? "true" : "false");
+            updateVisibility();
+          });
+        });
+
+        requestAnimationFrame(updateVisibility);
+        window.addEventListener("resize", updateVisibility);
+      })();
+    </script>
   </body>
 </html>

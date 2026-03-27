@@ -1,25 +1,46 @@
 <section class="hero container hero-layout--<%= portfolio.heroLayout %>">
   <div class="hero-content">
+    <% if (portfolio.profileImageUrl) { %>
+    <img
+      class="hero-profile-image"
+      src="<%= portfolio.profileImageUrl %>"
+      alt="<%= portfolio.fullName %> profile picture"
+      loading="lazy"
+    />
+    <% } %>
     <p class="eyebrow"><%= portfolio.role %></p>
     <h1>
       <%= portfolio.fullName %>
       <span><%= portfolio.headline %></span>
     </h1>
-    <p class="hero-text"><%= portfolio.heroText %></p>
+    <div data-read-more-container>
+      <p class="hero-text text-clamp-3" data-read-more-text><%= portfolio.heroText %></p>
+      <button type="button" class="read-more-toggle hero-read-more" data-read-more-toggle hidden aria-expanded="false">
+        Read more
+      </button>
+    </div>
     <div class="hero-actions">
       <a class="btn btn-primary" href="#projects">View Work</a>
       <a class="btn btn-ghost" href="#contact">Let’s Connect</a>
     </div>
   </div>
 
+  <% const hasShippingContent = Boolean(portfolio.shippingTitle || portfolio.shippingHeading || portfolio.shippingDescription || (portfolio.shippingPoints && portfolio.shippingPoints.length > 0)); %>
+  <% if (hasShippingContent) { %>
   <aside class="hero-card">
     <p class="card-label"><%= portfolio.shippingTitle %></p>
     <h2><%= portfolio.shippingHeading %></h2>
-    <p><%= portfolio.shippingDescription %></p>
+    <div data-read-more-container>
+      <p class="text-clamp-3" data-read-more-text><%= portfolio.shippingDescription %></p>
+      <button type="button" class="read-more-toggle" data-read-more-toggle hidden aria-expanded="false">
+        Read more
+      </button>
+    </div>
     <ul>
       <% portfolio.shippingPoints.forEach((point) => { %>
       <li><%= point %></li>
       <% }) %>
     </ul>
   </aside>
+  <% } %>
 </section>

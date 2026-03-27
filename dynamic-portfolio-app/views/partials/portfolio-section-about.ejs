@@ -7,7 +7,12 @@
     <% portfolio.aboutCards.forEach((card) => { %>
     <article class="glass-card">
       <h3><%= card.title %></h3>
-      <p><%= card.description %></p>
+      <div data-read-more-container>
+        <p class="text-clamp-3" data-read-more-text><%= card.description %></p>
+        <button type="button" class="read-more-toggle" data-read-more-toggle hidden aria-expanded="false">
+          Read more
+        </button>
+      </div>
     </article>
     <% }) %>
   </div>

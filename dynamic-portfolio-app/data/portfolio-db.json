@@ -1,6 +1,113 @@
 {
   "portfolios": [
     {
+      "id": "atharv-raj-sharma",
+      "portfolioId": "tz4t2ez0",
+      "slug": "atharv-raj-sharma",
+      "ownerUserId": "ypuawd9b",
+      "ownerEmail": "atharvrs2010@gmail.com",
+      "creatorEmail": "atharvrs2010@gmail.com",
+      "createdAt": "2026-03-27T15:09:29.923Z",
+      "fullName": "Atharv Raj Sharma",
+      "role": "Founder | Co-Founder | Developer | Tennis Player",
+      "headline": "Young athelete who's unusually skilled.",
+      "heroText": "Hi, I'm Atharv, and I'm the founder and owner of LiquiLink. I ABSOLUTELY LOVE to play Lawn Tennis. You might've never seen someone so unusually skilled at such a young age, I mean I believe my prime era in computers was probably between 11 and 14, but I guess I'm old now. I always dreamed of doing something remarkable with the skills I have and if you want to know more about me then just check out this page!",
+      "shippingTitle": "Right Now",
+      "shippingHeading": "Founder of LiquiLink | Tennis Player",
+      "shippingDescription": "Right now, I'm the owner and founder of LiquiLink. LiquiLink is a platform which generates premium looking link-in-bio, portfolio style links that you can use in your Bio across any platform you like! If you don't want a link-in-bio, well, this can work as a portfolio generator for you, and will cover everything you need. LiquiLink comes with amazing perks once you unlock the Pro version like Editing, Choosing your own layout of how you want things to be shown, or just choosing your own color palettes all comes at a very affordable price!",
+      "shippingPoints": [
+        "It works both ways, as a link-in-bio, or as a portfolio.",
+        "Pro comes at a very very affordable price!",
+        "Once pro is unlocked, you get amazing perks!"
+      ],
+      "aboutCards": [
+        {
+          "title": "AI Specialist",
+          "description": "I specialize in AI, I personally review people's problems, evaluate them, then BUILD a solution that super effective for them."
+        },
+        {
+          "title": "Tennis Tennis Tennis....",
+          "description": "I absolutely LOVE TO PLAY LAWN TENNIS! Tennis is my most favorite thing to do. I always am aiming for the top in this, and as of 2026, I've officially stepped into Nationals!"
+        },
+        {
+          "title": "Developer",
+          "description": "I am a professional developer. I've got you covered with what ever you want. From personal AI agents, to any app you want, I've got every single thing."
+        }
+      ],
+      "projects": [
+        {
+          "title": "25 Carat Wealth",
+          "platform": "Website",
+          "description": "My dad's finance business needed a professional website, so I MADE IT! Check it out at https://25caratwealth.com"
+        },
+        {
+          "title": "Enriching Wealth",
+          "platform": "Website",
+          "description": "Ultimately, my dad's client was impressed, so he also wanted a website, so I DID IT AGAIN! Check it out at https://enrichingwealth.com"
+        },
+        {
+          "title": "ECard Generator",
+          "platform": "XevoNet",
+          "description": "Why waste time, money, and natural resources into manufacturing business cards again and again when this can be done online? That's where ECard Generator by XevoNet steps in! It generates a professional, and stunning Digital Business Card, one time payment gives you a personalized link that you can share with anyone, multiple times!"
+        },
+        {
+          "title": "Portfolio Generator",
+          "platform": "LiquiLink",
+          "description": "LiquiLink is a link-in-bio or a portfolio generator. It works at both, depends up to you and your needs!"
+        }
+      ],
+      "experiences": [
+        {
+          "period": "2026 - Present",
+          "title": "Founder | Co-Founder | Tennis Player",
+          "description": "At this point, I've just established my company, and growing it. I literally haven't achieved much yet, but what ever I've done till now, is all done by me and honestly it blows my mind away! I still cannot believe that this is me, this is what I've done, at this age."
+        },
+        {
+          "period": "2023 - 2025",
+          "title": "Completed Courses, but realized...",
+          "description": "By mid 2023, I had completed courses of Python, MySQL, and MongoDB. But as 2024 came, I saw many changes in the internet world, new tools, AI growing rapidly, many people losing their jobs. I realized, that whatever course I've done is now technically a waste if I don't master AI. So spent my time, researching different things, exploring how vast AI is, and spent the whole 2025 exploring different amazing AI tools, doing multiple workshops, AI Courses etc."
+        },
+        {
+          "period": "2020 - 2022",
+          "title": "Frontend Web Developer",
+          "description": "By 2020, I developed interest in front end web development. Finished courses of HTML, CSS and also learnt a bit of JavaScript. This showed me the path of how much potential I had and how much I was underestimating my self. By 2021, I built a website for my dad's business, and by 2022, another website which is still live to date!"
+        },
+        {
+          "period": "2018 - 2019",
+          "title": "Slowly started to notice the world around me...",
+          "description": "So I was in my growing stage, and received my first computer in 2018. I would spent a lot of time exploring different things, and the world of internet. Later on I developed a keen interest in how things worked, how to develop them and this showed me way to the field of web development."
+        }
+      ],
+      "email": "cfpatharv@gmail.com",
+      "linkedin": "",
+      "youtube": "https://www.youtube.com/@codewithatharv",
+      "instagram": "https://www.instagram.com/atharvrajsharma2010",
+      "twitter": "https://x.com/atharvrs2010",
+      "github": "https://github.com/atharvrs07",
+      "theme": "dark",
+      "layoutVariant": "hero-reverse",
+      "sectionOrder": [
+        "hero",
+        "about",
+        "projects",
+        "experience"
+      ],
+      "heroLayout": "split-reverse",
+      "profileImageUrl": "/asset/ezNm5DgLDtNSfjsBSfhDrTtx",
+      "companyLogoUrl": "",
+      "aboutLayout": "grid-3",
+      "projectsLayout": "cols-3",
+      "experienceLayout": "timeline",
+      "showNavbar": true,
+      "showFooterContact": true,
+      "fontFamily": "inter",
+      "fontScale": "medium",
+      "colorBg": "#05070d",
+      "colorText": "#f5f8ff",
+      "colorAccent": "#88b3ff",
+      "colorCard": "#151d30"
+    },
+    {
       "id": "adarsh-sharma",
       "portfolioId": "z5wuhlpo",
       "slug": "adarsh-sharma",
@@ -77,92 +184,102 @@
       "theme": "light",
       "layoutVariant": "hero-reverse",
       "updatedAt": "2026-03-25T16:13:23.349Z"
-    },
-    {
-      "id": "atharv-raj-sharma",
-      "slug": "atharv-raj-sharma",
-      "createdAt": "2026-03-24T14:40:30.167Z",
-      "fullName": "Atharv Raj Sharma",
-      "role": "AI Developer",
-      "headline": "Crafting the software you need in minutes",
-      "heroText": "I'm 15 years old as of 2026, born on 7th Nov' 2010, I build real world applications in minutes, all those applications just the way you want.",
-      "shippingTitle": "Now shipping",
-      "shippingHeading": "Free Professional Portfolio Generator",
-      "shippingDescription": "Portfolio generator you may have never seen, it's free, and builds just what you want, simple and easy to do. You can easily change the look and feel of your portfolio for a staggering affordable price of roughly $3 a month!",
-      "shippingPoints": [
-        "Built more than 1000+ portfolios.",
-        "Over 50K+ Happy Customers.",
-        "Visually Appealing Portfolios."
-      ],
-      "aboutCards": [
-        {
-          "title": "AI + Vibe Coding",
-          "description": "I used to write codes my self and some of my projects would take months, but with the help of Vibe Coding, I can achieve anything in minutes."
-        },
-        {
-          "title": "Tennis Player",
-          "description": "Not to mention, I am a professional tennis player, currently my goal is TOP 50 in nationals, India."
-        },
-        {
-          "title": "YouTuber",
-          "description": "I also spend time making videos, and getting some attention."
-        },
-        {
-          "title": "Guitar",
-          "description": "PC closed, off the court, you'd definitely see me with a guitar in hand."
-        }
-      ],
-      "projects": [
-        {
-          "title": "25 Carat Wealth",
-          "platform": "Web, HTML & CSS",
-          "description": "I made a website for my dad, he's a financial planner, and he wanted a website for his business, so I made one for him, go check it out at \"25caratwealth.com\"."
-        },
-        {
-          "title": "Enriching Wealth",
-          "platform": "Web, HTML & CSS",
-          "description": "I also made another website for my dad's client, he's also in the same business as my dad and wanted a website, so I did it again, make sure to check it out at \"enrichingwealth.com\"."
-        },
-        {
-          "title": "Portfolio-Atharv",
-          "platform": "Web, HTML, CSS & JS",
-          "description": "I have made my own portfolio, you are literally on this page and this is my portfolio."
-        }
-      ],
-      "experiences": [],
-      "email": "atharvrs2010@gmail.com",
-      "linkedin": "",
-      "youtube": "https://www.youtube.com/@codewithatharv",
-      "instagram": "https://www.instagram.com/atharvrajsharma2010",
-      "twitter": "https://x.com/atharvrs2010",
-      "github": "https://github.com/atharvrs07",
-      "ownerUserId": "uoll2tme",
-      "ownerEmail": "atharvrs2010@gmail.com",
-      "portfolioId": "emzfhqyk",
-      "theme": "light",
-      "layoutVariant": "hero-reverse",
-      "updatedAt": "2026-03-26T07:53:29.422Z",
-      "sectionOrder": [
-        "hero",
-        "about",
-        "projects",
-        "experience"
-      ],
-      "heroLayout": "split-reverse",
-      "aboutLayout": "grid-3",
-      "projectsLayout": "cols-3",
-      "experienceLayout": "timeline",
-      "showNavbar": true,
-      "showFooterContact": true,
-      "fontFamily": "inter",
-      "fontScale": "medium",
-      "colorBg": "#eef3ff",
-      "colorText": "#0f1a2f",
-      "colorAccent": "#356ed5",
-      "colorCard": "#ffffff"
     }
   ],
   "users": [
+    {
+      "id": "ypuawd9b",
+      "fullName": "Atharv Raj Sharma",
+      "email": "atharvrs2010@gmail.com",
+      "passwordHash": "$2a$10$oTGV2KqiofYM7UuC7vblgutDsA735jU/xR1uletb0FtJz9NPkBQo2",
+      "createdAt": "2026-03-26T08:11:38.603Z",
+      "plan": "pro",
+      "planStatus": "active",
+      "planExpiresAt": "2026-04-25T08:14:13.260Z",
+      "proActivatedAt": "2026-03-26T08:14:13.260Z",
+      "uploadedAssets": [
+        {
+          "id": "n4mnnros",
+          "token": "ezNm5DgLDtNSfjsBSfhDrTtx",
+          "kind": "profile",
+          "storedName": "1774624169919-4rg9cwfg.jpg",
+          "originalName": "Code With Atharv.jpg",
+          "mimeType": "image/jpeg",
+          "size": 15153,
+          "createdAt": "2026-03-27T15:09:29.923Z"
+        },
+        {
+          "id": "wmv97n2g",
+          "token": "NKef1jMPTQW07p5fjHW2AWLE",
+          "kind": "profile",
+          "storedName": "1774622122290-65j0n09f.jpg",
+          "originalName": "Code With Atharv.jpg",
+          "mimeType": "image/jpeg",
+          "size": 15153,
+          "createdAt": "2026-03-27T14:35:22.293Z"
+        },
+        {
+          "id": "19yxdxri",
+          "token": "UuKCvx9uayrA1wIHcoI9ACX5",
+          "kind": "company-logo",
+          "storedName": "1774618299460-4add7fje.png",
+          "originalName": "COMPANY LOGO.png",
+          "mimeType": "image/png",
+          "size": 11684,
+          "createdAt": "2026-03-27T13:31:39.463Z"
+        },
+        {
+          "id": "j2loqvcr",
+          "token": "uWnTas4GRkXEVBEAE3HAwb64",
+          "kind": "profile",
+          "storedName": "1774618299459-hs0m03ec.jpg",
+          "originalName": "Code With Atharv.jpg",
+          "mimeType": "image/jpeg",
+          "size": 15153,
+          "createdAt": "2026-03-27T13:31:39.463Z"
+        },
+        {
+          "id": "mr88n9ex",
+          "token": "Szb4KS2jp_GYH6esbsFZR66C",
+          "kind": "company-logo",
+          "storedName": "1774513979544-zzo83gqa.png",
+          "originalName": "COMPANY LOGO.png",
+          "mimeType": "image/png",
+          "size": 11684,
+          "createdAt": "2026-03-26T08:32:59.545Z"
+        },
+        {
+          "id": "qvc9ln5x",
+          "token": "OgQSQwI_xxsQlVBhFsPg3Qow",
+          "kind": "profile",
+          "storedName": "1774513979543-yfzta19p.jpg",
+          "originalName": "Code With Atharv.jpg",
+          "mimeType": "image/jpeg",
+          "size": 15153,
+          "createdAt": "2026-03-26T08:32:59.545Z"
+        },
+        {
+          "id": "wvltuhy8",
+          "token": "0uHN9wCMVbtS6Wllh9y15Jv4",
+          "kind": "company-logo",
+          "storedName": "1774513936495-mbiwkxlm.png",
+          "originalName": "COMPANY LOGO.png",
+          "mimeType": "image/png",
+          "size": 11684,
+          "createdAt": "2026-03-26T08:32:16.498Z"
+        },
+        {
+          "id": "jfssct3o",
+          "token": "ql9IYzkAUrXF0RZx16GjD2wT",
+          "kind": "profile",
+          "storedName": "1774513936494-yjq7ke44.jpg",
+          "originalName": "Code With Atharv.jpg",
+          "mimeType": "image/jpeg",
+          "size": 15153,
+          "createdAt": "2026-03-26T08:32:16.498Z"
+        }
+      ]
+    },
     {
       "id": "4u67bn86",
       "fullName": "Adarsh Sharma",
@@ -172,18 +289,8 @@
       "plan": "pro",
       "planStatus": "active",
       "proActivatedAt": "2026-03-25T16:13:17.101Z",
-      "planExpiresAt": "2026-04-24T16:13:17.101Z"
-    },
-    {
-      "id": "uoll2tme",
-      "fullName": "Atharv Raj Sharma",
-      "email": "atharvrs2010@gmail.com",
-      "passwordHash": "$2a$10$MYltKo7ipnyHOlmd7x5vHu9rl33f/fQ/OjSOG1Ev7ONKGV/6DrkaG",
-      "createdAt": "2026-03-24T14:15:58.838Z",
-      "plan": "pro",
-      "planStatus": "active",
-      "proActivatedAt": "2026-03-25T16:04:24.005Z",
-      "planExpiresAt": "2026-04-24T16:04:24.005Z"
+      "planExpiresAt": "2026-04-24T16:13:17.101Z",
+      "uploadedAssets": []
     }
   ],
   "pendingSignups": []

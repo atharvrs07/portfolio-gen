@@ -249,10 +249,50 @@ h1 span {
   max-width: 56ch;
 }
 
+.text-clamp-3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+.text-expanded {
+  display: block;
+  overflow: visible;
+}
+
+.read-more-toggle {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin: -1.05rem 0 1.35rem;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.read-more-toggle:hover {
+  opacity: 0.86;
+}
+
 .hero-actions {
   display: flex;
   gap: 0.9rem;
   flex-wrap: wrap;
+}
+
+.hero-profile-image {
+  width: 92px;
+  height: 92px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--accent) 65%, white);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28);
+  margin: 0.85rem 0 0.95rem;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .btn {
@@ -381,6 +421,22 @@ h1 span {
   line-height: 1.2;
   max-width: 30ch;
 }
+
+.section-title--projects {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.projects-company-logo {
+  width: auto;
+  max-width: 140px;
+  max-height: 52px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.24));
+}
+
 
 .about-grid {
   display: grid;
@@ -1045,6 +1101,11 @@ h1 span {
   .section {
     padding-top: 3rem;
   }
+
+  .section-title--projects {
+    flex-direction: column;
+  }
+
 }
 
 /* Pricing / Pro upgrade modal */
@@ -1427,5 +1488,58 @@ body.theme-light.portfolio-page {
 .section-order-item i {
   color: #7de3ff;
   opacity: 0.85;
+}
+
+.edit-preview-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 0.9rem 0 1rem;
+}
+
+.edit-tab-btn.is-active {
+  border-color: color-mix(in srgb, var(--accent) 62%, white);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+.edit-tab-panel[hidden] {
+  display: none !important;
+}
+
+.live-preview-frame {
+  width: 100%;
+  min-height: 76vh;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 1rem;
+  background: rgba(3, 8, 18, 0.6);
+}
+
+.experience-entry-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.experience-entry-item {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 0.9rem;
+  padding: 0.75rem;
+  background: rgba(8, 12, 24, 0.45);
+}
+
+.experience-entry-grid {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.experience-entry-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.experience-add-btn {
+  width: fit-content;
+  margin-top: 0.55rem;
 }
 

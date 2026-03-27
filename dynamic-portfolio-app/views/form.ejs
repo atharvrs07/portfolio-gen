@@ -39,7 +39,7 @@
           you are redirected to your own portfolio page.
         </p>
 
-        <form action="/create" method="POST" class="portfolio-form">
+        <form action="/create" method="POST" enctype="multipart/form-data" class="portfolio-form">
           <div class="grid-2">
             <label>
               Full Name
@@ -91,6 +91,33 @@
 
           <div class="grid-2">
             <label>
+              Profile Picture URL
+              <input
+                type="text"
+                name="profileImageUrl"
+                placeholder="https://example.com/profile.jpg or /asset/your-token"
+              />
+            </label>
+            <label>
+              Company Logo URL
+              <input
+                type="text"
+                name="companyLogoUrl"
+                placeholder="https://example.com/company-logo.png or /asset/your-token"
+              />
+            </label>
+            <label>
+              Profile Picture Upload
+              <input type="file" name="profileImageFile" accept="image/*" />
+            </label>
+            <label>
+              Company Logo Upload
+              <input type="file" name="companyLogoFile" accept="image/*" />
+            </label>
+          </div>
+
+          <div class="grid-2">
+            <label>
               Shipping Label
               <input type="text" name="shippingTitle" placeholder="Now Shipping" />
             </label>
@@ -115,30 +142,30 @@
           </label>
 
           <label>
-            About Cards (format: title | description, one per line)
-            <textarea
-              name="aboutCards"
-              rows="4"
-              placeholder="Design + Code | I bridge product and engineering...&#10;Performance Obsessed | I focus on launch-time and smooth UX..."
-            ></textarea>
+            About Cards
+            <div id="aboutEntriesCreate" class="experience-entry-list"></div>
+            <button type="button" class="btn btn-ghost experience-add-btn" id="addAboutCreate">
+              <i class="fa-solid fa-plus" aria-hidden="true"></i>
+              Add About Card
+            </button>
           </label>
 
           <label>
-            Projects (format: title | platform | description, one per line)
-            <textarea
-              name="projects"
-              rows="5"
-              placeholder="Health Insight Dashboard | iOS | Built real-time analytics UX...&#10;Creative Workspace Suite | macOS | Built modular productivity suite..."
-            ></textarea>
+            Projects
+            <div id="projectEntriesCreate" class="experience-entry-list"></div>
+            <button type="button" class="btn btn-ghost experience-add-btn" id="addProjectCreate">
+              <i class="fa-solid fa-plus" aria-hidden="true"></i>
+              Add Project
+            </button>
           </label>
 
           <label>
-            Experience (format: period | title | description, one per line) (Leave it empty if you don't want to add experience)
-            <textarea
-              name="experiences"
-              rows="5"
-              placeholder="2022 - Present | Senior Developer, Apple | Leading feature engineering...&#10;2019 - 2022 | Software Engineer | Delivered interaction patterns..."
-            ></textarea>
+            Experience (optional)
+            <div id="experienceEntriesCreate" class="experience-entry-list"></div>
+            <button type="button" class="btn btn-ghost experience-add-btn" id="addExperienceCreate">
+              <i class="fa-solid fa-plus" aria-hidden="true"></i>
+              Add Experience
+            </button>
           </label>
 
           <div class="grid-2">
@@ -175,5 +202,98 @@
         </form>
       </section>
     </main>
+    <template id="experienceEntryTemplateCreate">
+      <article class="experience-entry-item">
+        <div class="experience-entry-grid">
+          <input type="text" name="experiencePeriod" placeholder="Period (e.g. 2022 - Present)" />
+          <input type="text" name="experienceTitle" placeholder="Title (e.g. Senior Developer, Apple)" />
+          <textarea name="experienceDescription" rows="2" placeholder="Description"></textarea>
+        </div>
+        <div class="experience-entry-actions">
+          <button type="button" class="btn btn-ghost experience-edit-btn">Edit</button>
+          <button type="button" class="btn btn-ghost experience-remove-btn">
+            <i class="fa-solid fa-minus" aria-hidden="true"></i>
+            Remove
+          </button>
+        </div>
+      </article>
+    </template>
+    <template id="aboutEntryTemplateCreate">
+      <article class="experience-entry-item">
+        <div class="experience-entry-grid">
+          <input type="text" name="aboutTitle" placeholder="About title (e.g. Design + Code)" />
+          <textarea name="aboutDescription" rows="2" placeholder="About description"></textarea>
+        </div>
+        <div class="experience-entry-actions">
+          <button type="button" class="btn btn-ghost experience-edit-btn">Edit</button>
+          <button type="button" class="btn btn-ghost experience-remove-btn">
+            <i class="fa-solid fa-minus" aria-hidden="true"></i>
+            Remove
+          </button>
+        </div>
+      </article>
+    </template>
+    <template id="projectEntryTemplateCreate">
+      <article class="experience-entry-item">
+        <div class="experience-entry-grid">
+          <input type="text" name="projectTitle" placeholder="Project title" />
+          <input type="text" name="projectPlatform" placeholder="Platform (e.g. iOS, Web)" />
+          <textarea name="projectDescription" rows="2" placeholder="Project description"></textarea>
+        </div>
+        <div class="experience-entry-actions">
+          <button type="button" class="btn btn-ghost experience-edit-btn">Edit</button>
+          <button type="button" class="btn btn-ghost experience-remove-btn">
+            <i class="fa-solid fa-minus" aria-hidden="true"></i>
+            Remove
+          </button>
+        </div>
+      </article>
+    </template>
+    <script>
+      (function () {
+        function setEditable(item, editable) {
+          var fields = item.querySelectorAll("input, textarea");
+          fields.forEach(function (field) { field.readOnly = !editable; });
+          var editBtn = item.querySelector(".experience-edit-btn");
+          if (editBtn) editBtn.textContent = editable ? "Done" : "Edit";
+        }
+
+        function bindItem(item) {
+          var editBtn = item.querySelector(".experience-edit-btn");
+          var removeBtn = item.querySelector(".experience-remove-btn");
+
+          if (editBtn) {
+            editBtn.addEventListener("click", function () {
+              var isReadOnly = item.querySelector("input").readOnly;
+              setEditable(item, isReadOnly);
+            });
+          }
+          if (removeBtn) {
+            removeBtn.addEventListener("click", function () {
+              item.remove();
+            });
+          }
+          setEditable(item, true);
+        }
+
+        function addEntry(listEl, tpl) {
+          var node = tpl.content.firstElementChild.cloneNode(true);
+          listEl.appendChild(node);
+          bindItem(node);
+        }
+
+        function setupList(listId, addBtnId, tplId) {
+          var listEl = document.getElementById(listId);
+          var addBtn = document.getElementById(addBtnId);
+          var tpl = document.getElementById(tplId);
+          if (!listEl || !addBtn || !tpl) return;
+          addBtn.addEventListener("click", function () { addEntry(listEl, tpl); });
+        }
+
+        setupList("aboutEntriesCreate", "addAboutCreate", "aboutEntryTemplateCreate");
+        setupList("projectEntriesCreate", "addProjectCreate", "projectEntryTemplateCreate");
+        setupList("experienceEntriesCreate", "addExperienceCreate", "experienceEntryTemplateCreate");
+      })();
+    </script>
   </body>
 </html>

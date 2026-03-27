@@ -1,12 +1,14 @@
 require("dotenv").config();
 
 const path = require("path");
+const fs = require("fs");
 const express = require("express");
 const session = require("express-session");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const Razorpay = require("razorpay");
 const nodemailer = require("nodemailer");
+const multer = require("multer");
 const { Low } = require("lowdb");
 const { JSONFile } = require("lowdb/node");
 const { customAlphabet } = require("nanoid");
@@ -104,6 +106,57 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
+const uploadsDir = path.join(__dirname, "public", "uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+const imageUpload = multer({
+  storage: multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, uploadsDir),
+    filename: (_req, file, cb) => {
+      const ext = path.extname(file.originalname || "").toLowerCase() || ".jpg";
+      cb(null, `${Date.now()}-${nanoid()}${ext}`);
+    }
+  }),
+  fileFilter: (_req, file, cb) => {
+    if (!file.mimetype || !file.mimetype.startsWith("image/")) {
+      return cb(new Error("Only image files are allowed."));
+    }
+    cb(null, true);
+  },
+  limits: {
+    fileSize: 5 * 1024 * 1024
+  }
+});
+
+function handlePortfolioImageUpload(req, res, next) {
+  const middleware = imageUpload.fields([
+    { name: "profileImageFile", maxCount: 1 },
+    { name: "companyLogoFile", maxCount: 1 }
+  ]);
+
+  middleware(req, res, (err) => {
+    if (err) {
+      return res.status(400).send(
+        err && err.message
+          ? err.message
+          : "Image upload failed. Please use valid image files."
+      );
+    }
+
+    const profileImage = req.files?.profileImageFile?.[0];
+    const companyLogo = req.files?.companyLogoFile?.[0];
+
+    req.uploadedFilesMeta = {
+      profileImageFile: profileImage || null,
+      companyLogoFile: companyLogo || null
+    };
+
+    next();
+  });
+}
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "change-this-in-production",
@@ -133,6 +186,139 @@ function parsePipeRows(text, expectedParts) {
     .map((line) => line.split("|").map((part) => part.trim()))
     .filter((parts) => parts.length >= expectedParts)
     .map((parts) => parts.slice(0, expectedParts));
+}
+
+function parseAboutEntries(req) {
+  const titles = Array.isArray(req.body.aboutTitle)
+    ? req.body.aboutTitle
+    : req.body.aboutTitle
+      ? [req.body.aboutTitle]
+      : [];
+  const descriptions = Array.isArray(req.body.aboutDescription)
+    ? req.body.aboutDescription
+    : req.body.aboutDescription
+      ? [req.body.aboutDescription]
+      : [];
+
+  const maxLen = Math.max(titles.length, descriptions.length);
+  const out = [];
+  for (let i = 0; i < maxLen; i += 1) {
+    const title = String(titles[i] || "").trim();
+    const description = String(descriptions[i] || "").trim();
+    if (!title && !description) continue;
+    out.push({ title, description });
+  }
+  if (out.length > 0) return out;
+
+  return parsePipeRows(req.body.aboutCards, 2).map(([title, description]) => ({
+    title,
+    description
+  }));
+}
+
+function parseProjectEntries(req) {
+  const titles = Array.isArray(req.body.projectTitle)
+    ? req.body.projectTitle
+    : req.body.projectTitle
+      ? [req.body.projectTitle]
+      : [];
+  const platforms = Array.isArray(req.body.projectPlatform)
+    ? req.body.projectPlatform
+    : req.body.projectPlatform
+      ? [req.body.projectPlatform]
+      : [];
+  const descriptions = Array.isArray(req.body.projectDescription)
+    ? req.body.projectDescription
+    : req.body.projectDescription
+      ? [req.body.projectDescription]
+      : [];
+
+  const maxLen = Math.max(titles.length, platforms.length, descriptions.length);
+  const out = [];
+  for (let i = 0; i < maxLen; i += 1) {
+    const title = String(titles[i] || "").trim();
+    const platform = String(platforms[i] || "").trim();
+    const description = String(descriptions[i] || "").trim();
+    if (!title && !platform && !description) continue;
+    out.push({ title, platform, description });
+  }
+  if (out.length > 0) return out;
+
+  return parsePipeRows(req.body.projects, 3).map(
+    ([title, platform, description]) => ({
+      title,
+      platform,
+      description
+    })
+  );
+}
+
+function isFilled(value) {
+  return String(value || "").trim().length > 0;
+}
+
+function filterCompleteAboutCards(items) {
+  return (items || []).filter(
+    (item) => isFilled(item.title) && isFilled(item.description)
+  );
+}
+
+function filterCompleteProjects(items) {
+  return (items || []).filter(
+    (item) =>
+      isFilled(item.title) &&
+      isFilled(item.platform) &&
+      isFilled(item.description)
+  );
+}
+
+function filterCompleteExperiences(items) {
+  return (items || []).filter(
+    (item) =>
+      isFilled(item.period) &&
+      isFilled(item.title) &&
+      isFilled(item.description)
+  );
+}
+
+function parseExperienceEntries(req) {
+  const periods = Array.isArray(req.body.experiencePeriod)
+    ? req.body.experiencePeriod
+    : req.body.experiencePeriod
+      ? [req.body.experiencePeriod]
+      : [];
+  const titles = Array.isArray(req.body.experienceTitle)
+    ? req.body.experienceTitle
+    : req.body.experienceTitle
+      ? [req.body.experienceTitle]
+      : [];
+  const descriptions = Array.isArray(req.body.experienceDescription)
+    ? req.body.experienceDescription
+    : req.body.experienceDescription
+      ? [req.body.experienceDescription]
+      : [];
+
+  const maxLen = Math.max(periods.length, titles.length, descriptions.length);
+  const out = [];
+
+  for (let i = 0; i < maxLen; i += 1) {
+    const period = String(periods[i] || "").trim();
+    const title = String(titles[i] || "").trim();
+    const description = String(descriptions[i] || "").trim();
+    if (!period && !title && !description) continue;
+    out.push({ period, title, description });
+  }
+
+  if (out.length > 0) return out;
+
+  // Backward compatibility for old textarea format.
+  return parsePipeRows(req.body.experiences, 3).map(
+    ([period, title, description]) => ({
+      period,
+      title,
+      description
+    })
+  );
 }
 
 function slugifyName(value) {
@@ -295,6 +481,53 @@ function normalizeShowNavFooter(value, defaultTrue = true) {
   return defaultTrue;
 }
 
+function normalizeImageUrl(value) {
+  const raw = (value || "").trim();
+  if (!raw) return "";
+  if (/^https?:\/\//i.test(raw)) return raw;
+  if (/^\/asset\/[a-zA-Z0-9_-]+$/.test(raw)) return raw;
+  if (/^\/uploads\/[a-zA-Z0-9._-]+$/.test(raw)) return raw;
+  return "";
+}
+
+function createAssetToken() {
+  return crypto.randomBytes(18).toString("base64url");
+}
+
+function registerPrivateAssetForUser(user, uploadedFile, kind) {
+  if (!user || !uploadedFile) return "";
+  user.uploadedAssets ||= [];
+
+  const token = createAssetToken();
+  const assetRecord = {
+    id: nanoid(),
+    token,
+    kind,
+    storedName: uploadedFile.filename,
+    originalName: uploadedFile.originalname || "",
+    mimeType: uploadedFile.mimetype || "",
+    size: uploadedFile.size || 0,
+    createdAt: new Date().toISOString()
+  };
+
+  user.uploadedAssets.unshift(assetRecord);
+  return `/asset/${token}`;
+}
+
+function applyUploadedImageUrlsToRequest(req, user) {
+  const profileImageFile = req.uploadedFilesMeta?.profileImageFile || null;
+  const companyLogoFile = req.uploadedFilesMeta?.companyLogoFile || null;
+
+  req.uploadedImageUrls = {
+    profileImageUrl: profileImageFile
+      ? registerPrivateAssetForUser(user, profileImageFile, "profile")
+      : "",
+    companyLogoUrl: companyLogoFile
+      ? registerPrivateAssetForUser(user, companyLogoFile, "company-logo")
+      : ""
+  };
+}
+
 function buildGoogleFontHref(fontKey) {
   const param = FONT_GOOGLE_PARAMS[fontKey] || FONT_GOOGLE_PARAMS.inter;
   return `https://fonts.googleapis.com/css2?family=${param}&display=swap`;
@@ -332,7 +565,10 @@ function resolvePortfolioForView(record) {
   const fontFamily = normalizeFontFamily(record.fontFamily);
   const fontScale = normalizeFontScale(record.fontScale);
   const derivedVariant = deriveLayoutVariant(sectionOrder, heroLayout);
-  const hasExperience = Array.isArray(record.experiences) && record.experiences.length > 0;
+  const aboutCards = filterCompleteAboutCards(record.aboutCards);
+  const projects = filterCompleteProjects(record.projects);
+  const experiences = filterCompleteExperiences(record.experiences);
+  const hasExperience = experiences.length > 0;
 
   return {
     ...record,
@@ -340,6 +576,9 @@ function resolvePortfolioForView(record) {
     layoutVariant: derivedVariant,
     sectionOrder,
     hasExperience,
+    aboutCards,
+    projects,
+    experiences,
     heroLayout,
     aboutLayout: normalizeAboutLayout(record.aboutLayout),
     projectsLayout: normalizeProjectsLayout(record.projectsLayout),
@@ -352,6 +591,8 @@ function resolvePortfolioForView(record) {
     colorText: normalizeHexColor(record.colorText) || preset.colorText,
     colorAccent: normalizeHexColor(record.colorAccent) || preset.colorAccent,
     colorCard: normalizeHexColor(record.colorCard) || preset.colorCard,
+    profileImageUrl: normalizeImageUrl(record.profileImageUrl),
+    companyLogoUrl: normalizeImageUrl(record.companyLogoUrl),
     googleFontHref: buildGoogleFontHref(fontFamily),
     fontFamilyCss: FONT_STACK_CSS[fontFamily] || FONT_STACK_CSS.inter,
     fontBasePx: FONT_BASE_PX[fontScale] ?? 16
@@ -404,32 +645,13 @@ function buildPortfolioPayload(req) {
     heroText:
       req.body.heroText ||
       "I design and engineer high-performance product experiences with a strong focus on motion, clarity, and user delight.",
-    shippingTitle: req.body.shippingTitle || "Now Shipping",
-    shippingHeading: req.body.shippingHeading || "Apple Ecosystem Features",
-    shippingDescription:
-      req.body.shippingDescription ||
-      "Leading cross-platform experiences for iOS, macOS, and visionOS with clean architecture and consistent performance.",
+    shippingTitle: (req.body.shippingTitle || "").trim(),
+    shippingHeading: (req.body.shippingHeading || "").trim(),
+    shippingDescription: (req.body.shippingDescription || "").trim(),
     shippingPoints: splitLines(req.body.shippingPoints),
-    aboutCards: parsePipeRows(req.body.aboutCards, 2).map(
-      ([title, description]) => ({
-        title,
-        description
-      })
-    ),
-    projects: parsePipeRows(req.body.projects, 3).map(
-      ([title, platform, description]) => ({
-        title,
-        platform,
-        description
-      })
-    ),
-    experiences: parsePipeRows(req.body.experiences, 3).map(
-      ([period, title, description]) => ({
-        period,
-        title,
-        description
-      })
-    ),
+    aboutCards: filterCompleteAboutCards(parseAboutEntries(req)),
+    projects: filterCompleteProjects(parseProjectEntries(req)),
+    experiences: filterCompleteExperiences(parseExperienceEntries(req)),
     email: (req.body.email || "").trim(),
     linkedin: (req.body.linkedin || "").trim(),
     youtube: (req.body.youtube || "").trim(),
@@ -440,6 +662,12 @@ function buildPortfolioPayload(req) {
     layoutVariant,
     sectionOrder,
     heroLayout,
+    profileImageUrl:
+      req.uploadedImageUrls?.profileImageUrl ||
+      normalizeImageUrl(req.body.profileImageUrl),
+    companyLogoUrl:
+      req.uploadedImageUrls?.companyLogoUrl ||
+      normalizeImageUrl(req.body.companyLogoUrl),
     aboutLayout: normalizeAboutLayout(req.body.aboutLayout),
     projectsLayout: normalizeProjectsLayout(req.body.projectsLayout),
     experienceLayout: normalizeExperienceLayout(req.body.experienceLayout),
@@ -455,60 +683,10 @@ function buildPortfolioPayload(req) {
 }
 
 function applyPortfolioDefaults(record) {
-  if (!record.shippingPoints || record.shippingPoints.length === 0) {
-    record.shippingPoints = [
-      "SwiftUI + UIKit integration",
-      "Performance-first interaction design",
-      "Accessibility at enterprise scale"
-    ];
-  }
-
-  if (!record.aboutCards || record.aboutCards.length === 0) {
-    record.aboutCards = [
-      {
-        title: "Design + Code",
-        description:
-          "I bridge product, design, and engineering to deliver interfaces that are intuitive, beautiful, and technically robust."
-      },
-      {
-        title: "Performance Obsessed",
-        description:
-          "From launch-time optimization to fluid animations, I focus on measurable quality and polished user interactions."
-      },
-      {
-        title: "Mentorship",
-        description:
-          "I mentor teams on architecture, UI craftsmanship, and modern app standards across Apple platforms."
-      }
-    ];
-  }
-
-  if (!record.projects || record.projects.length === 0) {
-    record.projects = [
-      {
-        title: "Health Insight Dashboard",
-        platform: "iOS",
-        description:
-          "Developed a real-time health analytics interface with dynamic charts, meaningful animations, and robust offline behavior."
-      },
-      {
-        title: "Creative Workspace Suite",
-        platform: "macOS",
-        description:
-          "Built a modular productivity suite with seamless continuity and advanced keyboard-first workflow optimization."
-      },
-      {
-        title: "Spatial Interaction Lab",
-        platform: "visionOS",
-        description:
-          "Prototyped immersive UI patterns for spatial computing, focusing on depth, gesture feedback, and intuitive navigation."
-      }
-    ];
-  }
-
-  if (!record.experiences) {
-    record.experiences = [];
-  }
+  if (!Array.isArray(record.shippingPoints)) record.shippingPoints = [];
+  if (!Array.isArray(record.aboutCards)) record.aboutCards = [];
+  if (!Array.isArray(record.projects)) record.projects = [];
+  if (!Array.isArray(record.experiences)) record.experiences = [];
 }
 
 async function loadDb() {
@@ -539,6 +717,16 @@ async function loadDb() {
       portfolio.ownerEmail = portfolio.creatorEmail;
       needsWrite = true;
     }
+
+    if ("businessTitle" in portfolio) {
+      delete portfolio.businessTitle;
+      needsWrite = true;
+    }
+
+    if ("businessDescription" in portfolio) {
+      delete portfolio.businessDescription;
+      needsWrite = true;
+    }
   });
 
   db.data.users.forEach((user) => {
@@ -559,6 +747,11 @@ async function loadDb() {
         user.planStatus = "expired";
         needsWrite = true;
       }
+    }
+
+    if (!Array.isArray(user.uploadedAssets)) {
+      user.uploadedAssets = [];
+      needsWrite = true;
     }
   });
 
@@ -991,12 +1184,13 @@ app.get("/form.html", requireAuth, async (req, res) => {
   return res.render("form");
 });
 
-app.post("/create", requireAuth, async (req, res) => {
+app.post("/create", requireAuth, handlePortfolioImageUpload, async (req, res) => {
   await loadDb();
   await claimLegacyPortfoliosForUser(req.session.user);
 
   const user = getUserBySession(req);
   const isPro = hasActivePro(user);
+  applyUploadedImageUrlsToRequest(req, user);
 
   const myPortfolioCount = db.data.portfolios.filter(
     (p) => p.ownerUserId === req.session.user.id
@@ -1265,13 +1459,19 @@ app.get("/portfolio/:portfolioId/edit", requireAuth, async (req, res) => {
     colorBg: resolved.colorBg,
     colorText: resolved.colorText,
     colorAccent: resolved.colorAccent,
-    colorCard: resolved.colorCard
+    colorCard: resolved.colorCard,
+    profileImageUrl: resolved.profileImageUrl,
+    companyLogoUrl: resolved.companyLogoUrl
   };
 
   return res.render("edit-portfolio", { portfolio: formData });
 });
 
-app.post("/portfolio/:portfolioId/edit", requireAuth, async (req, res) => {
+app.post(
+  "/portfolio/:portfolioId/edit",
+  requireAuth,
+  handlePortfolioImageUpload,
+  async (req, res) => {
   await loadDb();
 
   const identifier = req.params.portfolioId;
@@ -1292,6 +1492,7 @@ app.post("/portfolio/:portfolioId/edit", requireAuth, async (req, res) => {
 
   const user = getUserBySession(req);
   const isPro = hasActivePro(user);
+  applyUploadedImageUrlsToRequest(req, user);
 
   if (!isPro) {
     const nextUrl = `/portfolio/${encodeURIComponent(identifier)}/edit`;
@@ -1318,6 +1519,68 @@ app.post("/portfolio/:portfolioId/edit", requireAuth, async (req, res) => {
   await db.write();
 
   return res.redirect("/dashboard");
+  }
+);
+
+app.post("/portfolio/:portfolioId/delete", requireAuth, async (req, res) => {
+  await loadDb();
+
+  const identifier = req.params.portfolioId;
+  const portfolio =
+    db.data.portfolios.find((item) => item.portfolioId === identifier) ||
+    db.data.portfolios.find(
+      (item) => item.slug === identifier || item.id === identifier
+    );
+
+  if (!portfolio) {
+    return res.status(404).send("Portfolio not found.");
+  }
+
+  if (portfolio.ownerUserId !== req.session.user.id) {
+    return res.status(403).send("You are not allowed to delete this portfolio.");
+  }
+
+  db.data.portfolios = db.data.portfolios.filter((item) => item !== portfolio);
+  await db.write();
+
+  return res.redirect("/dashboard");
+});
+
+app.get("/asset/:token", async (req, res) => {
+  await loadDb();
+
+  const token = (req.params.token || "").trim();
+  if (!token) {
+    return res.status(404).send("Asset not found.");
+  }
+
+  let foundAsset = null;
+  for (const user of db.data.users) {
+    const asset = (user.uploadedAssets || []).find((a) => a.token === token);
+    if (asset) {
+      foundAsset = asset;
+      break;
+    }
+  }
+
+  if (!foundAsset) {
+    return res.status(404).send("Asset not found.");
+  }
+
+  const safeName = path.basename(foundAsset.storedName || "");
+  if (!safeName) {
+    return res.status(404).send("Asset not found.");
+  }
+
+  const filePath = path.join(uploadsDir, safeName);
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).send("Asset file missing.");
+  }
+
+  if (foundAsset.mimeType) {
+    res.type(foundAsset.mimeType);
+  }
+  return res.sendFile(filePath);
 });
 
 app.get("/api/portfolios", async (req, res) => {

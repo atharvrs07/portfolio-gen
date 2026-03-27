@@ -73,6 +73,13 @@
               >
                 Edit
               </a>
+              <form
+                action="/portfolio/<%= item.portfolioId || item.slug || item.id %>/delete"
+                method="POST"
+                onsubmit="return confirm('Delete this portfolio permanently?');"
+              >
+                <button type="submit" class="btn btn-danger">Delete</button>
+              </form>
             </div>
           </article>
           <% }) %>

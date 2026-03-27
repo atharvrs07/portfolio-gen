@@ -32,7 +32,14 @@
         <p class="eyebrow">Edit Portfolio</p>
         <h1>Update your portfolio content and style</h1>
 
-        <form action="/portfolio/<%= portfolio.portfolioId %>/edit" method="POST" class="portfolio-form">
+        <div class="edit-preview-tabs">
+          <button type="button" class="btn btn-ghost edit-tab-btn is-active" data-tab="editor">Editor</button>
+          <button type="button" class="btn btn-ghost edit-tab-btn" data-tab="preview">Live Preview</button>
+          <button type="button" class="btn btn-ghost" id="openPreviewTabBtn">Open Preview in New Tab</button>
+        </div>
+
+        <div id="editorPanel" class="edit-tab-panel is-active">
+        <form action="/portfolio/<%= portfolio.portfolioId %>/edit" method="POST" enctype="multipart/form-data" class="portfolio-form" id="editPortfolioForm">
           <input type="hidden" name="sectionOrder" id="sectionOrderField" value="<%= portfolio.sectionOrder %>" />
 
           <div class="grid-2">
@@ -214,6 +221,25 @@
 
           <div class="grid-2">
             <label>
+              Profile Picture URL
+              <input type="text" name="profileImageUrl" value="<%= portfolio.profileImageUrl || '' %>" />
+            </label>
+            <label>
+              Company Logo URL
+              <input type="text" name="companyLogoUrl" value="<%= portfolio.companyLogoUrl || '' %>" />
+            </label>
+            <label>
+              Profile Picture Upload
+              <input type="file" name="profileImageFile" accept="image/*" />
+            </label>
+            <label>
+              Company Logo Upload
+              <input type="file" name="companyLogoFile" accept="image/*" />
+            </label>
+          </div>
+
+          <div class="grid-2">
+            <label>
               Shipping Label
               <input type="text" name="shippingTitle" value="<%= portfolio.shippingTitle %>" />
             </label>
@@ -234,18 +260,80 @@
           </label>
 
           <label>
-            About Cards (format: title | description, one per line)
-            <textarea name="aboutCards" rows="4"><%= portfolio.aboutCardsText %></textarea>
+            About Cards
+            <div id="aboutEntriesEdit" class="experience-entry-list">
+              <% (portfolio.aboutCards || []).forEach((item) => { %>
+              <article class="experience-entry-item">
+                <div class="experience-entry-grid">
+                  <input type="text" name="aboutTitle" value="<%= item.title || '' %>" readonly />
+                  <textarea name="aboutDescription" rows="2" readonly><%= item.description || '' %></textarea>
+                </div>
+                <div class="experience-entry-actions">
+                  <button type="button" class="btn btn-ghost experience-edit-btn">Edit</button>
+                  <button type="button" class="btn btn-ghost experience-remove-btn">
+                    <i class="fa-solid fa-minus" aria-hidden="true"></i>
+                    Remove
+                  </button>
+                </div>
+              </article>
+              <% }) %>
+            </div>
+            <button type="button" class="btn btn-ghost experience-add-btn" id="addAboutEdit">
+              <i class="fa-solid fa-plus" aria-hidden="true"></i>
+              Add About Card
+            </button>
           </label>
 
           <label>
-            Projects (format: title | platform | description, one per line)
-            <textarea name="projects" rows="5"><%= portfolio.projectsText %></textarea>
+            Projects
+            <div id="projectEntriesEdit" class="experience-entry-list">
+              <% (portfolio.projects || []).forEach((item) => { %>
+              <article class="experience-entry-item">
+                <div class="experience-entry-grid">
+                  <input type="text" name="projectTitle" value="<%= item.title || '' %>" readonly />
+                  <input type="text" name="projectPlatform" value="<%= item.platform || '' %>" readonly />
+                  <textarea name="projectDescription" rows="2" readonly><%= item.description || '' %></textarea>
+                </div>
+                <div class="experience-entry-actions">
+                  <button type="button" class="btn btn-ghost experience-edit-btn">Edit</button>
+                  <button type="button" class="btn btn-ghost experience-remove-btn">
+                    <i class="fa-solid fa-minus" aria-hidden="true"></i>
+                    Remove
+                  </button>
+                </div>
+              </article>
+              <% }) %>
+            </div>
+            <button type="button" class="btn btn-ghost experience-add-btn" id="addProjectEdit">
+              <i class="fa-solid fa-plus" aria-hidden="true"></i>
+              Add Project
+            </button>
           </label>
 
           <label>
-            Experience (format: period | title | description, one per line)
-            <textarea name="experiences" rows="5"><%= portfolio.experiencesText %></textarea>
+            Experience (optional)
+            <div id="experienceEntriesEdit" class="experience-entry-list">
+              <% (portfolio.experiences || []).forEach((item) => { %>
+              <article class="experience-entry-item">
+                <div class="experience-entry-grid">
+                  <input type="text" name="experiencePeriod" value="<%= item.period || '' %>" readonly />
+                  <input type="text" name="experienceTitle" value="<%= item.title || '' %>" readonly />
+                  <textarea name="experienceDescription" rows="2" readonly><%= item.description || '' %></textarea>
+                </div>
+                <div class="experience-entry-actions">
+                  <button type="button" class="btn btn-ghost experience-edit-btn">Edit</button>
+                  <button type="button" class="btn btn-ghost experience-remove-btn">
+                    <i class="fa-solid fa-minus" aria-hidden="true"></i>
+                    Remove
+                  </button>
+                </div>
+              </article>
+              <% }) %>
+            </div>
+            <button type="button" class="btn btn-ghost experience-add-btn" id="addExperienceEdit">
+              <i class="fa-solid fa-plus" aria-hidden="true"></i>
+              Add Experience
+            </button>
           </label>
 
           <div class="grid-2">
@@ -280,8 +368,60 @@
             Save Changes
           </button>
         </form>
+        </div>
+
+        <div id="previewPanel" class="edit-tab-panel" hidden>
+          <iframe id="livePreviewFrame" title="Live portfolio preview" class="live-preview-frame"></iframe>
+        </div>
       </section>
     </main>
+    <template id="experienceEntryTemplateEdit">
+      <article class="experience-entry-item">
+        <div class="experience-entry-grid">
+          <input type="text" name="experiencePeriod" placeholder="Period (e.g. 2022 - Present)" />
+          <input type="text" name="experienceTitle" placeholder="Title (e.g. Senior Developer, Apple)" />
+          <textarea name="experienceDescription" rows="2" placeholder="Description"></textarea>
+        </div>
+        <div class="experience-entry-actions">
+          <button type="button" class="btn btn-ghost experience-edit-btn">Edit</button>
+          <button type="button" class="btn btn-ghost experience-remove-btn">
+            <i class="fa-solid fa-minus" aria-hidden="true"></i>
+            Remove
+          </button>
+        </div>
+      </article>
+    </template>
+    <template id="aboutEntryTemplateEdit">
+      <article class="experience-entry-item">
+        <div class="experience-entry-grid">
+          <input type="text" name="aboutTitle" placeholder="About title (e.g. Design + Code)" />
+          <textarea name="aboutDescription" rows="2" placeholder="About description"></textarea>
+        </div>
+        <div class="experience-entry-actions">
+          <button type="button" class="btn btn-ghost experience-edit-btn">Edit</button>
+          <button type="button" class="btn btn-ghost experience-remove-btn">
+            <i class="fa-solid fa-minus" aria-hidden="true"></i>
+            Remove
+          </button>
+        </div>
+      </article>
+    </template>
+    <template id="projectEntryTemplateEdit">
+      <article class="experience-entry-item">
+        <div class="experience-entry-grid">
+          <input type="text" name="projectTitle" placeholder="Project title" />
+          <input type="text" name="projectPlatform" placeholder="Platform (e.g. iOS, Web)" />
+          <textarea name="projectDescription" rows="2" placeholder="Project description"></textarea>
+        </div>
+        <div class="experience-entry-actions">
+          <button type="button" class="btn btn-ghost experience-edit-btn">Edit</button>
+          <button type="button" class="btn btn-ghost experience-remove-btn">
+            <i class="fa-solid fa-minus" aria-hidden="true"></i>
+            Remove
+          </button>
+        </div>
+      </article>
+    </template>
     <script>
       (function () {
         var THEME_PRESETS = {
@@ -398,8 +538,266 @@
           });
         }
 
-        document.querySelector("form.portfolio-form").addEventListener("submit", syncOrderField);
+        var formEl = document.querySelector("form#editPortfolioForm");
+        formEl.addEventListener("submit", syncOrderField);
         syncOrderField();
+
+        var tabButtons = [].slice.call(document.querySelectorAll(".edit-tab-btn"));
+        var editorPanel = document.getElementById("editorPanel");
+        var previewPanel = document.getElementById("previewPanel");
+        var previewFrame = document.getElementById("livePreviewFrame");
+        var openPreviewTabBtn = document.getElementById("openPreviewTabBtn");
+        var aboutListEl = document.getElementById("aboutEntriesEdit");
+        var aboutAddBtn = document.getElementById("addAboutEdit");
+        var aboutTpl = document.getElementById("aboutEntryTemplateEdit");
+        var projectListEl = document.getElementById("projectEntriesEdit");
+        var projectAddBtn = document.getElementById("addProjectEdit");
+        var projectTpl = document.getElementById("projectEntryTemplateEdit");
+        var expListEl = document.getElementById("experienceEntriesEdit");
+        var expAddBtn = document.getElementById("addExperienceEdit");
+        var expTpl = document.getElementById("experienceEntryTemplateEdit");
+
+        function setEditable(item, editable) {
+          var fields = item.querySelectorAll("input, textarea");
+          fields.forEach(function (field) { field.readOnly = !editable; });
+          var editBtn = item.querySelector(".experience-edit-btn");
+          if (editBtn) editBtn.textContent = editable ? "Done" : "Edit";
+        }
+
+        function bindItem(item) {
+          var editBtn = item.querySelector(".experience-edit-btn");
+          var removeBtn = item.querySelector(".experience-remove-btn");
+          if (editBtn) {
+            editBtn.addEventListener("click", function () {
+              var firstInput = item.querySelector("input");
+              var isReadOnly = firstInput ? firstInput.readOnly : false;
+              setEditable(item, isReadOnly);
+              refreshLivePreview();
+            });
+          }
+          if (removeBtn) {
+            removeBtn.addEventListener("click", function () {
+              item.remove();
+              refreshLivePreview();
+            });
+          }
+        }
+
+        function setupEditableList(listEl, addBtn, tpl, initialReadOnly) {
+          if (!listEl || !tpl) return;
+          [].slice.call(listEl.querySelectorAll(".experience-entry-item")).forEach(function (item) {
+            bindItem(item);
+            setEditable(item, !initialReadOnly);
+          });
+          if (!addBtn) return;
+          addBtn.addEventListener("click", function () {
+            var node = tpl.content.firstElementChild.cloneNode(true);
+            listEl.appendChild(node);
+            bindItem(node);
+            setEditable(node, true);
+            refreshLivePreview();
+          });
+        }
+
+        setupEditableList(aboutListEl, aboutAddBtn, aboutTpl, true);
+        setupEditableList(projectListEl, projectAddBtn, projectTpl, true);
+        setupEditableList(expListEl, expAddBtn, expTpl, true);
+
+        function escHtml(s) {
+          return String(s || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/\"/g, "&quot;");
+        }
+
+        function splitLines(v) {
+          return String(v || "")
+            .split("\n")
+            .map(function (x) { return x.trim(); })
+            .filter(Boolean);
+        }
+
+        function getFormModel() {
+          syncOrderField();
+          var fd = new FormData(formEl);
+          var aboutTitles = fd.getAll("aboutTitle");
+          var aboutDescriptions = fd.getAll("aboutDescription");
+          var aboutMax = Math.max(aboutTitles.length, aboutDescriptions.length);
+          var aboutRows = [];
+          for (var a = 0; a < aboutMax; a += 1) {
+            var at = String(aboutTitles[a] || "").trim();
+            var ad = String(aboutDescriptions[a] || "").trim();
+            if (!at && !ad) continue;
+            aboutRows.push([at, ad]);
+          }
+
+          var projectTitles = fd.getAll("projectTitle");
+          var projectPlatforms = fd.getAll("projectPlatform");
+          var projectDescriptions = fd.getAll("projectDescription");
+          var projectMax = Math.max(projectTitles.length, projectPlatforms.length, projectDescriptions.length);
+          var projectRows = [];
+          for (var j = 0; j < projectMax; j += 1) {
+            var pt = String(projectTitles[j] || "").trim();
+            var pp = String(projectPlatforms[j] || "").trim();
+            var pd = String(projectDescriptions[j] || "").trim();
+            if (!pt && !pp && !pd) continue;
+            projectRows.push([pt, pp, pd]);
+          }
+
+          var expPeriods = fd.getAll("experiencePeriod");
+          var expTitles = fd.getAll("experienceTitle");
+          var expDescriptions = fd.getAll("experienceDescription");
+          var expMax = Math.max(expPeriods.length, expTitles.length, expDescriptions.length);
+          var exps = [];
+          for (var i = 0; i < expMax; i += 1) {
+            var p = String(expPeriods[i] || "").trim();
+            var t = String(expTitles[i] || "").trim();
+            var d = String(expDescriptions[i] || "").trim();
+            if (!p && !t && !d) continue;
+            exps.push([p, t, d]);
+          }
+
+          return {
+            fullName: fd.get("fullName") || "",
+            role: fd.get("role") || "",
+            headline: fd.get("headline") || "",
+            heroText: fd.get("heroText") || "",
+            shippingTitle: fd.get("shippingTitle") || "",
+            shippingHeading: fd.get("shippingHeading") || "",
+            shippingDescription: fd.get("shippingDescription") || "",
+            shippingPoints: splitLines(fd.get("shippingPoints") || ""),
+            aboutCards: aboutRows,
+            projects: projectRows,
+            experiences: exps,
+            sectionOrder: String(fd.get("sectionOrder") || "hero,about,projects,experience")
+              .split(",")
+              .map(function (x) { return x.trim(); })
+              .filter(Boolean),
+            theme: fd.get("theme") || "dark",
+            heroLayout: fd.get("heroLayout") || "split",
+            aboutLayout: fd.get("aboutLayout") || "grid-3",
+            projectsLayout: fd.get("projectsLayout") || "cols-3",
+            experienceLayout: fd.get("experienceLayout") || "timeline",
+            showNavbar: String(fd.get("showNavbar") || "1") === "1",
+            showFooterContact: String(fd.get("showFooterContact") || "1") === "1",
+            fontScale: fd.get("fontScale") || "medium",
+            colorBg: fd.get("colorBg") || "#05070d",
+            colorText: fd.get("colorText") || "#f5f8ff",
+            colorAccent: fd.get("colorAccent") || "#88b3ff",
+            colorCard: fd.get("colorCard") || "#151d30",
+            profileImageUrl: fd.get("profileImageUrl") || "",
+            companyLogoUrl: fd.get("companyLogoUrl") || ""
+          };
+        }
+
+        function renderPreviewHtml(m) {
+          var navItems = [];
+          if (m.showNavbar) {
+            m.sectionOrder.forEach(function (sec) {
+              if (sec === "about") navItems.push('<a href="#about">About</a>');
+              if (sec === "projects") navItems.push('<a href="#projects">Projects</a>');
+              if (sec === "experience" && m.experiences.length) navItems.push('<a href="#experience">Experience</a>');
+            });
+            if (m.showFooterContact) navItems.push('<a href="#contact">Contact</a>');
+          }
+
+          function renderSection(sec) {
+            if (sec === "hero") {
+              return (
+                '<section class="hero"><div class="hero-content">' +
+                (m.profileImageUrl ? ('<img class="avatar" src="' + escHtml(m.profileImageUrl) + '" alt="Profile" />') : "") +
+                '<p class="eyebrow">' + escHtml(m.role) + '</p>' +
+                '<h1>' + escHtml(m.fullName) + '<span>' + escHtml(m.headline) + '</span></h1>' +
+                '<p class="muted">' + escHtml(m.heroText) + '</p></div>' +
+                '<aside class="card">' +
+                '<p class="eyebrow">' + escHtml(m.shippingTitle) + '</p>' +
+                '<h3>' + escHtml(m.shippingHeading) + '</h3>' +
+                '<p class="muted">' + escHtml(m.shippingDescription) + '</p>' +
+                '</aside></section>'
+              );
+            }
+            if (sec === "about") {
+              var cards = m.aboutCards.map(function (r) {
+                return '<article class="card"><h4>' + escHtml(r[0]) + '</h4><p class="muted">' + escHtml(r[1]) + '</p></article>';
+              }).join("");
+              return '<section id="about"><h2>About</h2><div class="grid">' + cards + '</div></section>';
+            }
+            if (sec === "projects") {
+              var proj = m.projects.map(function (r) {
+                return '<article class="card"><p class="eyebrow">' + escHtml(r[1]) + '</p><h4>' + escHtml(r[0]) + '</h4><p class="muted">' + escHtml(r[2]) + '</p></article>';
+              }).join("");
+              return '<section id="projects"><div class="projects-head"><h2>Projects</h2>' +
+                (m.companyLogoUrl ? ('<img class="logo" src="' + escHtml(m.companyLogoUrl) + '" alt="Logo" />') : "") +
+                '</div><div class="grid">' + proj + '</div></section>';
+            }
+            if (sec === "experience" && m.experiences.length) {
+              var exp = m.experiences.map(function (r) {
+                return '<article class="card"><p class="eyebrow">' + escHtml(r[0]) + '</p><h4>' + escHtml(r[1]) + '</h4><p class="muted">' + escHtml(r[2]) + '</p></article>';
+              }).join("");
+              return '<section id="experience"><h2>Experience</h2><div class="stack">' + exp + '</div></section>';
+            }
+            return "";
+          }
+
+          var sections = m.sectionOrder.map(renderSection).join("");
+
+          return (
+            "<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>" +
+            "<style>" +
+            "body{font-family:Inter,Arial,sans-serif;margin:0;background:" + escHtml(m.colorBg) + ";color:" + escHtml(m.colorText) + ";padding:20px;}" +
+            ".wrap{max-width:1000px;margin:0 auto}.top{display:flex;justify-content:space-between;align-items:center;gap:12px}" +
+            ".top a{color:" + escHtml(m.colorAccent) + ";text-decoration:none;margin-left:10px;font-weight:600}" +
+            ".hero{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin:20px 0}.hero h1{margin:.2rem 0}.hero h1 span{display:block;font-weight:600;color:" + escHtml(m.colorAccent) + "}" +
+            ".card{background:" + escHtml(m.colorCard) + ";border-radius:14px;padding:14px;border:1px solid rgba(255,255,255,.16)}" +
+            ".grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.stack{display:grid;gap:10px}" +
+            ".eyebrow{font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;color:" + escHtml(m.colorAccent) + ";margin:0}" +
+            ".muted{opacity:.82}.avatar{width:84px;height:84px;border-radius:999px;object-fit:cover;border:2px solid " + escHtml(m.colorAccent) + ";display:block;margin:0 0 10px}" +
+            ".projects-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.logo{max-height:46px;max-width:120px;object-fit:contain}" +
+            "@media(max-width:860px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:1fr}}" +
+            "</style></head><body><div class='wrap'>" +
+            (m.showNavbar ? ("<header class='top'><h3 style='margin:0'>" + escHtml(m.fullName) + "</h3><nav>" + navItems.join("") + "</nav></header>") : "") +
+            sections +
+            (m.showFooterContact ? "<footer id='contact' style='margin-top:28px;opacity:.85'>Contact section enabled</footer>" : "") +
+            "</div></body></html>"
+          );
+        }
+
+        function refreshLivePreview() {
+          if (!previewFrame) return;
+          var model = getFormModel();
+          var html = renderPreviewHtml(model);
+          previewFrame.srcdoc = html;
+          previewFrame.dataset.latestHtml = html;
+        }
+
+        tabButtons.forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            var t = btn.getAttribute("data-tab");
+            tabButtons.forEach(function (b) { b.classList.remove("is-active"); });
+            btn.classList.add("is-active");
+            var showPreview = t === "preview";
+            editorPanel.hidden = showPreview;
+            previewPanel.hidden = !showPreview;
+            editorPanel.classList.toggle("is-active", !showPreview);
+            previewPanel.classList.toggle("is-active", showPreview);
+            if (showPreview) refreshLivePreview();
+          });
+        });
+
+        openPreviewTabBtn.addEventListener("click", function () {
+          refreshLivePreview();
+          var html = previewFrame.dataset.latestHtml || "";
+          var w = window.open("", "_blank");
+          if (!w) return;
+          w.document.open();
+          w.document.write(html);
+          w.document.close();
+        });
+
+        formEl.addEventListener("input", refreshLivePreview);
+        formEl.addEventListener("change", refreshLivePreview);
+        refreshLivePreview();
       })();
     </script>
   </body>

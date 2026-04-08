@@ -18,6 +18,83 @@
       referrerpolicy="no-referrer"
     />
     <link rel="stylesheet" href="/styles.css" />
+    <style>
+      .pro-locked-block {
+        position: relative;
+      }
+      .pro-locked-block::before {
+        content: "Pro";
+        position: absolute;
+        top: -0.5rem;
+        right: 0;
+        z-index: 4;
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 0.15rem 0.45rem;
+        border-radius: 999px;
+        background: rgba(255, 80, 80, 0.16);
+        border: 1px solid rgba(255, 80, 80, 0.38);
+        color: #ff9f9f;
+        pointer-events: none;
+      }
+      .pro-locked-block.is-locked-hit {
+        outline: 2px solid rgba(255, 88, 88, 0.9);
+        outline-offset: 8px;
+        border-radius: 0.75rem;
+      }
+      .pro-lock-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        margin: 0;
+        padding: 0;
+        border: none;
+        border-radius: 0.75rem;
+        background: transparent;
+        cursor: pointer;
+      }
+      #proLockModal[hidden] {
+        display: none !important;
+        pointer-events: none !important;
+        visibility: hidden !important;
+      }
+      #proLockModal:not([hidden]) {
+        display: grid;
+        visibility: visible;
+      }
+      .editor-live-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(360px, 44%);
+        gap: 1rem;
+        align-items: start;
+      }
+      .editor-pane {
+        min-width: 0;
+      }
+      .preview-pane {
+        position: sticky;
+        top: 1rem;
+      }
+      .preview-pane .live-preview-frame {
+        min-height: 82vh;
+      }
+      .preview-pane h3 {
+        margin: 0 0 0.45rem;
+        font-size: 0.95rem;
+        color: var(--muted);
+      }
+      @media (max-width: 1080px) {
+        .editor-live-layout {
+          grid-template-columns: 1fr;
+        }
+        .preview-pane {
+          position: static;
+        }
+        .preview-pane .live-preview-frame {
+          min-height: 64vh;
+        }
+      }
+    </style>
   </head>
   <body class="form-page">
     <div class="aurora aurora--one"></div>
@@ -30,15 +107,19 @@
         </div>
 
         <p class="eyebrow">Edit Portfolio</p>
-        <h1>Update your portfolio content and style</h1>
+        <h1>Update your portfolio content</h1>
+        <% if (!isPro) { %>
+        <p class="hero-text">
+          Basic plan: you can edit existing fields and add new entries. Layout, color, and typography settings are Pro-only.
+        </p>
+        <% } %>
 
-        <div class="edit-preview-tabs">
-          <button type="button" class="btn btn-ghost edit-tab-btn is-active" data-tab="editor">Editor</button>
-          <button type="button" class="btn btn-ghost edit-tab-btn" data-tab="preview">Live Preview</button>
+        <div style="margin:0.9rem 0 1rem;">
           <button type="button" class="btn btn-ghost" id="openPreviewTabBtn">Open Preview in New Tab</button>
         </div>
 
-        <div id="editorPanel" class="edit-tab-panel is-active">
+        <div class="editor-live-layout">
+        <div id="editorPanel" class="edit-tab-panel is-active editor-pane">
         <form action="/portfolio/<%= portfolio.portfolioId %>/edit" method="POST" enctype="multipart/form-data" class="portfolio-form" id="editPortfolioForm">
           <input type="hidden" name="sectionOrder" id="sectionOrderField" value="<%= portfolio.sectionOrder %>" />
 
@@ -53,6 +134,7 @@
             </label>
           </div>
 
+          <div class="<%= isPro ? '' : 'pro-locked-block' %>" data-pro-feature="Theme preset and color scheme">
           <div class="grid-2">
             <label>
               Theme preset
@@ -63,6 +145,13 @@
               <span class="hero-text" style="display:block;margin-top:0.35rem;font-size:0.86rem;font-weight:500;"
                 >Sets page contrast helpers and fills color fields below.</span
               >
+            </label>
+            <label>
+              Style theme
+              <select name="styleTheme">
+                <option value="liquid-glass" <%= portfolio.styleTheme === "liquid-glass" ? "selected" : "" %>>Liquid Glass (default)</option>
+                <option value="glow" <%= portfolio.styleTheme === "glow" || portfolio.styleTheme === "anime-manga" ? "selected" : "" %>>Glow</option>
+              </select>
             </label>
             <div>
               <p class="customize-preview-label" style="margin-bottom:0.35rem;">Live color preview</p>
@@ -118,6 +207,16 @@
             </label>
           </div>
 
+          <% if (!isPro) { %>
+          <button
+            type="button"
+            class="pro-lock-overlay"
+            aria-label="Theme and colors are Pro only. Click for upgrade options."
+          ></button>
+          <% } %>
+          </div>
+
+          <div class="<%= isPro ? '' : 'pro-locked-block' %>" data-pro-feature="Portfolio layout">
           <p class="eyebrow" style="margin-top:0.5rem;">Layout</p>
           <label>
             Section order (drag to reorder)
@@ -187,6 +286,16 @@
             </label>
           </div>
 
+          <% if (!isPro) { %>
+          <button
+            type="button"
+            class="pro-lock-overlay"
+            aria-label="Layout options are Pro only. Click for upgrade options."
+          ></button>
+          <% } %>
+          </div>
+
+          <div class="<%= isPro ? '' : 'pro-locked-block' %>" data-pro-feature="Typography options">
           <p class="eyebrow" style="margin-top:0.5rem;">Typography</p>
           <div class="grid-2">
             <label>
@@ -207,6 +316,14 @@
                 <option value="large" <%= portfolio.fontScale === "large" ? "selected" : "" %>>Large</option>
               </select>
             </label>
+          </div>
+          <% if (!isPro) { %>
+          <button
+            type="button"
+            class="pro-lock-overlay"
+            aria-label="Typography is Pro only. Click for upgrade options."
+          ></button>
+          <% } %>
           </div>
 
           <label>
@@ -370,11 +487,26 @@
         </form>
         </div>
 
-        <div id="previewPanel" class="edit-tab-panel" hidden>
+        <div id="previewPanel" class="edit-tab-panel is-active preview-pane">
+          <h3>Live preview</h3>
           <iframe id="livePreviewFrame" title="Live portfolio preview" class="live-preview-frame"></iframe>
+        </div>
         </div>
       </section>
     </main>
+    <div class="modal-backdrop" id="proLockModal" hidden style="display: none">
+      <section class="upgrade-modal" role="dialog" aria-modal="true" aria-labelledby="proLockTitle">
+        <p class="eyebrow">Pro feature</p>
+        <h2 id="proLockTitle" style="margin:0.3rem 0 0.65rem;">Unlock customization controls</h2>
+        <p class="hero-text" id="proLockText" style="margin:0;">
+          This setting is available only on Pro. Upgrade now to unlock all customization options.
+        </p>
+        <div class="upgrade-modal-actions">
+          <a class="btn btn-primary" id="proLockUpgradeBtn" href="/pricing?reason=edit">See all plans</a>
+          <button type="button" class="btn btn-ghost" id="proLockCloseBtn">Not now</button>
+        </div>
+      </section>
+    </div>
     <template id="experienceEntryTemplateEdit">
       <article class="experience-entry-item">
         <div class="experience-entry-grid">
@@ -460,10 +592,14 @@
         function refreshPreview() {
           var el = document.getElementById("colorPreview");
           if (!el) return;
-          var bg = normHex(document.getElementById("colorBg").value);
-          var text = normHex(document.getElementById("colorText").value);
-          var accent = normHex(document.getElementById("colorAccent").value);
-          var card = normHex(document.getElementById("colorCard").value);
+          var bgField = document.getElementById("colorBg");
+          var textField = document.getElementById("colorText");
+          var accentField = document.getElementById("colorAccent");
+          var cardField = document.getElementById("colorCard");
+          var bg = normHex(bgField ? bgField.value : "#05070d");
+          var text = normHex(textField ? textField.value : "#f5f8ff");
+          var accent = normHex(accentField ? accentField.value : "#88b3ff");
+          var card = normHex(cardField ? cardField.value : "#151d30");
           el.style.setProperty("--pv-bg", bg);
           el.style.setProperty("--pv-text", text);
           el.style.setProperty("--pv-accent", accent);
@@ -478,17 +614,19 @@
         wireColorPair("colorCard", "pick-colorCard");
 
         var themeSel = document.getElementById("themePreset");
-        themeSel.addEventListener("change", function () {
-          var p = THEME_PRESETS[themeSel.value];
-          if (!p) return;
-          ["colorBg", "colorText", "colorAccent", "colorCard"].forEach(function (k) {
-            var h = document.getElementById(k);
-            var pick = document.getElementById("pick-" + k);
-            if (h) h.value = p[k];
-            if (pick) pick.value = p[k];
+        if (themeSel) {
+          themeSel.addEventListener("change", function () {
+            var p = THEME_PRESETS[themeSel.value];
+            if (!p) return;
+            ["colorBg", "colorText", "colorAccent", "colorCard"].forEach(function (k) {
+              var h = document.getElementById(k);
+              var pick = document.getElementById("pick-" + k);
+              if (h) h.value = p[k];
+              if (pick) pick.value = p[k];
+            });
+            refreshPreview();
           });
-          refreshPreview();
-        });
+        }
 
         refreshPreview();
 
@@ -539,10 +677,15 @@
         }
 
         var formEl = document.querySelector("form#editPortfolioForm");
+        if (!formEl) return;
+        var isProUser = <%= isPro ? "true" : "false" %>;
+        var proLockModal = document.getElementById("proLockModal");
+        var proLockText = document.getElementById("proLockText");
+        var proLockCloseBtn = document.getElementById("proLockCloseBtn");
+        var proLockUpgradeBtn = document.getElementById("proLockUpgradeBtn");
         formEl.addEventListener("submit", syncOrderField);
         syncOrderField();
 
-        var tabButtons = [].slice.call(document.querySelectorAll(".edit-tab-btn"));
         var editorPanel = document.getElementById("editorPanel");
         var previewPanel = document.getElementById("previewPanel");
         var previewFrame = document.getElementById("livePreviewFrame");
@@ -556,6 +699,76 @@
         var expListEl = document.getElementById("experienceEntriesEdit");
         var expAddBtn = document.getElementById("addExperienceEdit");
         var expTpl = document.getElementById("experienceEntryTemplateEdit");
+
+        function openProModal() {
+          if (!proLockModal) return;
+          proLockModal.removeAttribute("hidden");
+          proLockModal.style.display = "grid";
+          proLockModal.style.visibility = "visible";
+        }
+
+        function closeProModal() {
+          if (!proLockModal) return;
+          proLockModal.setAttribute("hidden", "");
+          proLockModal.style.display = "none";
+          proLockModal.style.visibility = "hidden";
+        }
+
+        function showProLock(block) {
+          if (!block) return;
+          block.classList.add("is-locked-hit");
+          setTimeout(function () {
+            block.classList.remove("is-locked-hit");
+          }, 850);
+          if (!proLockModal) return;
+          var feature = block.getAttribute("data-pro-feature") || "This setting";
+          if (proLockText) {
+            proLockText.textContent =
+              feature +
+              " is available only on Pro. Upgrade now to unlock full customization.";
+          }
+          openProModal();
+        }
+
+        if (!isProUser) {
+          if (proLockUpgradeBtn) {
+            proLockUpgradeBtn.setAttribute(
+              "href",
+              "/pricing?reason=edit&next=" + encodeURIComponent(window.location.pathname)
+            );
+          }
+          [].slice.call(document.querySelectorAll(".pro-locked-block")).forEach(function (block) {
+            block
+              .querySelectorAll("input, select, textarea, button:not(.pro-lock-overlay), .section-order-item")
+              .forEach(function (el) {
+                el.setAttribute("tabindex", "-1");
+              });
+          });
+          [].slice.call(document.querySelectorAll(".pro-lock-overlay")).forEach(function (btn) {
+            btn.addEventListener("click", function (e) {
+              e.preventDefault();
+              e.stopPropagation();
+              showProLock(btn.closest(".pro-locked-block"));
+            });
+          });
+          if (proLockCloseBtn) {
+            proLockCloseBtn.addEventListener("click", function (e) {
+              e.preventDefault();
+              e.stopPropagation();
+              closeProModal();
+            });
+          }
+          if (proLockModal) {
+            proLockModal.addEventListener("click", function (e) {
+              if (e.target === proLockModal) closeProModal();
+            });
+          }
+          document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape" && proLockModal && !proLockModal.hasAttribute("hidden")) {
+              closeProModal();
+            }
+          });
+        }
 
         function setEditable(item, editable) {
           var fields = item.querySelectorAll("input, textarea");
@@ -675,6 +888,7 @@
               .map(function (x) { return x.trim(); })
               .filter(Boolean),
             theme: fd.get("theme") || "dark",
+            styleTheme: fd.get("styleTheme") || "liquid-glass",
             heroLayout: fd.get("heroLayout") || "split",
             aboutLayout: fd.get("aboutLayout") || "grid-3",
             projectsLayout: fd.get("projectsLayout") || "cols-3",
@@ -692,6 +906,7 @@
         }
 
         function renderPreviewHtml(m) {
+          var bodyClass = "theme-style-" + escHtml(m.styleTheme || "liquid-glass");
           var navItems = [];
           if (m.showNavbar) {
             m.sectionOrder.forEach(function (sec) {
@@ -754,8 +969,9 @@
             ".eyebrow{font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;color:" + escHtml(m.colorAccent) + ";margin:0}" +
             ".muted{opacity:.82}.avatar{width:84px;height:84px;border-radius:999px;object-fit:cover;border:2px solid " + escHtml(m.colorAccent) + ";display:block;margin:0 0 10px}" +
             ".projects-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.logo{max-height:46px;max-width:120px;object-fit:contain}" +
+            ".theme-style-glow h1,.theme-style-glow h2{letter-spacing:.01em;text-shadow:0 3px 0 rgba(0,0,0,.2)}" +
             "@media(max-width:860px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:1fr}}" +
-            "</style></head><body><div class='wrap'>" +
+            "</style></head><body class='" + bodyClass + "'><div class='wrap'>" +
             (m.showNavbar ? ("<header class='top'><h3 style='margin:0'>" + escHtml(m.fullName) + "</h3><nav>" + navItems.join("") + "</nav></header>") : "") +
             sections +
             (m.showFooterContact ? "<footer id='contact' style='margin-top:28px;opacity:.85'>Contact section enabled</footer>" : "") +
@@ -771,19 +987,8 @@
           previewFrame.dataset.latestHtml = html;
         }
 
-        tabButtons.forEach(function (btn) {
-          btn.addEventListener("click", function () {
-            var t = btn.getAttribute("data-tab");
-            tabButtons.forEach(function (b) { b.classList.remove("is-active"); });
-            btn.classList.add("is-active");
-            var showPreview = t === "preview";
-            editorPanel.hidden = showPreview;
-            previewPanel.hidden = !showPreview;
-            editorPanel.classList.toggle("is-active", !showPreview);
-            previewPanel.classList.toggle("is-active", showPreview);
-            if (showPreview) refreshLivePreview();
-          });
-        });
+        if (editorPanel) editorPanel.hidden = false;
+        if (previewPanel) previewPanel.hidden = false;
 
         openPreviewTabBtn.addEventListener("click", function () {
           refreshLivePreview();

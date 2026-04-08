@@ -1193,20 +1193,61 @@ h1 span {
 /* ——— Public portfolio: custom colors & layouts ——— */
 .portfolio-page {
   --muted: color-mix(in srgb, var(--text) 58%, transparent);
+  --aurora-one: color-mix(in srgb, var(--accent) 64%, var(--bg));
+  --aurora-two: color-mix(in srgb, var(--card-bg) 52%, var(--accent));
   color: var(--text);
   background: radial-gradient(
     circle at 20% 15%,
     color-mix(in srgb, var(--bg) 82%, var(--accent)) 0%,
     var(--bg) 50%
+    ),
+    radial-gradient(
+      circle at 90% 92%,
+      color-mix(in srgb, var(--accent) 24%, var(--card-bg)) 0%,
+      transparent 45%
   );
 }
 
 body.theme-light.portfolio-page {
+  --aurora-one: color-mix(in srgb, var(--accent) 48%, white);
+  --aurora-two: color-mix(in srgb, var(--accent) 32%, var(--card-bg));
   background: radial-gradient(
     circle at 20% 15%,
     color-mix(in srgb, var(--bg) 92%, white) 0%,
     var(--bg) 55%
   );
+}
+
+.portfolio-page .aurora--one {
+  background: var(--aurora-one);
+  opacity: 0.38;
+}
+
+.portfolio-page .aurora--two {
+  background: var(--aurora-two);
+  opacity: 0.34;
+}
+
+.portfolio-page .site-header {
+  background: color-mix(in srgb, var(--bg) 74%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--text) 12%, transparent);
+}
+
+.portfolio-page .brand,
+.portfolio-page h1,
+.portfolio-page h2,
+.portfolio-page h3,
+.portfolio-page .project-head p,
+.portfolio-page .hero-card h2 {
+  color: var(--text);
+}
+
+.portfolio-page .nav-links a {
+  color: color-mix(in srgb, var(--text) 78%, var(--accent));
+}
+
+.portfolio-page .nav-links a:hover {
+  color: var(--accent);
 }
 
 .portfolio-page h1 span {
@@ -1240,8 +1281,8 @@ body.theme-light.portfolio-page {
 .portfolio-page .timeline-item {
   background: linear-gradient(
     145deg,
-    color-mix(in srgb, var(--card-bg) 90%, white),
-    var(--card-bg)
+    color-mix(in srgb, var(--card-bg) 72%, transparent),
+    color-mix(in srgb, var(--card-bg) 84%, var(--bg))
   );
   border-color: color-mix(in srgb, var(--text) 16%, transparent);
 }
@@ -1270,6 +1311,151 @@ body.theme-light.portfolio-page {
 
 .portfolio-page .contact-links a:hover {
   color: var(--text);
+}
+
+.portfolio-page.theme-style-glow,
+.portfolio-page.theme-style-anime-manga {
+  --aurora-one: color-mix(in srgb, var(--accent) 76%, #ff4da6);
+  --aurora-two: color-mix(in srgb, var(--accent) 72%, #6f69ff);
+  --muted: color-mix(in srgb, var(--text) 64%, transparent);
+  background-image:
+    radial-gradient(circle at 14% 10%, color-mix(in srgb, var(--accent) 34%, var(--bg)) 0%, transparent 38%),
+    radial-gradient(circle at 84% 87%, color-mix(in srgb, var(--accent) 30%, #6f69ff) 0%, transparent 42%),
+    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--accent) 14%, transparent) 1px, transparent 0);
+  background-size: auto, auto, 18px 18px;
+  background-color: var(--bg);
+}
+
+.portfolio-page.theme-style-glow h1,
+.portfolio-page.theme-style-glow h2,
+.portfolio-page.theme-style-glow h3,
+.portfolio-page.theme-style-anime-manga h1,
+.portfolio-page.theme-style-anime-manga h2,
+.portfolio-page.theme-style-anime-manga h3 {
+  letter-spacing: 0.015em;
+  font-weight: 800;
+  text-shadow: none;
+}
+
+.portfolio-page.theme-style-glow .hero-card,
+.portfolio-page.theme-style-glow .glass-card,
+.portfolio-page.theme-style-glow .project-card,
+.portfolio-page.theme-style-glow .timeline-item,
+.portfolio-page.theme-style-anime-manga .hero-card,
+.portfolio-page.theme-style-anime-manga .glass-card,
+.portfolio-page.theme-style-anime-manga .project-card,
+.portfolio-page.theme-style-anime-manga .timeline-item {
+  border-width: 2px;
+  border-color: color-mix(in srgb, var(--accent) 52%, var(--text));
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--card-bg) 68%, transparent),
+    color-mix(in srgb, var(--card-bg) 82%, var(--bg))
+  );
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--accent) 16%, transparent),
+    0 14px 34px color-mix(in srgb, var(--accent) 24%, transparent);
+}
+
+.portfolio-page.theme-style-glow .btn-primary,
+.portfolio-page.theme-style-anime-manga .btn-primary {
+  background: linear-gradient(120deg, var(--accent), color-mix(in srgb, var(--accent) 68%, #ffd6ff));
+  color: #101014;
+  border: 2px solid color-mix(in srgb, var(--accent) 72%, #fff);
+}
+
+.portfolio-page.theme-style-glow .site-header,
+.portfolio-page.theme-style-anime-manga .site-header {
+  border-bottom-width: 2px;
+  border-bottom-color: color-mix(in srgb, var(--accent) 42%, var(--text));
+}
+
+/* Liquid Glass: compatibility-safe fallback (no color-mix) */
+.portfolio-page.theme-style-liquid-glass {
+  --muted: rgba(245, 248, 255, 0.76);
+  background:
+    radial-gradient(circle at 18% 14%, var(--accent) 0%, transparent 34%),
+    radial-gradient(circle at 88% 90%, var(--card-bg) 0%, transparent 42%),
+    var(--bg);
+  color: var(--text);
+}
+
+.portfolio-page.theme-dark.theme-style-liquid-glass {
+  --bg: #05070d;
+  --text: #f5f8ff;
+  --accent: #88b3ff;
+  --accent-2: #7de3ff;
+  --card-bg: #151d30;
+  --muted: rgba(230, 238, 255, 0.74);
+  background:
+    radial-gradient(circle at 20% 15%, #1a2a4b 0%, rgba(26, 42, 75, 0.45) 22%, transparent 45%),
+    radial-gradient(circle at 86% 88%, rgba(83, 224, 255, 0.22) 0%, transparent 40%),
+    #05070d;
+}
+
+.portfolio-page.theme-light.theme-style-liquid-glass {
+  --bg: #eef3ff;
+  --text: #0f1a2f;
+  --accent: #356ed5;
+  --accent-2: #0b7dcf;
+  --card-bg: #ffffff;
+  --muted: rgba(30, 47, 75, 0.7);
+  background:
+    radial-gradient(circle at 18% 14%, rgba(53, 110, 213, 0.24) 0%, transparent 34%),
+    radial-gradient(circle at 88% 90%, rgba(125, 165, 235, 0.2) 0%, transparent 42%),
+    var(--bg);
+}
+
+.portfolio-page.theme-style-liquid-glass .site-header {
+  background: rgba(10, 15, 28, 0.68);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(12px);
+}
+
+.portfolio-page.theme-light.theme-style-liquid-glass .site-header {
+  background: rgba(255, 255, 255, 0.84);
+  border-bottom-color: rgba(30, 47, 75, 0.18);
+}
+
+.portfolio-page.theme-style-liquid-glass .hero-card,
+.portfolio-page.theme-style-liquid-glass .glass-card,
+.portfolio-page.theme-style-liquid-glass .project-card,
+.portfolio-page.theme-style-liquid-glass .timeline-item {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04)),
+    var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.24);
+}
+
+.portfolio-page.theme-light.theme-style-liquid-glass .hero-card,
+.portfolio-page.theme-light.theme-style-liquid-glass .glass-card,
+.portfolio-page.theme-light.theme-style-liquid-glass .project-card,
+.portfolio-page.theme-light.theme-style-liquid-glass .timeline-item {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.52)),
+    var(--card-bg);
+  border-color: rgba(27, 55, 96, 0.14);
+  box-shadow: 0 14px 28px rgba(59, 88, 145, 0.14);
+}
+
+.portfolio-page.theme-style-liquid-glass .brand,
+.portfolio-page.theme-style-liquid-glass h1,
+.portfolio-page.theme-style-liquid-glass h2,
+.portfolio-page.theme-style-liquid-glass h3,
+.portfolio-page.theme-style-liquid-glass .project-head p,
+.portfolio-page.theme-style-liquid-glass .hero-card h2 {
+  color: var(--text);
+}
+
+.portfolio-page.theme-style-liquid-glass .nav-links a {
+  color: var(--text);
+  opacity: 0.82;
+}
+
+.portfolio-page.theme-style-liquid-glass .nav-links a:hover {
+  color: var(--accent);
+  opacity: 1;
 }
 
 .portfolio-html.font-scale--small {

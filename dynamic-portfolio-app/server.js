@@ -354,6 +354,13 @@ function normalizeTheme(value) {
   return value === "light" ? "light" : "dark";
 }
 
+function normalizeStyleTheme(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (normalized === "anime-manga") return "glow";
+  const allowed = new Set(["liquid-glass", "glow"]);
+  return allowed.has(normalized) ? normalized : "liquid-glass";
+}
+
 function normalizeLayout(value) {
   const allowed = new Set(["default", "hero-reverse", "projects-first"]);
   return allowed.has(value) ? value : "default";
@@ -542,6 +549,7 @@ function deriveLayoutVariant(sectionOrder, heroLayout) {
 
 function resolvePortfolioForView(record) {
   const theme = normalizeTheme(record.theme);
+  const styleTheme = normalizeStyleTheme(record.styleTheme);
   const preset = THEME_COLOR_PRESETS[theme];
 
   const missingSectionOrder =
@@ -573,6 +581,7 @@ function resolvePortfolioForView(record) {
   return {
     ...record,
     theme,
+    styleTheme,
     layoutVariant: derivedVariant,
     sectionOrder,
     hasExperience,
@@ -613,6 +622,7 @@ function addDays(date, days) {
 
 function buildPortfolioPayload(req) {
   const theme = normalizeTheme(req.body.theme);
+  const styleTheme = normalizeStyleTheme(req.body.styleTheme);
   const preset = THEME_COLOR_PRESETS[theme];
   const legacyLayout = normalizeLayout(req.body.layoutVariant);
 
@@ -659,6 +669,7 @@ function buildPortfolioPayload(req) {
     twitter: (req.body.twitter || "").trim(),
     github: (req.body.github || "").trim(),
     theme,
+    styleTheme,
     layoutVariant,
     sectionOrder,
     heroLayout,
@@ -1422,13 +1433,6 @@ app.get("/portfolio/:portfolioId/edit", requireAuth, async (req, res) => {
   const user = getUserBySession(req);
   const isPro = hasActivePro(user);
 
-  if (!isPro) {
-    const nextUrl = `/portfolio/${encodeURIComponent(editIdentifier)}/edit`;
-    return res.redirect(
-      `/pricing?reason=edit&next=${encodeURIComponent(nextUrl)}`
-    );
-  }
-
   const resolved = resolvePortfolioForView(portfolio);
   const formData = {
     ...portfolio,
@@ -1446,6 +1450,7 @@ app.get("/portfolio/:portfolioId/edit", requireAuth, async (req, res) => {
     ]),
     shippingPointsText: (portfolio.shippingPoints || []).join("\n"),
     theme: resolved.theme,
+    styleTheme: resolved.styleTheme,
     layoutVariant: resolved.layoutVariant,
     sectionOrder: resolved.sectionOrder.join(","),
     heroLayout: resolved.heroLayout,
@@ -1464,7 +1469,7 @@ app.get("/portfolio/:portfolioId/edit", requireAuth, async (req, res) => {
     companyLogoUrl: resolved.companyLogoUrl
   };
 
-  return res.render("edit-portfolio", { portfolio: formData });
+  return res.render("edit-portfolio", { portfolio: formData, isPro });
 });
 
 app.post(
@@ -1494,14 +1499,25 @@ app.post(
   const isPro = hasActivePro(user);
   applyUploadedImageUrlsToRequest(req, user);
 
-  if (!isPro) {
-    const nextUrl = `/portfolio/${encodeURIComponent(identifier)}/edit`;
-    return res.redirect(
-      `/pricing?reason=edit&next=${encodeURIComponent(nextUrl)}`
-    );
-  }
-
   const payload = buildPortfolioPayload(req);
+  if (!isPro) {
+    payload.theme = portfolio.theme;
+    payload.layoutVariant = portfolio.layoutVariant;
+    payload.sectionOrder = portfolio.sectionOrder;
+    payload.heroLayout = portfolio.heroLayout;
+    payload.aboutLayout = portfolio.aboutLayout;
+    payload.projectsLayout = portfolio.projectsLayout;
+    payload.experienceLayout = portfolio.experienceLayout;
+    payload.showNavbar = portfolio.showNavbar;
+    payload.showFooterContact = portfolio.showFooterContact;
+    payload.colorBg = portfolio.colorBg;
+    payload.colorText = portfolio.colorText;
+    payload.colorAccent = portfolio.colorAccent;
+    payload.colorCard = portfolio.colorCard;
+    payload.fontFamily = portfolio.fontFamily;
+    payload.fontScale = portfolio.fontScale;
+    payload.styleTheme = portfolio.styleTheme;
+  }
   const previousFullName = portfolio.fullName;
 
   Object.assign(portfolio, payload, {

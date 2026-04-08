@@ -105,7 +105,9 @@
       "colorBg": "#05070d",
       "colorText": "#f5f8ff",
       "colorAccent": "#88b3ff",
-      "colorCard": "#151d30"
+      "colorCard": "#151d30",
+      "updatedAt": "2026-04-08T10:31:17.858Z",
+      "styleTheme": "liquid-glass"
     },
     {
       "id": "adarsh-sharma",
@@ -183,7 +185,9 @@
       "github": "",
       "theme": "light",
       "layoutVariant": "hero-reverse",
-      "updatedAt": "2026-03-25T16:13:23.349Z"
+      "updatedAt": "2026-04-07T16:02:18.589Z",
+      "profileImageUrl": "",
+      "companyLogoUrl": ""
     }
   ],
   "users": [
@@ -195,8 +199,8 @@
       "createdAt": "2026-03-26T08:11:38.603Z",
       "plan": "pro",
       "planStatus": "active",
-      "planExpiresAt": "2026-04-25T08:14:13.260Z",
-      "proActivatedAt": "2026-03-26T08:14:13.260Z",
+      "planExpiresAt": "2026-05-08T10:12:55.806Z",
+      "proActivatedAt": "2026-04-08T10:12:55.806Z",
       "uploadedAssets": [
         {
           "id": "n4mnnros",
@@ -286,10 +290,10 @@
       "email": "cfpadarsh@gmail.com",
       "passwordHash": "$2a$10$S2V.vPPbH9TbQLTiYt9w9.RjtcqfJlHqCD7AUwFC9V210NVjFk2iy",
       "createdAt": "2026-03-25T13:27:17.284Z",
-      "plan": "pro",
-      "planStatus": "active",
+      "plan": "basic",
+      "planStatus": "inactive",
       "proActivatedAt": "2026-03-25T16:13:17.101Z",
-      "planExpiresAt": "2026-04-24T16:13:17.101Z",
+      "planExpiresAt": null,
       "uploadedAssets": []
     }
   ],

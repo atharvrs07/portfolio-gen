@@ -18,6 +18,40 @@
       referrerpolicy="no-referrer"
     />
     <link rel="stylesheet" href="/styles.css" />
+    <style>
+      .builder-live-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(360px, 44%);
+        gap: 1rem;
+        align-items: start;
+      }
+      .builder-pane {
+        min-width: 0;
+      }
+      .builder-preview-pane {
+        position: sticky;
+        top: 1rem;
+      }
+      .builder-preview-pane h3 {
+        margin: 0 0 0.45rem;
+        font-size: 0.95rem;
+        color: var(--muted);
+      }
+      .builder-preview-pane .live-preview-frame {
+        min-height: 82vh;
+      }
+      @media (max-width: 1080px) {
+        .builder-live-layout {
+          grid-template-columns: 1fr;
+        }
+        .builder-preview-pane {
+          position: static;
+        }
+        .builder-preview-pane .live-preview-frame {
+          min-height: 64vh;
+        }
+      }
+    </style>
   </head>
   <body class="form-page">
     <div class="aurora aurora--one"></div>
@@ -39,7 +73,9 @@
           you are redirected to your own portfolio page.
         </p>
 
-        <form action="/create" method="POST" enctype="multipart/form-data" class="portfolio-form">
+        <div class="builder-live-layout">
+        <div class="builder-pane">
+        <form action="/create" method="POST" enctype="multipart/form-data" class="portfolio-form" id="createPortfolioForm">
           <div class="grid-2">
             <label>
               Full Name
@@ -54,9 +90,16 @@
           <div class="grid-2">
             <label>
               Theme
-              <select name="theme">
+              <select name="theme" id="createThemePreset">
                 <option value="dark" selected>Dark</option>
                 <option value="light">Light</option>
+              </select>
+            </label>
+            <label>
+              Style theme
+              <select name="styleTheme" id="createStyleTheme">
+                <option value="liquid-glass" selected>Liquid Glass (default)</option>
+                <option value="glow">Glow</option>
               </select>
             </label>
             <label>
@@ -66,6 +109,38 @@
                 <option value="hero-reverse">Hero Reversed</option>
                 <option value="projects-first">Projects First</option>
               </select>
+            </label>
+          </div>
+
+          <p class="eyebrow" style="margin-top:0.3rem;">Colors</p>
+          <div class="color-field-grid">
+            <label>
+              Background
+              <span class="color-input-row">
+                <input type="color" id="create-pick-colorBg" data-hex-field="create-colorBg" value="#05070d" />
+                <input type="text" name="colorBg" id="create-colorBg" value="#05070d" pattern="#[0-9A-Fa-f]{6}" maxlength="7" />
+              </span>
+            </label>
+            <label>
+              Text
+              <span class="color-input-row">
+                <input type="color" id="create-pick-colorText" data-hex-field="create-colorText" value="#f5f8ff" />
+                <input type="text" name="colorText" id="create-colorText" value="#f5f8ff" pattern="#[0-9A-Fa-f]{6}" maxlength="7" />
+              </span>
+            </label>
+            <label>
+              Accent
+              <span class="color-input-row">
+                <input type="color" id="create-pick-colorAccent" data-hex-field="create-colorAccent" value="#88b3ff" />
+                <input type="text" name="colorAccent" id="create-colorAccent" value="#88b3ff" pattern="#[0-9A-Fa-f]{6}" maxlength="7" />
+              </span>
+            </label>
+            <label>
+              Card background
+              <span class="color-input-row">
+                <input type="color" id="create-pick-colorCard" data-hex-field="create-colorCard" value="#151d30" />
+                <input type="text" name="colorCard" id="create-colorCard" value="#151d30" pattern="#[0-9A-Fa-f]{6}" maxlength="7" />
+              </span>
             </label>
           </div>
 
@@ -200,6 +275,12 @@
             Create My Portfolio
           </button>
         </form>
+        </div>
+        <div class="builder-preview-pane">
+          <h3>Live preview</h3>
+          <iframe id="createLivePreviewFrame" title="Live portfolio preview" class="live-preview-frame"></iframe>
+        </div>
+        </div>
       </section>
     </main>
     <template id="experienceEntryTemplateCreate">
@@ -251,6 +332,19 @@
     </template>
     <script>
       (function () {
+        var THEME_PRESETS = {
+          dark: { colorBg: "#05070d", colorText: "#f5f8ff", colorAccent: "#88b3ff", colorCard: "#151d30" },
+          light: { colorBg: "#eef3ff", colorText: "#0f1a2f", colorAccent: "#356ed5", colorCard: "#ffffff" }
+        };
+
+        function normHex(v) {
+          if (!v || typeof v !== "string") return "#000000";
+          var s = v.trim();
+          if (!s.startsWith("#")) s = "#" + s;
+          if (!/^#[0-9A-Fa-f]{6}$/.test(s)) return "#000000";
+          return s.toLowerCase();
+        }
+
         function setEditable(item, editable) {
           var fields = item.querySelectorAll("input, textarea");
           fields.forEach(function (field) { field.readOnly = !editable; });
@@ -266,11 +360,13 @@
             editBtn.addEventListener("click", function () {
               var isReadOnly = item.querySelector("input").readOnly;
               setEditable(item, isReadOnly);
+              refreshLivePreview();
             });
           }
           if (removeBtn) {
             removeBtn.addEventListener("click", function () {
               item.remove();
+              refreshLivePreview();
             });
           }
           setEditable(item, true);
@@ -280,6 +376,7 @@
           var node = tpl.content.firstElementChild.cloneNode(true);
           listEl.appendChild(node);
           bindItem(node);
+          refreshLivePreview();
         }
 
         function setupList(listId, addBtnId, tplId) {
@@ -293,6 +390,146 @@
         setupList("aboutEntriesCreate", "addAboutCreate", "aboutEntryTemplateCreate");
         setupList("projectEntriesCreate", "addProjectCreate", "projectEntryTemplateCreate");
         setupList("experienceEntriesCreate", "addExperienceCreate", "experienceEntryTemplateCreate");
+
+        function wireColorPair(hexId, pickerId) {
+          var hexEl = document.getElementById(hexId);
+          var pickEl = document.getElementById(pickerId);
+          if (!hexEl || !pickEl) return;
+          function fromHex() {
+            var h = normHex(hexEl.value);
+            pickEl.value = h;
+            hexEl.value = h;
+            refreshLivePreview();
+          }
+          function fromPick() {
+            hexEl.value = normHex(pickEl.value);
+            refreshLivePreview();
+          }
+          hexEl.addEventListener("input", fromHex);
+          hexEl.addEventListener("change", fromHex);
+          pickEl.addEventListener("input", fromPick);
+          pickEl.addEventListener("change", fromPick);
+        }
+
+        wireColorPair("create-colorBg", "create-pick-colorBg");
+        wireColorPair("create-colorText", "create-pick-colorText");
+        wireColorPair("create-colorAccent", "create-pick-colorAccent");
+        wireColorPair("create-colorCard", "create-pick-colorCard");
+
+        var createThemeSel = document.getElementById("createThemePreset");
+        if (createThemeSel) {
+          createThemeSel.addEventListener("change", function () {
+            var p = THEME_PRESETS[createThemeSel.value];
+            if (!p) return;
+            ["colorBg", "colorText", "colorAccent", "colorCard"].forEach(function (k) {
+              var h = document.getElementById("create-" + k);
+              var pick = document.getElementById("create-pick-" + k);
+              if (h) h.value = p[k];
+              if (pick) pick.value = p[k];
+            });
+            refreshLivePreview();
+          });
+        }
+
+        function escHtml(s) {
+          return String(s || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/\"/g, "&quot;");
+        }
+
+        function getRows(fd, a, b, c) {
+          var aa = fd.getAll(a);
+          var bb = fd.getAll(b);
+          var cc = c ? fd.getAll(c) : [];
+          var max = Math.max(aa.length, bb.length, c ? cc.length : 0);
+          var out = [];
+          for (var i = 0; i < max; i += 1) {
+            var x = String(aa[i] || "").trim();
+            var y = String(bb[i] || "").trim();
+            var z = c ? String(cc[i] || "").trim() : "";
+            if (!x && !y && !z) continue;
+            out.push(c ? [x, y, z] : [x, y]);
+          }
+          return out;
+        }
+
+        function getModel() {
+          var form = document.getElementById("createPortfolioForm");
+          if (!form) return null;
+          var fd = new FormData(form);
+          return {
+            fullName: fd.get("fullName") || "",
+            role: fd.get("role") || "",
+            headline: fd.get("headline") || "",
+            heroText: fd.get("heroText") || "",
+            shippingTitle: fd.get("shippingTitle") || "",
+            shippingHeading: fd.get("shippingHeading") || "",
+            shippingDescription: fd.get("shippingDescription") || "",
+            aboutCards: getRows(fd, "aboutTitle", "aboutDescription"),
+            projects: getRows(fd, "projectTitle", "projectPlatform", "projectDescription"),
+            experiences: getRows(fd, "experiencePeriod", "experienceTitle", "experienceDescription"),
+            styleTheme: fd.get("styleTheme") || "liquid-glass",
+            colorBg: normHex(fd.get("colorBg") || "#05070d"),
+            colorText: normHex(fd.get("colorText") || "#f5f8ff"),
+            colorAccent: normHex(fd.get("colorAccent") || "#88b3ff"),
+            colorCard: normHex(fd.get("colorCard") || "#151d30"),
+            profileImageUrl: fd.get("profileImageUrl") || "",
+            companyLogoUrl: fd.get("companyLogoUrl") || ""
+          };
+        }
+
+        function renderPreviewHtml(m) {
+          var bodyClass = "theme-style-" + escHtml(m.styleTheme || "liquid-glass");
+          return (
+            "<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>" +
+            "<style>" +
+            "body{font-family:Inter,Arial,sans-serif;margin:0;background:" + escHtml(m.colorBg) + ";color:" + escHtml(m.colorText) + ";padding:20px;}" +
+            ".wrap{max-width:1000px;margin:0 auto}.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin:12px 0}.hero h1{margin:.2rem 0}.hero h1 span{display:block;font-weight:600;color:" + escHtml(m.colorAccent) + "}" +
+            ".card{background:" + escHtml(m.colorCard) + ";border-radius:14px;padding:14px;border:1px solid rgba(255,255,255,.16)}" +
+            ".grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.stack{display:grid;gap:10px}" +
+            ".eyebrow{font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;color:" + escHtml(m.colorAccent) + ";margin:0}" +
+            ".muted{opacity:.82}.avatar{width:84px;height:84px;border-radius:999px;object-fit:cover;border:2px solid " + escHtml(m.colorAccent) + ";display:block;margin:0 0 10px}" +
+            ".projects-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.logo{max-height:46px;max-width:120px;object-fit:contain}" +
+            ".theme-style-glow h1,.theme-style-glow h2{letter-spacing:.01em;text-shadow:0 3px 0 rgba(0,0,0,.2)}" +
+            "@media(max-width:860px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:1fr}}" +
+            "</style></head><body class='" + bodyClass + "'><div class='wrap'>" +
+            "<section class='hero'><div>" +
+            (m.profileImageUrl ? ("<img class='avatar' src='" + escHtml(m.profileImageUrl) + "' alt='Profile' />") : "") +
+            "<p class='eyebrow'>" + escHtml(m.role) + "</p>" +
+            "<h1>" + escHtml(m.fullName) + "<span>" + escHtml(m.headline) + "</span></h1>" +
+            "<p class='muted'>" + escHtml(m.heroText) + "</p></div>" +
+            "<aside class='card'><p class='eyebrow'>" + escHtml(m.shippingTitle) + "</p><h3>" + escHtml(m.shippingHeading) + "</h3><p class='muted'>" + escHtml(m.shippingDescription) + "</p></aside></section>" +
+            "<section><h2>About</h2><div class='grid'>" +
+            m.aboutCards.map(function (r) { return "<article class='card'><h4>" + escHtml(r[0]) + "</h4><p class='muted'>" + escHtml(r[1]) + "</p></article>"; }).join("") +
+            "</div></section>" +
+            "<section><div class='projects-head'><h2>Projects</h2>" +
+            (m.companyLogoUrl ? ("<img class='logo' src='" + escHtml(m.companyLogoUrl) + "' alt='Logo' />") : "") +
+            "</div><div class='grid'>" +
+            m.projects.map(function (r) { return "<article class='card'><p class='eyebrow'>" + escHtml(r[1]) + "</p><h4>" + escHtml(r[0]) + "</h4><p class='muted'>" + escHtml(r[2]) + "</p></article>"; }).join("") +
+            "</div></section>" +
+            (m.experiences.length ? ("<section><h2>Experience</h2><div class='stack'>" +
+              m.experiences.map(function (r) { return "<article class='card'><p class='eyebrow'>" + escHtml(r[0]) + "</p><h4>" + escHtml(r[1]) + "</h4><p class='muted'>" + escHtml(r[2]) + "</p></article>"; }).join("") +
+              "</div></section>") : "") +
+            "</div></body></html>"
+          );
+        }
+
+        function refreshLivePreview() {
+          var frame = document.getElementById("createLivePreviewFrame");
+          if (!frame) return;
+          var m = getModel();
+          if (!m) return;
+          frame.srcdoc = renderPreviewHtml(m);
+        }
+
+        var createForm = document.getElementById("createPortfolioForm");
+        if (createForm) {
+          createForm.addEventListener("input", refreshLivePreview);
+          createForm.addEventListener("change", refreshLivePreview);
+        }
+        refreshLivePreview();
       })();
     </script>
   </body>

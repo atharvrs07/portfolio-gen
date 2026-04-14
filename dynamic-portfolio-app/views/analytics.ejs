@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Analytics | LiquiLink</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  </head>
+  <body class="dashboard-page analytics-page">
+    <div class="aurora aurora--one"></div>
+    <div class="aurora aurora--two"></div>
+
+    <main class="container dashboard-wrap">
+      <section class="dashboard-card analytics-shell">
+        <div class="dashboard-top">
+          <div>
+            <p class="eyebrow">Analytics</p>
+            <h1>Detailed performance analytics</h1>
+            <p class="plan-chip <%= isPro ? 'plan-chip--pro' : 'plan-chip--basic' %>">
+              <%= planLabel %>
+            </p>
+            <p class="hero-text">
+              Full view of traffic, clicks, audience devices, referral sources, and portfolio-level performance.
+            </p>
+            <nav class="dashboard-tabs" aria-label="Dashboard navigation">
+              <a href="/dashboard" class="dashboard-tab">Portfolios</a>
+              <a href="/analytics" class="dashboard-tab is-active">Analytics</a>
+            </nav>
+          </div>
+          <div class="dashboard-actions">
+            <a href="/dashboard" class="btn btn-ghost">Back to Portfolios</a>
+            <a href="/form.html" class="btn btn-primary">Create New Portfolio</a>
+            <form action="/logout" method="POST">
+              <button type="submit" class="btn btn-ghost">Logout</button>
+            </form>
+          </div>
+        </div>
+
+        <section class="analytics-summary-grid" aria-label="Analytics overview">
+          <article class="analytics-summary-card">
+            <p class="analytics-summary-card__label">Total views</p>
+            <p class="analytics-summary-card__value"><%= analytics.summary.views %></p>
+          </article>
+          <article class="analytics-summary-card">
+            <p class="analytics-summary-card__label">Unique visitors (30d)</p>
+            <p class="analytics-summary-card__value"><%= analytics.summary.uniqueVisitors30d %></p>
+          </article>
+          <article class="analytics-summary-card">
+            <p class="analytics-summary-card__label">Sessions</p>
+            <p class="analytics-summary-card__value"><%= analytics.summary.sessions %></p>
+          </article>
+          <article class="analytics-summary-card">
+            <p class="analytics-summary-card__label">Total link clicks</p>
+            <p class="analytics-summary-card__value"><%= analytics.summary.linkClicks %></p>
+          </article>
+          <article class="analytics-summary-card">
+            <p class="analytics-summary-card__label">Overall CTR</p>
+            <p class="analytics-summary-card__value"><%= analytics.summary.ctrTotal.toFixed(2) %>%</p>
+          </article>
+          <article class="analytics-summary-card">
+            <p class="analytics-summary-card__label">Bounce rate</p>
+            <p class="analytics-summary-card__value"><%= analytics.summary.bounceRate.toFixed(1) %>%</p>
+          </article>
+          <article class="analytics-summary-card">
+            <p class="analytics-summary-card__label">Avg engagement / session</p>
+            <p class="analytics-summary-card__value"><%= analytics.summary.avgEngagementSec.toFixed(1) %>s</p>
+          </article>
+          <article class="analytics-summary-card">
+            <p class="analytics-summary-card__label">Returning visitors</p>
+            <p class="analytics-summary-card__value"><%= analytics.summary.returningVisitors30d %></p>
+          </article>
+          <article class="analytics-summary-card">
+            <p class="analytics-summary-card__label">Avg scroll depth</p>
+            <p class="analytics-summary-card__value"><%= analytics.summary.avgScrollDepth.toFixed(1) %>%</p>
+          </article>
+          <article class="analytics-summary-card">
+            <p class="analytics-summary-card__label">Avg daily views (30d)</p>
+            <p class="analytics-summary-card__value"><%= analytics.summary.avgDailyViews.toFixed(1) %></p>
+          </article>
+          <article class="analytics-summary-card">
+            <p class="analytics-summary-card__label">Portfolios tracked</p>
+            <p class="analytics-summary-card__value"><%= analytics.summary.portfoliosTracked %></p>
+          </article>
+        </section>
+
+        <section class="analytics-chart-grid" aria-label="Chart visualizations">
+          <article class="analytics-chart-card analytics-chart-card--wide">
+            <h2>Traffic trend (last 30 days)</h2>
+            <div class="analytics-chart-canvas">
+              <canvas id="dailyTrafficChart" aria-label="Daily traffic chart"></canvas>
+            </div>
+          </article>
+          <article class="analytics-chart-card">
+            <h2>Traffic by device</h2>
+            <div class="analytics-chart-canvas">
+              <canvas id="deviceChart" aria-label="Device split chart"></canvas>
+            </div>
+          </article>
+          <article class="analytics-chart-card">
+            <h2>Top referral sources</h2>
+            <div class="analytics-chart-canvas">
+              <canvas id="referrerChart" aria-label="Referrer chart"></canvas>
+            </div>
+          </article>
+          <article class="analytics-chart-card analytics-chart-card--wide">
+            <h2>Views and clicks by portfolio</h2>
+            <div class="analytics-chart-canvas">
+              <canvas id="portfolioChart" aria-label="Portfolio performance chart"></canvas>
+            </div>
+          </article>
+          <article class="analytics-chart-card">
+            <h2>Browser mix</h2>
+            <div class="analytics-chart-canvas">
+              <canvas id="browserChart" aria-label="Browser usage chart"></canvas>
+            </div>
+          </article>
+          <article class="analytics-chart-card">
+            <h2>Hourly activity</h2>
+            <div class="analytics-chart-canvas">
+              <canvas id="hourlyChart" aria-label="Hourly activity chart"></canvas>
+            </div>
+          </article>
+          <article class="analytics-chart-card">
+            <h2>Top UTM sources</h2>
+            <div class="analytics-chart-canvas">
+              <canvas id="utmSourceChart" aria-label="UTM source chart"></canvas>
+            </div>
+          </article>
+          <article class="analytics-chart-card">
+            <h2>Top UTM campaigns</h2>
+            <div class="analytics-chart-canvas">
+              <canvas id="utmCampaignChart" aria-label="UTM campaign chart"></canvas>
+            </div>
+          </article>
+          <article class="analytics-chart-card analytics-chart-card--wide">
+            <h2>Top clicked destinations</h2>
+            <div class="analytics-chart-canvas">
+              <canvas id="linkTargetsChart" aria-label="Link destination chart"></canvas>
+            </div>
+          </article>
+        </section>
+
+        <section class="analytics-table-wrap" aria-label="Portfolio analytics table">
+          <div class="analytics-block-head">
+            <h2>Portfolio-level metrics</h2>
+          </div>
+          <% if (!analytics.portfolioRows.length) { %>
+          <div class="empty-state">
+            <p>No portfolio analytics yet. Publish and share your first portfolio to start collecting data.</p>
+          </div>
+          <% } else { %>
+          <div class="analytics-table-scroll">
+            <table class="analytics-table">
+              <thead>
+                <tr>
+                  <th>Portfolio</th>
+                  <th>Views</th>
+                  <th>Clicks</th>
+                  <th>CTR</th>
+                  <th>Last activity</th>
+                  <th>Open</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% analytics.portfolioRows.forEach((row) => { %>
+                <tr>
+                  <td>
+                    <strong><%= row.fullName %></strong>
+                    <div class="muted-line">/<%= row.slug %></div>
+                  </td>
+                  <td><%= row.views %></td>
+                  <td><%= row.linkClicks %></td>
+                  <td><%= row.ctr.toFixed(2) %>%</td>
+                  <td><%= row.lastSeenAt ? new Date(row.lastSeenAt).toLocaleString() : "No activity yet" %></td>
+                  <td><a href="/<%= row.slug %>" class="analytics-inline-link" target="_blank" rel="noreferrer">Open page</a></td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+          <% } %>
+        </section>
+
+        <section class="analytics-table-wrap" aria-label="Recent events">
+          <div class="analytics-block-head">
+            <h2>Recent events</h2>
+            <p class="muted-line">Shows latest views and outbound click events.</p>
+          </div>
+          <% if (!analytics.recentEvents.length) { %>
+          <div class="empty-state">
+            <p>No events recorded yet.</p>
+          </div>
+          <% } else { %>
+          <div class="analytics-table-scroll">
+            <table class="analytics-table analytics-table--events">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Portfolio</th>
+                  <th>Event</th>
+                  <th>Source</th>
+                  <th>Device</th>
+                  <th>Browser</th>
+                  <th>OS</th>
+                  <th>Session</th>
+                  <th>Target</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% analytics.recentEvents.forEach((event) => { %>
+                <tr>
+                  <td><%= new Date(event.at).toLocaleString() %></td>
+                  <td><%= event.portfolioName %></td>
+                  <td>
+                    <% if (event.type === "link_click") { %>
+                    <span class="event-chip event-chip--click">Link click</span>
+                    <% } else if (event.type === "engagement") { %>
+                    <span class="event-chip event-chip--engagement">Engaged</span>
+                    <% } else { %>
+                    <span class="event-chip event-chip--view">Page view</span>
+                    <% } %>
+                  </td>
+                  <td><%= event.referrer %></td>
+                  <td><%= event.device %></td>
+                  <td><%= event.browser %></td>
+                  <td><%= event.os %></td>
+                  <td><%= event.sessionId || "-" %></td>
+                  <td><%= event.target || "-" %></td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+          <% } %>
+        </section>
+      </section>
+    </main>
+
+    <script>
+      const analyticsCharts = <%- JSON.stringify(analytics.charts) %>;
+      const chartFontColor = "#dce8ff";
+      const chartGridColor = "rgba(255, 255, 255, 0.09)";
+
+      function buildChart(ctx, config) {
+        if (!ctx) return null;
+        return new Chart(ctx, config);
+      }
+
+      function pickColors(count) {
+        const palette = [
+          "#7de3ff",
+          "#88b3ff",
+          "#7dffcc",
+          "#ffbe7d",
+          "#ffa0da",
+          "#c0a7ff",
+          "#93f58e",
+          "#ffd57d"
+        ];
+        return Array.from({ length: count }, (_, idx) => palette[idx % palette.length]);
+      }
+
+      function labelsFromEntries(entries) {
+        return (entries || []).map((item) => item.label);
+      }
+
+      function valuesFromEntries(entries) {
+        return (entries || []).map((item) => item.value);
+      }
+
+      buildChart(document.getElementById("dailyTrafficChart"), {
+        type: "line",
+        data: {
+          labels: analyticsCharts.daily.labels,
+          datasets: [
+            {
+              label: "Views",
+              data: analyticsCharts.daily.views,
+              borderColor: "#7de3ff",
+              backgroundColor: "rgba(125, 227, 255, 0.2)",
+              borderWidth: 2,
+              tension: 0.3,
+              fill: true
+            },
+            {
+              label: "Link Clicks",
+              data: analyticsCharts.daily.clicks,
+              borderColor: "#88b3ff",
+              backgroundColor: "rgba(136, 179, 255, 0.14)",
+              borderWidth: 2,
+              tension: 0.3,
+              fill: true
+            }
+          ]
+        },
+        options: {
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: chartFontColor } }
+          },
+          scales: {
+            x: { ticks: { color: chartFontColor }, grid: { color: chartGridColor } },
+            y: { ticks: { color: chartFontColor }, grid: { color: chartGridColor }, beginAtZero: true }
+          }
+        }
+      });
+
+      buildChart(document.getElementById("deviceChart"), {
+        type: "doughnut",
+        data: {
+          labels: analyticsCharts.devices.map((item) => item.label),
+          datasets: [
+            {
+              data: analyticsCharts.devices.map((item) => item.value),
+              backgroundColor: pickColors(analyticsCharts.devices.length)
+            }
+          ]
+        },
+        options: {
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: chartFontColor } }
+          }
+        }
+      });
+
+      buildChart(document.getElementById("referrerChart"), {
+        type: "bar",
+        data: {
+          labels: analyticsCharts.referrers.map((item) => item.label),
+          datasets: [
+            {
+              label: "Events",
+              data: analyticsCharts.referrers.map((item) => item.value),
+              backgroundColor: "rgba(125, 227, 255, 0.6)"
+            }
+          ]
+        },
+        options: {
+          indexAxis: "y",
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: chartFontColor } }
+          },
+          scales: {
+            x: { ticks: { color: chartFontColor }, grid: { color: chartGridColor }, beginAtZero: true },
+            y: { ticks: { color: chartFontColor }, grid: { color: chartGridColor } }
+          }
+        }
+      });
+
+      buildChart(document.getElementById("portfolioChart"), {
+        type: "bar",
+        data: {
+          labels: analyticsCharts.portfolios.map((item) => item.label),
+          datasets: [
+            {
+              label: "Views",
+              data: analyticsCharts.portfolios.map((item) => item.views),
+              backgroundColor: "rgba(136, 179, 255, 0.74)"
+            },
+            {
+              label: "Clicks",
+              data: analyticsCharts.portfolios.map((item) => item.clicks),
+              backgroundColor: "rgba(125, 227, 255, 0.74)"
+            }
+          ]
+        },
+        options: {
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: chartFontColor } }
+          },
+          scales: {
+            x: { ticks: { color: chartFontColor }, grid: { color: chartGridColor } },
+            y: { ticks: { color: chartFontColor }, grid: { color: chartGridColor }, beginAtZero: true }
+          }
+        }
+      });
+
+      buildChart(document.getElementById("browserChart"), {
+        type: "polarArea",
+        data: {
+          labels: analyticsCharts.browsers.map((item) => item.label),
+          datasets: [
+            {
+              data: analyticsCharts.browsers.map((item) => item.value),
+              backgroundColor: pickColors(analyticsCharts.browsers.length)
+            }
+          ]
+        },
+        options: {
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: chartFontColor } }
+          },
+          scales: {
+            r: {
+              grid: { color: chartGridColor },
+              pointLabels: { color: chartFontColor },
+              ticks: { color: chartFontColor, backdropColor: "transparent" }
+            }
+          }
+        }
+      });
+
+      buildChart(document.getElementById("hourlyChart"), {
+        type: "bar",
+        data: {
+          labels: analyticsCharts.hourly.labels,
+          datasets: [
+            {
+              label: "Events",
+              data: analyticsCharts.hourly.events,
+              backgroundColor: "rgba(125, 227, 255, 0.65)"
+            }
+          ]
+        },
+        options: {
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: chartFontColor } }
+          },
+          scales: {
+            x: { ticks: { color: chartFontColor, maxRotation: 0 }, grid: { color: chartGridColor } },
+            y: { ticks: { color: chartFontColor }, grid: { color: chartGridColor }, beginAtZero: true }
+          }
+        }
+      });
+
+      buildChart(document.getElementById("utmSourceChart"), {
+        type: "bar",
+        data: {
+          labels: labelsFromEntries(analyticsCharts.utmSources),
+          datasets: [
+            {
+              label: "Visits",
+              data: valuesFromEntries(analyticsCharts.utmSources),
+              backgroundColor: "rgba(136, 179, 255, 0.75)"
+            }
+          ]
+        },
+        options: {
+          indexAxis: "y",
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: chartFontColor } }
+          },
+          scales: {
+            x: { ticks: { color: chartFontColor }, grid: { color: chartGridColor }, beginAtZero: true },
+            y: { ticks: { color: chartFontColor }, grid: { color: chartGridColor } }
+          }
+        }
+      });
+
+      buildChart(document.getElementById("utmCampaignChart"), {
+        type: "bar",
+        data: {
+          labels: labelsFromEntries(analyticsCharts.utmCampaigns),
+          datasets: [
+            {
+              label: "Visits",
+              data: valuesFromEntries(analyticsCharts.utmCampaigns),
+              backgroundColor: "rgba(125, 227, 255, 0.68)"
+            }
+          ]
+        },
+        options: {
+          indexAxis: "y",
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: chartFontColor } }
+          },
+          scales: {
+            x: { ticks: { color: chartFontColor }, grid: { color: chartGridColor }, beginAtZero: true },
+            y: { ticks: { color: chartFontColor }, grid: { color: chartGridColor } }
+          }
+        }
+      });
+
+      buildChart(document.getElementById("linkTargetsChart"), {
+        type: "bar",
+        data: {
+          labels: labelsFromEntries(analyticsCharts.links),
+          datasets: [
+            {
+              label: "Clicks",
+              data: valuesFromEntries(analyticsCharts.links),
+              backgroundColor: "rgba(125, 227, 255, 0.7)"
+            }
+          ]
+        },
+        options: {
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: chartFontColor } }
+          },
+          scales: {
+            x: { ticks: { color: chartFontColor }, grid: { color: chartGridColor } },
+            y: { ticks: { color: chartFontColor }, grid: { color: chartGridColor }, beginAtZero: true }
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

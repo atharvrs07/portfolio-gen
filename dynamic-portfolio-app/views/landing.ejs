@@ -6,7 +6,7 @@
     <title>LiquiLink | A Link-in-bio builder</title>
     <meta
       name="description"
-      content="Create stunning link-in-bio page in minutes, free for starters, paid for pros."
+      content="Create a polished link-in-bio page in minutes. Free to start; track views and link clicks from your dashboard."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -22,188 +22,122 @@
       referrerpolicy="no-referrer"
     />
     <link rel="stylesheet" href="/styles.css" />
-    <style>
-      .landing-stack {
-        padding: clamp(2.5rem, 5vw, 4rem) 0 5rem;
-      }
-
-      .landing-narrow {
-        max-width: 42rem;
-        margin-left: auto;
-        margin-right: auto;
-      }
-
-      .landing-stack .eyebrow {
-        margin: 0 0 0.35rem;
-      }
-
-      .landing-stack h1 {
-        margin: 0 0 0.85rem;
-        line-height: 1.1;
-        font-size: clamp(1.85rem, 5vw, 2.35rem);
-      }
-
-      .landing-stack h1 span {
-        display: block;
-        margin-top: 0.4rem;
-        font-weight: 600;
-        font-size: clamp(1rem, 2.5vw, 1.2rem);
-        color: var(--muted);
-      }
-
-      .landing-stack .hero-text {
-        margin: 0 0 1.25rem;
-        line-height: 1.6;
-      }
-
-      .landing-stack .landing-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-        margin-bottom: 2.25rem;
-        justify-content: center;
-      }
-
-      .landing-narrow .landing-actions {
-        justify-content: flex-start;
-      }
-
-      .landing-preview-wrap {
-        width: min(1040px, 100%);
-        margin-left: auto;
-        margin-right: auto;
-        margin-bottom: 1rem;
-        aspect-ratio: 16 / 9;
-        overflow: hidden;
-        background: rgba(0, 0, 0, 0.25);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-      }
-
-      .landing-preview-wrap iframe {
-        width: 100%;
-        height: 100%;
-        border: 0;
-        display: block;
-        pointer-events: none;
-        user-select: none;
-      }
-
-      .landing-preview-caption {
-        margin: 0 auto 2.75rem;
-        padding: 0 0.25rem;
-        font-size: 0.9rem;
-        color: var(--muted);
-        line-height: 1.5;
-      }
-
-      .landing-prose {
-        max-width: 42rem;
-        margin: 0 auto;
-      }
-
-      .landing-prose h2 {
-        margin: 2.25rem 0 0.75rem;
-        font-size: 1.2rem;
-        font-weight: 700;
-        letter-spacing: -0.02em;
-      }
-
-      .landing-prose h2:first-child {
-        margin-top: 0;
-      }
-
-      .landing-prose p {
-        margin: 0 0 1rem;
-        line-height: 1.7;
-        color: var(--muted);
-      }
-
-      .landing-prose p:last-child {
-        margin-bottom: 0;
-      }
-    </style>
   </head>
-  <body class="landing-page">
-    <main class="container landing-stack">
-      <div class="landing-narrow">
-        <p class="eyebrow">Free to start</p>
-        <h1>
-          LiquiLink
-          <span>Make your link-in-bio feel premium.</span>
-        </h1>
-        <p class="hero-text">
-          One short form, one polished page, one shareable URL like
-          <span class="mono">https://liquilink.in/your-name</span>.
-        </p>
-      </div>
+  <body class="landing-page ll-landing">
+    <div class="ll-landing__bg" aria-hidden="true"></div>
+    <main>
+      <section class="container ll-landing__hero">
+        <div class="ll-landing__hero-grid">
+          <div class="ll-landing__copy">
+            <p class="eyebrow">Free to start</p>
+            <h1>
+              LiquiLink
+              <span>Make your link-in-bio feel premium.</span>
+            </h1>
+            <p class="hero-text">
+              One short form, one polished page, one shareable URL like
+              <span class="mono">https://yoursite.com/your-name</span>. See how a
+              finished page can look in the preview — then build your own in
+              minutes.
+            </p>
+            <div class="landing-actions">
+              <% if (currentUser) { %>
+              <a class="btn btn-primary" href="/dashboard">
+                <i class="fa-solid fa-table-columns" aria-hidden="true"></i>
+                Go to my dashboard
+              </a>
+              <a class="btn btn-ghost" href="/form.html">Create new portfolio</a>
+              <form action="/logout" method="POST">
+                <button type="submit" class="btn btn-ghost">Logout</button>
+              </form>
+              <% } else { %>
+              <a class="btn btn-primary" href="/signup">
+                <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
+                Create your account
+              </a>
+              <a class="btn btn-ghost" href="/login">
+                <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i>
+                Log in to dashboard
+              </a>
+              <% } %>
+            </div>
+          </div>
+          <div class="ll-landing__visual">
+            <figure class="ll-landing__mockup">
+              <img
+                src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1400&q=82"
+                width="1400"
+                height="1050"
+                alt="Example only: laptop on a desk with a web project on screen — not a specific LiquiLink profile"
+                loading="eager"
+                decoding="async"
+              />
+            </figure>
+            <p class="ll-landing__caption">
+              Example image (stock photo) for atmosphere — not a real user profile.
+              Your published page uses your content, colors, and layout.
+            </p>
+          </div>
+        </div>
+      </section>
 
-      <div class="landing-actions landing-narrow">
-        <% if (currentUser) { %>
-        <a class="btn btn-primary" href="/dashboard">
-          <i class="fa-solid fa-table-columns" aria-hidden="true"></i>
-          Go to my dashboard
-        </a>
-        <a class="btn btn-ghost" href="/form.html">Create new portfolio</a>
-        <form action="/logout" method="POST">
-          <button type="submit" class="btn btn-ghost">Logout</button>
-        </form>
-        <% } else { %>
-        <a class="btn btn-primary" href="/signup">
-          <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
-          Create your account
-        </a>
-        <a class="btn btn-ghost" href="/login">
-          <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i>
-          Log in to dashboard
-        </a>
-        <% } %>
-      </div>
+      <section class="container ll-landing__features" aria-label="Why LiquiLink">
+        <div class="ll-landing__feature-grid">
+          <article class="ll-landing__feature">
+            <div class="ll-landing__feature-icon" aria-hidden="true">
+              <i class="fa-solid fa-bolt"></i>
+            </div>
+            <h2>Ship in one sitting</h2>
+            <p>
+              Guided form, live-feeling preview, and a single URL you can drop
+              into every bio. No CMS rabbit holes.
+            </p>
+          </article>
+          <article class="ll-landing__feature">
+            <div class="ll-landing__feature-icon" aria-hidden="true">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <h2>Looks intentional</h2>
+            <p>
+              Themes, typography, and layout options so the page matches your
+              brand — not a generic link list.
+            </p>
+          </article>
+          <article class="ll-landing__feature">
+            <div class="ll-landing__feature-icon" aria-hidden="true">
+              <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <h2>Built-in analytics</h2>
+            <p>
+              Your dashboard shows page views and outbound link clicks so you
+              can see what people actually use.
+            </p>
+          </article>
+        </div>
+      </section>
 
-      <div class="landing-preview-wrap" aria-label="Example preview of a published page">
-        <iframe
-          src="/atharv-raj-sharma"
-          title="Example LiquiLink page (non-interactive preview)"
-          loading="lazy"
-          tabindex="-1"
-        ></iframe>
-      </div>
-      <p class="landing-preview-caption landing-narrow">
-        Above is an example of a real page created with LiquiLink after someone
-        submits the form. The preview is read-only here: you cannot click or edit
-        it on the home page; it is only meant to show what visitors will see.
-      </p>
-
-      <div class="landing-prose">
+      <div class="container ll-landing__prose">
         <h2 id="what-is-liquilink">What is LiquiLink?</h2>
         <p>
           LiquiLink is a link-in-bio builder and lightweight portfolio host. You
           describe yourself once—projects, socials, contact—and we turn that into
-          a fast, good-looking page you can put in every bio where your name
-          appears.
+          a fast page you can put everywhere your name appears.
         </p>
 
         <h2 id="about-the-product">About the product</h2>
         <p>
           There is no heavy CMS and no separate design tool to learn. You fill out
-          a guided form, see how the page will look, and use your dashboard to
-          update your public link when your details change. The free tier is meant
-          to be easy to try; pro options are there when you want more control.
+          a guided form, tune the look, and use your dashboard to update your
+          public link when your details change. The free tier is easy to try; Pro
+          unlocks deeper customization when you want it.
         </p>
 
         <h2 id="why-use-it">Why people use it</h2>
         <p>
           Many people juggle different links across profiles—work samples in one
-          place, contact in another, older bios that never get updated. Visitors
-          get a scattered picture, and you maintain several spots instead of one.
-        </p>
-        <p>
-          LiquiLink gives you a single page that reads clearly and stays easier to
-          keep current, so the link you share is the one that actually represents
-          you.
-        </p>
-        <p>
-          In practice you submit the form once, receive one unique link, and reuse
-          that same link everywhere you want people to find you.
+          place, contact in another, older bios that never get updated. LiquiLink
+          gives you one page that stays easier to keep current, with simple
+          analytics so you know what visitors engage with.
         </p>
       </div>
     </main>

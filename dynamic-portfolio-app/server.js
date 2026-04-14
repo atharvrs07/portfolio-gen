@@ -14,8 +14,14 @@ const { JSONFile } = require("lowdb/node");
 const { customAlphabet } = require("nanoid");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 const nanoid = customAlphabet("abcdefghijklmnopqrstuvwxyz0123456789", 8);
+
+const TRACKING_SECRET =
+  process.env.TRACKING_SECRET ||
+  process.env.SESSION_SECRET ||
+  "liquilink-outbound-dev";
+const VCARD_REDIRECT_URL = (process.env.VCARD_REDIRECT_URL || "").trim();
 
 const dbFile = path.join(__dirname, "data", "portfolio-db.json");
 const adapter = new JSONFile(dbFile);
@@ -331,12 +337,18 @@ function slugifyName(value) {
     .replace(/^-|-$/g, "");
 }
 
+/** Paths registered before `GET /:slug` — slugs must not collide. */
+const RESERVED_SINGLE_SEGMENT_SLUGS = new Set(["out", "vcard"]);
+
 function uniqueSlugFromName(fullName, portfolios) {
   const base = slugifyName(fullName) || `portfolio-${nanoid()}`;
   let slug = base;
   let counter = 2;
 
-  while (portfolios.some((item) => item.slug === slug)) {
+  while (
+    RESERVED_SINGLE_SEGMENT_SLUGS.has(slug) ||
+    portfolios.some((item) => item.slug === slug)
+  ) {
     slug = `${base}-${counter}`;
     counter += 1;
   }
@@ -547,6 +559,34 @@ function deriveLayoutVariant(sectionOrder, heroLayout) {
   return "default";
 }
 
+function isSafeOutboundTarget(raw) {
+  const s = String(raw || "").trim();
+  if (!s) return false;
+  if (/^mailto:/i.test(s)) {
+    return /^mailto:[^<>"\s]+$/i.test(s);
+  }
+  try {
+    const parsed = new URL(s);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+function signOutboundLink(slug, targetUrl) {
+  return crypto
+    .createHmac("sha256", TRACKING_SECRET)
+    .update(`${slug}\n${targetUrl}`)
+    .digest("hex");
+}
+
+function buildTrackedOutboundHref(slug, targetUrl) {
+  const sig = signOutboundLink(slug, targetUrl);
+  return `/out?slug=${encodeURIComponent(slug)}&u=${encodeURIComponent(
+    targetUrl
+  )}&sig=${sig}`;
+}
+
 function resolvePortfolioForView(record) {
   const theme = normalizeTheme(record.theme);
   const styleTheme = normalizeStyleTheme(record.styleTheme);
@@ -693,11 +733,617 @@ function buildPortfolioPayload(req) {
   };
 }
 
+const ANALYTICS_EVENT_LIMIT = 2500;
+const ANALYTICS_ENGAGEMENT_EVENT_LIMIT_MS = 2 * 60 * 1000;
+
+function parseCookieHeader(req) {
+  const raw = String(req.headers.cookie || "");
+  if (!raw) return {};
+
+  const out = {};
+  const parts = raw.split(";");
+  for (const part of parts) {
+    const idx = part.indexOf("=");
+    if (idx <= 0) continue;
+    const key = part.slice(0, idx).trim();
+    const value = part.slice(idx + 1).trim();
+    if (!key) continue;
+    out[key] = value;
+  }
+  return out;
+}
+
+function sanitizeAnalyticsId(raw, maxLen = 80) {
+  const value = String(raw || "").trim();
+  if (!value) return "";
+  const safe = value.replace(/[^a-zA-Z0-9_-]/g, "");
+  if (!safe) return "";
+  return safe.slice(0, maxLen);
+}
+
+function resolveClientIp(req) {
+  const forwarded = String(req.headers["x-forwarded-for"] || "").trim();
+  if (forwarded) {
+    const first = forwarded.split(",")[0].trim();
+    if (first) return first;
+  }
+  return String(req.socket?.remoteAddress || req.ip || "").trim();
+}
+
+function createFallbackVisitorId(req) {
+  const ua = String(req.get("user-agent") || "");
+  const ip = resolveClientIp(req);
+  return crypto
+    .createHash("sha256")
+    .update(`${ip}|${ua}|${TRACKING_SECRET}`)
+    .digest("hex")
+    .slice(0, 24);
+}
+
+function getOrCreateVisitorId(req, res) {
+  const cookies = parseCookieHeader(req);
+  const existing = sanitizeAnalyticsId(cookies.ll_vid, 64);
+  if (existing) return existing;
+
+  const generated = sanitizeAnalyticsId(`v_${nanoid()}${Date.now().toString(36)}`, 64);
+  res.cookie("ll_vid", generated, {
+    maxAge: 1000 * 60 * 60 * 24 * 365,
+    httpOnly: false,
+    sameSite: "lax"
+  });
+  return generated || createFallbackVisitorId(req);
+}
+
+function normalizePercent(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n <= 0) return 0;
+  if (n > 100) return 100;
+  return Math.round(n * 100) / 100;
+}
+
+function normalizeCounterValue(value) {
+  const n = Number(value);
+  return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+}
+
+function normalizeCounterObject(value) {
+  const out = {};
+  if (!value || typeof value !== "object") return out;
+
+  for (const [rawKey, rawValue] of Object.entries(value)) {
+    const key = String(rawKey || "").trim();
+    if (!key) continue;
+    const count = normalizeCounterValue(rawValue);
+    if (count > 0) {
+      out[key] = count;
+    }
+  }
+
+  return out;
+}
+
+function normalizeDailyObject(value) {
+  const out = {};
+  if (!value || typeof value !== "object") return out;
+
+  for (const [rawDay, rawBucket] of Object.entries(value)) {
+    const day = String(rawDay || "").trim();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) continue;
+    const safeBucket =
+      rawBucket && typeof rawBucket === "object" ? rawBucket : {};
+    const views = normalizeCounterValue(safeBucket.views);
+    const linkClicks = normalizeCounterValue(safeBucket.linkClicks);
+    if (views > 0 || linkClicks > 0) {
+      out[day] = { views, linkClicks };
+    }
+  }
+
+  return out;
+}
+
+function normalizeHourlyObject(value) {
+  const out = {};
+  if (!value || typeof value !== "object") return out;
+
+  for (const [rawHour, rawCount] of Object.entries(value)) {
+    const hour = Number(rawHour);
+    if (!Number.isInteger(hour) || hour < 0 || hour > 23) continue;
+    const count = normalizeCounterValue(rawCount);
+    if (count > 0) {
+      out[String(hour)] = count;
+    }
+  }
+
+  return out;
+}
+
+function normalizeAnalyticsEvents(value) {
+  if (!Array.isArray(value)) return [];
+
+  const events = [];
+  for (const item of value) {
+    if (!item || typeof item !== "object") continue;
+
+    let type = "view";
+    if (item.type === "link_click") type = "link_click";
+    if (item.type === "engagement") type = "engagement";
+    const at =
+      typeof item.at === "string" && !Number.isNaN(Date.parse(item.at))
+        ? item.at
+        : "";
+    if (!at) continue;
+
+    events.push({
+      type,
+      at,
+      day:
+        typeof item.day === "string" && /^\d{4}-\d{2}-\d{2}$/.test(item.day)
+          ? item.day
+          : at.slice(0, 10),
+      hour:
+        Number.isInteger(item.hour) && item.hour >= 0 && item.hour <= 23
+          ? item.hour
+          : new Date(at).getHours(),
+      referrer:
+        typeof item.referrer === "string" && item.referrer.trim()
+          ? item.referrer.trim()
+          : "Direct",
+      device:
+        typeof item.device === "string" && item.device.trim()
+          ? item.device.trim()
+          : "Unknown",
+      browser:
+        typeof item.browser === "string" && item.browser.trim()
+          ? item.browser.trim()
+          : "Unknown",
+      os:
+        typeof item.os === "string" && item.os.trim() ? item.os.trim() : "Unknown",
+      target:
+        typeof item.target === "string" && item.target.trim()
+          ? item.target.trim()
+          : "",
+      visitorId: sanitizeAnalyticsId(item.visitorId, 64),
+      sessionId: sanitizeAnalyticsId(item.sessionId, 64),
+      utmSource:
+        typeof item.utmSource === "string" && item.utmSource.trim()
+          ? item.utmSource.trim().slice(0, 80)
+          : "",
+      utmMedium:
+        typeof item.utmMedium === "string" && item.utmMedium.trim()
+          ? item.utmMedium.trim().slice(0, 80)
+          : "",
+      utmCampaign:
+        typeof item.utmCampaign === "string" && item.utmCampaign.trim()
+          ? item.utmCampaign.trim().slice(0, 100)
+          : "",
+      engagedMs: normalizeCounterValue(item.engagedMs),
+      scrollDepth: normalizePercent(item.scrollDepth)
+    });
+  }
+
+  events.sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime());
+  return events.slice(0, ANALYTICS_EVENT_LIMIT);
+}
+
+function normalizeAnalyticsRecord(value) {
+  const source = value && typeof value === "object" ? value : {};
+  const parsedLastSeenAt =
+    typeof source.lastSeenAt === "string" && !Number.isNaN(Date.parse(source.lastSeenAt))
+      ? source.lastSeenAt
+      : "";
+
+  return {
+    views: normalizeCounterValue(source.views),
+    linkClicks: normalizeCounterValue(source.linkClicks),
+    daily: normalizeDailyObject(source.daily),
+    referrers: normalizeCounterObject(source.referrers),
+    devices: normalizeCounterObject(source.devices),
+    browsers: normalizeCounterObject(source.browsers),
+    operatingSystems: normalizeCounterObject(source.operatingSystems),
+    links: normalizeCounterObject(source.links),
+    utmSources: normalizeCounterObject(source.utmSources),
+    utmMediums: normalizeCounterObject(source.utmMediums),
+    utmCampaigns: normalizeCounterObject(source.utmCampaigns),
+    hourly: normalizeHourlyObject(source.hourly),
+    events: normalizeAnalyticsEvents(source.events),
+    totalEngagedMs: normalizeCounterValue(source.totalEngagedMs),
+    maxScrollDepth: normalizePercent(source.maxScrollDepth),
+    lastSeenAt: parsedLastSeenAt
+  };
+}
+
+function getDayKey(date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function incrementCounter(counterObj, key, amount = 1) {
+  if (!key) return;
+  const safeAmount = normalizeCounterValue(amount);
+  if (!safeAmount) return;
+  counterObj[key] = normalizeCounterValue(counterObj[key]) + safeAmount;
+}
+
+function getDeviceType(userAgentRaw) {
+  const ua = String(userAgentRaw || "").toLowerCase();
+  if (!ua) return "Unknown";
+  if (/tablet|ipad/.test(ua)) return "Tablet";
+  if (/mobi|iphone|android/.test(ua)) return "Mobile";
+  return "Desktop";
+}
+
+function getBrowserName(userAgentRaw) {
+  const ua = String(userAgentRaw || "").toLowerCase();
+  if (!ua) return "Unknown";
+  if (ua.includes("edg/")) return "Edge";
+  if (ua.includes("opr/") || ua.includes("opera")) return "Opera";
+  if (ua.includes("chrome/")) return "Chrome";
+  if (ua.includes("firefox/")) return "Firefox";
+  if (ua.includes("safari/") && !ua.includes("chrome/")) return "Safari";
+  return "Other";
+}
+
+function getOperatingSystemName(userAgentRaw) {
+  const ua = String(userAgentRaw || "").toLowerCase();
+  if (!ua) return "Unknown";
+  if (ua.includes("windows")) return "Windows";
+  if (ua.includes("android")) return "Android";
+  if (ua.includes("iphone") || ua.includes("ipad") || ua.includes("ios")) return "iOS";
+  if (ua.includes("mac os") || ua.includes("macintosh")) return "macOS";
+  if (ua.includes("linux")) return "Linux";
+  return "Other";
+}
+
+function isLikelyBotUserAgent(userAgentRaw) {
+  const ua = String(userAgentRaw || "").toLowerCase();
+  if (!ua) return false;
+  return /(bot|spider|crawler|preview|slurp|headless|lighthouse|facebookexternalhit)/.test(
+    ua
+  );
+}
+
+function getReferrerSource(req, slug) {
+  const ref = String(req.get("referer") || req.get("referrer") || "").trim();
+  if (!ref) return "Direct";
+
+  try {
+    const parsedRef = new URL(ref);
+    const refHost = String(parsedRef.hostname || "").toLowerCase();
+    const requestHost = String(req.get("host") || "")
+      .split(":")[0]
+      .toLowerCase();
+
+    if (!refHost) return "Direct";
+    if (requestHost && refHost === requestHost) {
+      if (slug && parsedRef.pathname === `/${slug}`) {
+        return "Internal Portfolio";
+      }
+      return "Internal";
+    }
+
+    return refHost.startsWith("www.") ? refHost.slice(4) : refHost;
+  } catch {
+    return "Unknown";
+  }
+}
+
+function getTargetLabel(targetUrl) {
+  if (!targetUrl) return "";
+  if (/^mailto:/i.test(targetUrl)) return "Email";
+  try {
+    const parsed = new URL(targetUrl);
+    const host = String(parsed.hostname || "").toLowerCase();
+    if (!host) return "Other";
+    return host.startsWith("www.") ? host.slice(4) : host;
+  } catch {
+    return "Other";
+  }
+}
+
+function trackPortfolioAnalyticsEvent(portfolio, req, options) {
+  const config = options || {};
+  let eventType = "view";
+  if (config.type === "link_click") eventType = "link_click";
+  if (config.type === "engagement") eventType = "engagement";
+
+  applyPortfolioDefaults(portfolio);
+  const analytics = portfolio.analytics;
+
+  const now = new Date();
+  const atIso = now.toISOString();
+  const dayKey = getDayKey(now);
+  const hourKey = String(now.getHours());
+  const ua = req.get("user-agent") || "";
+  const sourceReferrer = getReferrerSource(req, portfolio.slug);
+  const device = getDeviceType(ua);
+  const browser = getBrowserName(ua);
+  const os = getOperatingSystemName(ua);
+  const visitorId =
+    sanitizeAnalyticsId(config.visitorId, 64) || createFallbackVisitorId(req);
+  const sessionId = sanitizeAnalyticsId(config.sessionId, 64);
+  const utmSource = String(req.query.utm_source || "").trim().slice(0, 80);
+  const utmMedium = String(req.query.utm_medium || "").trim().slice(0, 80);
+  const utmCampaign = String(req.query.utm_campaign || "").trim().slice(0, 100);
+  const engagedMs = Math.min(
+    normalizeCounterValue(config.engagedMs),
+    ANALYTICS_ENGAGEMENT_EVENT_LIMIT_MS
+  );
+  const scrollDepth = normalizePercent(config.scrollDepth);
+  const targetLabel =
+    eventType === "link_click" ? getTargetLabel(config.targetUrl || "") : "";
+
+  if (eventType === "view") {
+    analytics.views += 1;
+  } else if (eventType === "link_click") {
+    analytics.linkClicks += 1;
+  }
+
+  if (!analytics.daily[dayKey]) {
+    analytics.daily[dayKey] = { views: 0, linkClicks: 0 };
+  }
+  if (eventType === "link_click") {
+    analytics.daily[dayKey].linkClicks += 1;
+  } else if (eventType === "view") {
+    analytics.daily[dayKey].views += 1;
+  }
+
+  incrementCounter(analytics.hourly, hourKey);
+  incrementCounter(analytics.referrers, sourceReferrer);
+  incrementCounter(analytics.devices, device);
+  incrementCounter(analytics.browsers, browser);
+  incrementCounter(analytics.operatingSystems, os);
+
+  if (utmSource) incrementCounter(analytics.utmSources, utmSource);
+  if (utmMedium) incrementCounter(analytics.utmMediums, utmMedium);
+  if (utmCampaign) incrementCounter(analytics.utmCampaigns, utmCampaign);
+
+  if (eventType === "engagement" && engagedMs > 0) {
+    analytics.totalEngagedMs += engagedMs;
+  }
+  if (scrollDepth > analytics.maxScrollDepth) {
+    analytics.maxScrollDepth = scrollDepth;
+  }
+  if (eventType === "link_click" && targetLabel) {
+    incrementCounter(analytics.links, targetLabel);
+  }
+
+  analytics.events.unshift({
+    type: eventType,
+    at: atIso,
+    day: dayKey,
+    hour: Number(hourKey),
+    referrer: sourceReferrer,
+    device,
+    browser,
+    os,
+    target: targetLabel,
+    visitorId,
+    sessionId,
+    utmSource,
+    utmMedium,
+    utmCampaign,
+    engagedMs,
+    scrollDepth
+  });
+  if (analytics.events.length > ANALYTICS_EVENT_LIMIT) {
+    analytics.events = analytics.events.slice(0, ANALYTICS_EVENT_LIMIT);
+  }
+
+  analytics.lastSeenAt = atIso;
+}
+
+function getRecentDayKeys(days) {
+  const out = [];
+  const now = new Date();
+  for (let i = days - 1; i >= 0; i -= 1) {
+    const date = new Date(now);
+    date.setDate(now.getDate() - i);
+    out.push(getDayKey(date));
+  }
+  return out;
+}
+
+function getTopEntries(counterObj, limit = 8) {
+  return Object.entries(counterObj || {})
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit)
+    .map(([label, value]) => ({ label, value }));
+}
+
+function mergeCounterObjects(target, source) {
+  for (const [key, value] of Object.entries(source || {})) {
+    incrementCounter(target, key, value);
+  }
+}
+
+function buildAnalyticsViewModel(portfolios) {
+  const totals = { views: 0, linkClicks: 0 };
+  const aggregateDaily = {};
+  const aggregateReferrers = {};
+  const aggregateDevices = {};
+  const aggregateBrowsers = {};
+  const aggregateOperatingSystems = {};
+  const aggregateLinks = {};
+  const aggregateUtmSources = {};
+  const aggregateUtmCampaigns = {};
+  const aggregateHourly = {};
+  const portfolioRows = [];
+  const recentEvents = [];
+  const sessionStats = new Map();
+  const visitorsThirtyDays = new Set();
+  const visitorSessionCount = new Map();
+  const nowMs = Date.now();
+  const thirtyDaysAgoMs = nowMs - 30 * 24 * 60 * 60 * 1000;
+
+  for (const portfolio of portfolios) {
+    applyPortfolioDefaults(portfolio);
+    const analytics = portfolio.analytics;
+
+    totals.views += analytics.views;
+    totals.linkClicks += analytics.linkClicks;
+
+    mergeCounterObjects(aggregateReferrers, analytics.referrers);
+    mergeCounterObjects(aggregateDevices, analytics.devices);
+    mergeCounterObjects(aggregateBrowsers, analytics.browsers);
+    mergeCounterObjects(aggregateOperatingSystems, analytics.operatingSystems);
+    mergeCounterObjects(aggregateLinks, analytics.links);
+    mergeCounterObjects(aggregateUtmSources, analytics.utmSources);
+    mergeCounterObjects(aggregateUtmCampaigns, analytics.utmCampaigns);
+    mergeCounterObjects(aggregateHourly, analytics.hourly);
+
+    for (const [day, bucket] of Object.entries(analytics.daily)) {
+      if (!aggregateDaily[day]) {
+        aggregateDaily[day] = { views: 0, linkClicks: 0 };
+      }
+      aggregateDaily[day].views += normalizeCounterValue(bucket.views);
+      aggregateDaily[day].linkClicks += normalizeCounterValue(bucket.linkClicks);
+    }
+
+    const views = analytics.views;
+    const linkClicks = analytics.linkClicks;
+    const ctr = views > 0 ? (linkClicks / views) * 100 : 0;
+
+    portfolioRows.push({
+      fullName: portfolio.fullName || "Untitled Portfolio",
+      slug: portfolio.slug || "",
+      views,
+      linkClicks,
+      ctr,
+      lastSeenAt: analytics.lastSeenAt || ""
+    });
+
+    for (const event of analytics.events) {
+      const eventAtMs = new Date(event.at).getTime();
+      if (!Number.isFinite(eventAtMs)) continue;
+
+      const visitorId = sanitizeAnalyticsId(event.visitorId, 64) || "unknown";
+      const sessionId =
+        sanitizeAnalyticsId(event.sessionId, 64) ||
+        `${visitorId}-${event.day || "unknown"}`;
+      const sessionKey = `${portfolio.slug || "na"}|${sessionId}`;
+
+      if (!sessionStats.has(sessionKey)) {
+        sessionStats.set(sessionKey, {
+          views: 0,
+          clicks: 0,
+          engagedMs: 0,
+          maxScrollDepth: 0,
+          visitorId
+        });
+      }
+      const stats = sessionStats.get(sessionKey);
+
+      if (event.type === "view") stats.views += 1;
+      if (event.type === "link_click") stats.clicks += 1;
+      if (event.type === "engagement") {
+        stats.engagedMs += normalizeCounterValue(event.engagedMs);
+        stats.maxScrollDepth = Math.max(
+          stats.maxScrollDepth,
+          normalizePercent(event.scrollDepth)
+        );
+      }
+
+      if (eventAtMs >= thirtyDaysAgoMs) {
+        visitorsThirtyDays.add(visitorId);
+      }
+
+      recentEvents.push({
+        ...event,
+        portfolioName: portfolio.fullName || "Untitled Portfolio",
+        portfolioSlug: portfolio.slug || "",
+        sessionId
+      });
+    }
+  }
+
+  for (const value of sessionStats.values()) {
+    const current = visitorSessionCount.get(value.visitorId) || 0;
+    visitorSessionCount.set(value.visitorId, current + 1);
+  }
+
+  const totalSessions = sessionStats.size;
+  let bounceSessions = 0;
+  let sessionEngagedTotalMs = 0;
+  let sessionScrollTotal = 0;
+  let sessionWithScroll = 0;
+  for (const item of sessionStats.values()) {
+    const isBounce = item.views <= 1 && item.clicks === 0 && item.engagedMs < 15000;
+    if (isBounce) bounceSessions += 1;
+    sessionEngagedTotalMs += item.engagedMs;
+    if (item.maxScrollDepth > 0) {
+      sessionScrollTotal += item.maxScrollDepth;
+      sessionWithScroll += 1;
+    }
+  }
+
+  portfolioRows.sort((a, b) => b.views - a.views || b.linkClicks - a.linkClicks);
+  recentEvents.sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime());
+
+  const dailyKeys = getRecentDayKeys(30);
+  const dailyViews = dailyKeys.map((day) => aggregateDaily[day]?.views || 0);
+  const dailyClicks = dailyKeys.map((day) => aggregateDaily[day]?.linkClicks || 0);
+  const hourlyLabels = Array.from({ length: 24 }, (_, i) => `${i}:00`);
+  const hourlyData = Array.from({ length: 24 }, (_, i) => aggregateHourly[String(i)] || 0);
+
+  const avgDailyViews = dailyViews.reduce((sum, value) => sum + value, 0) / dailyViews.length;
+  const ctrTotal = totals.views > 0 ? (totals.linkClicks / totals.views) * 100 : 0;
+  const uniqueVisitors30d = visitorsThirtyDays.size;
+  const returningVisitors30d = Array.from(visitorSessionCount.values()).filter(
+    (count) => count > 1
+  ).length;
+  const bounceRate = totalSessions > 0 ? (bounceSessions / totalSessions) * 100 : 0;
+  const avgEngagementSec =
+    totalSessions > 0 ? sessionEngagedTotalMs / totalSessions / 1000 : 0;
+  const avgScrollDepth =
+    sessionWithScroll > 0 ? sessionScrollTotal / sessionWithScroll : 0;
+
+  return {
+    summary: {
+      views: totals.views,
+      linkClicks: totals.linkClicks,
+      ctrTotal,
+      avgDailyViews,
+      portfoliosTracked: portfolios.length,
+      uniqueVisitors30d,
+      returningVisitors30d,
+      sessions: totalSessions,
+      bounceRate,
+      avgEngagementSec,
+      avgScrollDepth
+    },
+    charts: {
+      daily: {
+        labels: dailyKeys,
+        views: dailyViews,
+        clicks: dailyClicks
+      },
+      hourly: {
+        labels: hourlyLabels,
+        events: hourlyData
+      },
+      portfolios: portfolioRows.slice(0, 10).map((row) => ({
+        label: row.fullName,
+        views: row.views,
+        clicks: row.linkClicks
+      })),
+      referrers: getTopEntries(aggregateReferrers, 8),
+      devices: getTopEntries(aggregateDevices, 6),
+      browsers: getTopEntries(aggregateBrowsers, 6),
+      operatingSystems: getTopEntries(aggregateOperatingSystems, 6),
+      links: getTopEntries(aggregateLinks, 8),
+      utmSources: getTopEntries(aggregateUtmSources, 8),
+      utmCampaigns: getTopEntries(aggregateUtmCampaigns, 8)
+    },
+    portfolioRows,
+    recentEvents: recentEvents.slice(0, 120)
+  };
+}
+
 function applyPortfolioDefaults(record) {
   if (!Array.isArray(record.shippingPoints)) record.shippingPoints = [];
   if (!Array.isArray(record.aboutCards)) record.aboutCards = [];
   if (!Array.isArray(record.projects)) record.projects = [];
   if (!Array.isArray(record.experiences)) record.experiences = [];
+  record.analytics = normalizeAnalyticsRecord(record.analytics);
 }
 
 async function loadDb() {
@@ -736,6 +1382,21 @@ async function loadDb() {
 
     if ("businessDescription" in portfolio) {
       delete portfolio.businessDescription;
+      needsWrite = true;
+    }
+
+    // Keep reserved paths dedicated for app/system routes.
+    if (RESERVED_SINGLE_SEGMENT_SLUGS.has(String(portfolio.slug || "").trim())) {
+      portfolio.slug = uniqueSlugFromName(
+        portfolio.fullName || "Portfolio",
+        db.data.portfolios
+      );
+      needsWrite = true;
+    }
+
+    const analyticsBefore = JSON.stringify(portfolio.analytics || null);
+    portfolio.analytics = normalizeAnalyticsRecord(portfolio.analytics);
+    if (analyticsBefore !== JSON.stringify(portfolio.analytics)) {
       needsWrite = true;
     }
   });
@@ -843,6 +1504,24 @@ async function claimLegacyPortfoliosForUser(user) {
 
 app.get("/", (req, res) => {
   res.render("landing");
+});
+
+app.get("/vcard", (_req, res) => {
+  if (!VCARD_REDIRECT_URL) {
+    return res
+      .status(503)
+      .send(
+        "VCARD_REDIRECT_URL is not configured. Set it in your environment to your external digital visiting card URL."
+      );
+  }
+
+  if (!isSafeOutboundTarget(VCARD_REDIRECT_URL)) {
+    return res
+      .status(500)
+      .send("VCARD_REDIRECT_URL is invalid. Use an absolute http(s) URL.");
+  }
+
+  return res.redirect(302, VCARD_REDIRECT_URL);
 });
 
 app.get("/signup", (req, res) => {
@@ -1168,10 +1847,32 @@ app.get("/dashboard", requireAuth, async (req, res) => {
     (item) => item.ownerUserId === req.session.user.id
   );
 
+  for (const p of myPortfolios) {
+    applyPortfolioDefaults(p);
+  }
+
   res.render("dashboard", {
     portfolios: myPortfolios,
     isPro,
     planLabel: isPro ? "Pro" : "Basic Plan"
+  });
+});
+
+app.get("/analytics", requireAuth, async (req, res) => {
+  await loadDb();
+  await claimLegacyPortfoliosForUser(req.session.user);
+
+  const user = getUserBySession(req);
+  const isPro = hasActivePro(user);
+  const myPortfolios = db.data.portfolios.filter(
+    (item) => item.ownerUserId === req.session.user.id
+  );
+  const analytics = buildAnalyticsViewModel(myPortfolios);
+
+  return res.render("analytics", {
+    isPro,
+    planLabel: isPro ? "Pro" : "Basic Plan",
+    analytics
   });
 });
 
@@ -1604,6 +2305,82 @@ app.get("/api/portfolios", async (req, res) => {
   return res.json(db.data.portfolios);
 });
 
+app.post("/api/analytics/engage", async (req, res) => {
+  await loadDb();
+
+  const slug = String(req.body.slug || "").trim();
+  if (!slug) {
+    return res.status(400).json({ success: false, error: "Missing slug." });
+  }
+
+  const portfolio = db.data.portfolios.find((item) => item.slug === slug);
+  if (!portfolio) {
+    return res.status(404).json({ success: false, error: "Portfolio not found." });
+  }
+
+  if (isLikelyBotUserAgent(req.get("user-agent") || "")) {
+    return res.json({ success: true, skipped: true });
+  }
+
+  trackPortfolioAnalyticsEvent(portfolio, req, {
+    type: "engagement",
+    visitorId: req.body.visitorId,
+    sessionId: req.body.sessionId,
+    engagedMs: req.body.engagedMs,
+    scrollDepth: req.body.scrollDepth
+  });
+
+  await db.write();
+  return res.json({ success: true });
+});
+
+app.get("/out", async (req, res) => {
+  await loadDb();
+
+  const slug = String(req.query.slug || "").trim();
+  const sig = String(req.query.sig || "").trim();
+  let target;
+  try {
+    target = decodeURIComponent(String(req.query.u ?? ""));
+  } catch {
+    return res.status(400).send("Invalid request.");
+  }
+
+  if (!slug || !sig || !isSafeOutboundTarget(target)) {
+    return res.status(400).send("Invalid request.");
+  }
+
+  const portfolio = db.data.portfolios.find((item) => item.slug === slug);
+  if (!portfolio) {
+    return res.status(404).send("Portfolio not found.");
+  }
+
+  const expected = signOutboundLink(slug, target);
+  if (!/^[a-f0-9]{64}$/i.test(sig)) {
+    return res.status(403).send("Invalid link.");
+  }
+  const sigBuf = Buffer.from(sig, "hex");
+  const expBuf = Buffer.from(expected, "hex");
+  if (sigBuf.length !== expBuf.length) {
+    return res.status(403).send("Invalid link.");
+  }
+  if (!crypto.timingSafeEqual(sigBuf, expBuf)) {
+    return res.status(403).send("Invalid link.");
+  }
+
+  if (!isLikelyBotUserAgent(req.get("user-agent") || "")) {
+    const visitorId = getOrCreateVisitorId(req, res);
+    trackPortfolioAnalyticsEvent(portfolio, req, {
+      type: "link_click",
+      targetUrl: target,
+      visitorId
+    });
+    await db.write();
+  }
+
+  return res.redirect(302, target);
+});
+
 app.get("/:slug", async (req, res) => {
   await loadDb();
 
@@ -1615,8 +2392,18 @@ app.get("/:slug", async (req, res) => {
     return res.status(404).send("Portfolio not found.");
   }
 
+  if (!isLikelyBotUserAgent(req.get("user-agent") || "")) {
+    const visitorId = getOrCreateVisitorId(req, res);
+    trackPortfolioAnalyticsEvent(portfolio, req, {
+      type: "view",
+      visitorId
+    });
+    await db.write();
+  }
+
   return res.render("portfolio", {
-    portfolio: resolvePortfolioForView(portfolio)
+    portfolio: resolvePortfolioForView(portfolio),
+    outboundHref: (targetUrl) => buildTrackedOutboundHref(portfolio.slug, targetUrl)
   });
 });
 

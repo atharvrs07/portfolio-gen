@@ -10,6 +10,13 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body class="dashboard-page">
@@ -28,6 +35,10 @@
             <p class="hero-text">
               Welcome, <%= currentUser ? currentUser.fullName : "User" %>. Manage and open your existing portfolio links.
             </p>
+            <nav class="dashboard-tabs" aria-label="Dashboard navigation">
+              <a href="/dashboard" class="dashboard-tab is-active">Portfolios</a>
+              <a href="/analytics" class="dashboard-tab">Analytics</a>
+            </nav>
           </div>
           <div class="dashboard-actions">
             <a href="/form.html" class="btn btn-primary">Create New Portfolio</a>
@@ -65,6 +76,16 @@
               <h3><%= item.fullName %></h3>
               <p class="muted-line"><%= item.role %></p>
               <p class="muted-line">URL: /<%= item.slug %></p>
+              <div class="dashboard-item-metrics">
+                <span class="dashboard-metric" title="Visits to your public page">
+                  <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                  <%= item.analytics && typeof item.analytics.views === "number" ? item.analytics.views : 0 %> views
+                </span>
+                <span class="dashboard-metric" title="Clicks on email and social links">
+                  <i class="fa-solid fa-arrow-pointer" aria-hidden="true"></i>
+                  <%= item.analytics && typeof item.analytics.linkClicks === "number" ? item.analytics.linkClicks : 0 %> link clicks
+                </span>
+              </div>
             </div>
             <div class="dashboard-item-actions">
               <a href="/<%= item.slug %>" class="btn btn-ghost">Open</a>

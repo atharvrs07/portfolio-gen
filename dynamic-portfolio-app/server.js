@@ -38,8 +38,28 @@ const razorpay =
       })
     : null;
 
-const PRO_PRICE_INR = 450;
-const PRO_DURATION_DAYS = 30;
+const PLAN_SCHEMA_VERSION = 2;
+const PLAN_DEFINITIONS = {
+  free: {
+    key: "free",
+    label: "Free",
+    priceINR: 0,
+    durationDays: 0
+  },
+  plus: {
+    key: "plus",
+    label: "Plus",
+    priceINR: 450,
+    durationDays: 30
+  },
+  pro: {
+    key: "pro",
+    label: "Pro",
+    // Approx conversion for USD 20/month at ~INR 83.5 per USD.
+    priceINR: 1670,
+    durationDays: 30
+  }
+};
 
 const OTP_TTL_MS = 10 * 60 * 1000;
 const OTP_RESEND_COOLDOWN_MS = 60 * 1000;
@@ -507,6 +527,210 @@ function normalizeImageUrl(value) {
   if (/^\/asset\/[a-zA-Z0-9_-]+$/.test(raw)) return raw;
   if (/^\/uploads\/[a-zA-Z0-9._-]+$/.test(raw)) return raw;
   return "";
+}
+
+function normalizePlanKey(value) {
+  const raw = String(value || "").trim().toLowerCase();
+  if (raw === "basic") return "free";
+  if (raw === "free" || raw === "plus" || raw === "pro") return raw;
+  return "free";
+}
+
+function getPlanMeta(planKey) {
+  return PLAN_DEFINITIONS[normalizePlanKey(planKey)] || PLAN_DEFINITIONS.free;
+}
+
+function getPlanRank(planKey) {
+  const normalized = normalizePlanKey(planKey);
+  if (normalized === "pro") return 3;
+  if (normalized === "plus") return 2;
+  return 1;
+}
+
+function isPaidPlanKey(planKey) {
+  const normalized = normalizePlanKey(planKey);
+  return normalized === "plus" || normalized === "pro";
+}
+
+function resolveCurrentPlan(user) {
+  if (!user) return "free";
+  const normalizedPlan = normalizePlanKey(user.plan);
+  if (!isPaidPlanKey(normalizedPlan)) return "free";
+  if (user.planStatus !== "active") return "free";
+  if (!user.planExpiresAt) return "free";
+  return new Date(user.planExpiresAt).getTime() > Date.now() ? normalizedPlan : "free";
+}
+
+function canCustomizePortfolio(user) {
+  const plan = resolveCurrentPlan(user);
+  return plan === "plus" || plan === "pro";
+}
+
+function canUseWebsiteBuilder(user) {
+  return resolveCurrentPlan(user) === "pro";
+}
+
+function getPlanLabel(user) {
+  const plan = resolveCurrentPlan(user);
+  return `${getPlanMeta(plan).label} Plan`;
+}
+
+function normalizeBuilderText(value, maxLen = 4000) {
+  const str = String(value || "").trim();
+  if (!str) return "";
+  return str.slice(0, maxLen);
+}
+
+function normalizeBuilderBlockType(value) {
+  const allowed = new Set([
+    "hero",
+    "text",
+    "paragraph",
+    "button",
+    "link",
+    "image",
+    "glass-card",
+    "social"
+  ]);
+  const normalized = String(value || "").trim().toLowerCase();
+  return allowed.has(normalized) ? normalized : "text";
+}
+
+function normalizeBuilderElementType(value) {
+  const allowed = new Set(["heading", "paragraph", "button", "link", "image", "glass-card"]);
+  const normalized = String(value || "").trim().toLowerCase();
+  return allowed.has(normalized) ? normalized : "paragraph";
+}
+
+function normalizeBuilderElements(value) {
+  if (!Array.isArray(value)) return [];
+  const elements = [];
+
+  for (const item of value) {
+    if (!item || typeof item !== "object") continue;
+    const xRaw = Number(item.x);
+    const yRaw = Number(item.y);
+    const widthRaw = Number(item.width);
+    const heightRaw = Number(item.height);
+    const element = {
+      id: normalizeBuilderText(item.id, 40) || nanoid(),
+      type: normalizeBuilderElementType(item.type),
+      text: normalizeBuilderText(item.text, 3000),
+      href: "",
+      imageUrl: normalizeImageUrl(item.imageUrl),
+      textColor: normalizeHexColor(item.textColor) || "",
+      bgColor: normalizeHexColor(item.bgColor) || "",
+      align: String(item.align || "").trim().toLowerCase() === "center" ? "center" : "left",
+      x: Number.isFinite(xRaw) ? Math.max(0, Math.min(5000, Math.round(xRaw))) : 40,
+      y: Number.isFinite(yRaw) ? Math.max(0, Math.min(5000, Math.round(yRaw))) : 40,
+      width: Number.isFinite(widthRaw) ? Math.max(120, Math.min(1600, Math.round(widthRaw))) : 320,
+      height: Number.isFinite(heightRaw) ? Math.max(40, Math.min(1200, Math.round(heightRaw))) : 120
+    };
+    const maybeHref = normalizeBuilderText(item.href, 900);
+    if (!maybeHref || isSafeOutboundTarget(maybeHref)) {
+      element.href = maybeHref;
+    }
+    elements.push(element);
+  }
+
+  return elements.slice(0, 60);
+}
+
+function normalizeBuilderSectionType(value) {
+  const allowed = new Set(["blank", "hero", "about", "features", "contact"]);
+  const normalized = String(value || "").trim().toLowerCase();
+  return allowed.has(normalized) ? normalized : "blank";
+}
+
+function normalizeBuilderSections(value) {
+  if (!Array.isArray(value)) return [];
+  const sections = [];
+
+  for (const item of value) {
+    if (!item || typeof item !== "object") continue;
+    const section = {
+      id: normalizeBuilderText(item.id, 40) || nanoid(),
+      name: normalizeBuilderText(item.name, 80) || "Section",
+      type: normalizeBuilderSectionType(item.type),
+      layout: String(item.layout || "").trim().toLowerCase() === "two-col" ? "two-col" : "single",
+      bgColor: normalizeHexColor(item.bgColor) || "",
+      elements: normalizeBuilderElements(item.elements)
+    };
+    sections.push(section);
+  }
+
+  return sections.slice(0, 30);
+}
+
+function normalizeBuilderSettings(value) {
+  const src = value && typeof value === "object" ? value : {};
+  const bgModeRaw = String(src.backgroundMode || "").trim().toLowerCase();
+  const backgroundMode = bgModeRaw === "image" ? "image" : "color";
+  const backgroundColor = normalizeHexColor(src.backgroundColor) || "#05070d";
+  const textColor = normalizeHexColor(src.textColor) || "#f5f8ff";
+  const accentColor = normalizeHexColor(src.accentColor) || "#88b3ff";
+  const backgroundImageUrl = normalizeImageUrl(src.backgroundImageUrl);
+
+  return {
+    backgroundMode,
+    backgroundColor,
+    textColor,
+    accentColor,
+    backgroundImageUrl
+  };
+}
+
+function normalizeBuilderHtmlSnapshot(value) {
+  if (typeof value !== "string") return "";
+  const raw = value.trim();
+  if (!raw) return "";
+  return raw.slice(0, 800000);
+}
+
+function normalizeBuilderConfig(value) {
+  const src = value && typeof value === "object" ? value : {};
+  const legacyBlocks = Array.isArray(src.blocks) ? src.blocks : [];
+  let sections = normalizeBuilderSections(src.sections);
+  if (sections.length === 0 && legacyBlocks.length > 0) {
+    // Legacy migration: convert old flat blocks to a single section.
+    sections = [
+      {
+        id: nanoid(),
+        name: "Main section",
+        type: "blank",
+        layout: "single",
+        bgColor: "",
+        elements: legacyBlocks.map((block) => ({
+          id: normalizeBuilderText(block.id, 40) || nanoid(),
+          type:
+            block.type === "hero"
+              ? "heading"
+              : block.type === "image"
+                ? "image"
+                : block.type === "button" || block.type === "cta" || block.type === "link"
+                  ? "button"
+                  : block.type === "glass-card"
+                    ? "glass-card"
+                    : "paragraph",
+          text:
+            normalizeBuilderText(block.title, 200) ||
+            normalizeBuilderText(block.body, 2000),
+          href: normalizeBuilderText(block.buttonUrl, 900),
+          imageUrl: normalizeImageUrl(block.imageUrl),
+          textColor: "",
+          bgColor: "",
+          align: "left"
+        }))
+      }
+    ];
+  }
+
+  return {
+    enabled: src.enabled === true,
+    sections: normalizeBuilderSections(sections),
+    settings: normalizeBuilderSettings(src.settings),
+    htmlSnapshot: normalizeBuilderHtmlSnapshot(src.htmlSnapshot)
+  };
 }
 
 function createAssetToken() {
@@ -1399,26 +1623,52 @@ async function loadDb() {
     if (analyticsBefore !== JSON.stringify(portfolio.analytics)) {
       needsWrite = true;
     }
+
+    const builderBefore = JSON.stringify(portfolio.builder || null);
+    portfolio.builder = normalizeBuilderConfig(portfolio.builder);
+    if (builderBefore !== JSON.stringify(portfolio.builder)) {
+      needsWrite = true;
+    }
   });
 
   db.data.users.forEach((user) => {
     if (!user.plan) {
-      user.plan = "basic";
+      user.plan = "free";
+      needsWrite = true;
+    }
+
+    if (user.planSchemaVersion !== PLAN_SCHEMA_VERSION) {
+      const legacyPlan = normalizePlanKey(user.plan);
+      // Existing "pro" users map to Plus in the new 3-tier model.
+      user.plan = legacyPlan === "pro" ? "plus" : legacyPlan;
+      user.planSchemaVersion = PLAN_SCHEMA_VERSION;
+      needsWrite = true;
+    }
+
+    const normalizedPlan = normalizePlanKey(user.plan);
+    if (normalizedPlan !== user.plan) {
+      user.plan = normalizedPlan;
       needsWrite = true;
     }
 
     if (!user.planStatus) {
-      user.planStatus = user.plan === "pro" ? "active" : "inactive";
+      user.planStatus = isPaidPlanKey(user.plan) ? "active" : "inactive";
       needsWrite = true;
     }
 
-    if (user.plan === "pro" && user.planExpiresAt) {
+    if (isPaidPlanKey(user.plan) && user.planExpiresAt) {
       const expired = new Date(user.planExpiresAt).getTime() <= Date.now();
       if (expired) {
-        user.plan = "basic";
+        user.plan = "free";
         user.planStatus = "expired";
+        user.planExpiresAt = null;
         needsWrite = true;
       }
+    }
+
+    if (!isPaidPlanKey(user.plan) && user.planStatus === "active") {
+      user.planStatus = "inactive";
+      needsWrite = true;
     }
 
     if (!Array.isArray(user.uploadedAssets)) {
@@ -1437,22 +1687,19 @@ function getUserBySession(req) {
   return db.data.users.find((u) => u.id === req.session.user.id) || null;
 }
 
-function hasActivePro(user) {
-  if (!user) return false;
-  if (user.plan !== "pro") return false;
-  if (user.planStatus !== "active") return false;
-  if (!user.planExpiresAt) return false;
-
-  return new Date(user.planExpiresAt).getTime() > Date.now();
-}
-
-function activateProPlan(user) {
+function activatePaidPlan(user, planKey) {
+  const normalizedPlan = normalizePlanKey(planKey);
+  const planMeta = getPlanMeta(normalizedPlan);
+  if (!isPaidPlanKey(normalizedPlan)) {
+    return;
+  }
   const now = new Date();
-  const expiresAt = addDays(now, PRO_DURATION_DAYS);
+  const expiresAt = addDays(now, planMeta.durationDays);
 
-  user.plan = "pro";
+  user.plan = normalizedPlan;
   user.planStatus = "active";
-  user.proActivatedAt = now.toISOString();
+  user.planSchemaVersion = PLAN_SCHEMA_VERSION;
+  user.planActivatedAt = now.toISOString();
   user.planExpiresAt = expiresAt.toISOString();
 }
 
@@ -1751,9 +1998,10 @@ app.post("/signup/verify", async (req, res) => {
     email: pending.email,
     passwordHash: pending.passwordHash,
     createdAt: new Date().toISOString(),
-    plan: "basic",
+    plan: "free",
     planStatus: "inactive",
-    planExpiresAt: null
+    planExpiresAt: null,
+    planSchemaVersion: PLAN_SCHEMA_VERSION
   };
 
   db.data.users.unshift(user);
@@ -1841,7 +2089,9 @@ app.get("/dashboard", requireAuth, async (req, res) => {
   await claimLegacyPortfoliosForUser(req.session.user);
 
   const user = getUserBySession(req);
-  const isPro = hasActivePro(user);
+  const currentPlan = resolveCurrentPlan(user);
+  const isPaidPlan = currentPlan !== "free";
+  const isPro = currentPlan === "pro";
 
   const myPortfolios = db.data.portfolios.filter(
     (item) => item.ownerUserId === req.session.user.id
@@ -1853,8 +2103,11 @@ app.get("/dashboard", requireAuth, async (req, res) => {
 
   res.render("dashboard", {
     portfolios: myPortfolios,
+    isPaidPlan,
     isPro,
-    planLabel: isPro ? "Pro" : "Basic Plan"
+    canCustomize: canCustomizePortfolio(user),
+    canUseBuilder: canUseWebsiteBuilder(user),
+    planLabel: getPlanLabel(user)
   });
 });
 
@@ -1863,15 +2116,18 @@ app.get("/analytics", requireAuth, async (req, res) => {
   await claimLegacyPortfoliosForUser(req.session.user);
 
   const user = getUserBySession(req);
-  const isPro = hasActivePro(user);
+  const currentPlan = resolveCurrentPlan(user);
+  const isPaidPlan = currentPlan !== "free";
+  const isPro = currentPlan === "pro";
   const myPortfolios = db.data.portfolios.filter(
     (item) => item.ownerUserId === req.session.user.id
   );
   const analytics = buildAnalyticsViewModel(myPortfolios);
 
   return res.render("analytics", {
+    isPaidPlan,
     isPro,
-    planLabel: isPro ? "Pro" : "Basic Plan",
+    planLabel: getPlanLabel(user),
     analytics
   });
 });
@@ -1881,15 +2137,15 @@ app.get("/form.html", requireAuth, async (req, res) => {
   await claimLegacyPortfoliosForUser(req.session.user);
 
   const user = getUserBySession(req);
-  const isPro = hasActivePro(user);
+  const canCreateUnlimited = canCustomizePortfolio(user);
 
   const myPortfolioCount = db.data.portfolios.filter(
     (p) => p.ownerUserId === req.session.user.id
   ).length;
 
-  if (!isPro && myPortfolioCount >= 1) {
+  if (!canCreateUnlimited && myPortfolioCount >= 1) {
     return res.redirect(
-      `/pricing?reason=create&next=${encodeURIComponent("/form.html")}`
+      `/pricing?reason=create&plan=plus&next=${encodeURIComponent("/form.html")}`
     );
   }
 
@@ -1901,16 +2157,16 @@ app.post("/create", requireAuth, handlePortfolioImageUpload, async (req, res) =>
   await claimLegacyPortfoliosForUser(req.session.user);
 
   const user = getUserBySession(req);
-  const isPro = hasActivePro(user);
+  const canCreateUnlimited = canCustomizePortfolio(user);
   applyUploadedImageUrlsToRequest(req, user);
 
   const myPortfolioCount = db.data.portfolios.filter(
     (p) => p.ownerUserId === req.session.user.id
   ).length;
 
-  if (!isPro && myPortfolioCount >= 1) {
+  if (!canCreateUnlimited && myPortfolioCount >= 1) {
     return res.redirect(
-      `/pricing?reason=create&next=${encodeURIComponent("/form.html")}`
+      `/pricing?reason=create&plan=plus&next=${encodeURIComponent("/form.html")}`
     );
   }
 
@@ -1942,16 +2198,22 @@ app.get("/pricing", requireAuth, async (req, res) => {
 
   const reason = req.query.reason || "upgrade";
   const next = sanitizeNext(req.query.next || "/dashboard");
+  const requestedPlan = normalizePlanKey(req.query.plan || "plus");
+  const selectedPlan = requestedPlan === "pro" ? "pro" : "plus";
 
   const user = getUserBySession(req);
-  const isPro = hasActivePro(user);
+  const currentPlan = resolveCurrentPlan(user);
 
   res.render("pricing", {
     reason,
     next,
-    plan: isPro ? "pro" : "basic",
+    currentPlan,
+    selectedPlan,
+    plusPriceINR: PLAN_DEFINITIONS.plus.priceINR,
+    proPriceINR: PLAN_DEFINITIONS.pro.priceINR,
     razorpayKeyId,
-    proPriceINR: PRO_PRICE_INR
+    canCustomize: canCustomizePortfolio(user),
+    canUseBuilder: canUseWebsiteBuilder(user)
   });
 });
 
@@ -1974,9 +2236,25 @@ app.post("/api/razorpay/order", requireAuth, async (req, res) => {
       });
     }
 
-    const amountPaise = PRO_PRICE_INR * 100;
+    const requestedPlan = normalizePlanKey(req.body.plan || "plus");
+    if (!isPaidPlanKey(requestedPlan)) {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid plan selected."
+      });
+    }
+
+    const currentPlan = resolveCurrentPlan(user);
+    if (getPlanRank(currentPlan) >= getPlanRank(requestedPlan)) {
+      return res.status(400).json({
+        success: false,
+        error: "You already have this plan or a higher plan."
+      });
+    }
+
+    const amountPaise = getPlanMeta(requestedPlan).priceINR * 100;
     const currency = "INR";
-    const receipt = `pro-${user.id}-${Date.now()}`;
+    const receipt = `${requestedPlan}-${user.id}-${Date.now()}`;
 
     const order = await razorpay.orders.create({
       amount: amountPaise,
@@ -1984,12 +2262,19 @@ app.post("/api/razorpay/order", requireAuth, async (req, res) => {
       receipt
     });
 
+    req.session.pendingPlanPurchase = {
+      orderId: order.id,
+      plan: requestedPlan,
+      createdAt: new Date().toISOString()
+    };
+
     return res.json({
       success: true,
       order_id: order.id,
       amount: amountPaise,
       currency,
-      key_id: razorpayKeyId
+      key_id: razorpayKeyId,
+      plan: requestedPlan
     });
   } catch (error) {
     return res.status(500).json({
@@ -2003,52 +2288,8 @@ app.post("/api/razorpay/order", requireAuth, async (req, res) => {
 });
 
 app.get("/pay/pro", requireAuth, async (req, res) => {
-  await loadDb();
-
   const next = sanitizeNext(req.query.next || "/dashboard");
-  const user = getUserBySession(req);
-  const isPro = hasActivePro(user);
-
-  if (isPro) {
-    return res.redirect(next);
-  }
-
-  if (!razorpay) {
-    return res.status(500).render("pricing", {
-      reason: "upgrade",
-      next,
-      plan: "basic",
-      razorpayKeyId,
-      proPriceINR: PRO_PRICE_INR
-    });
-  }
-
-  try {
-    const amountPaise = PRO_PRICE_INR * 100;
-    const currency = "INR";
-    const receipt = `pro-${req.session.user.id}-${Date.now()}`;
-
-    const order = await razorpay.orders.create({
-      amount: amountPaise,
-      currency,
-      receipt
-    });
-
-    return res.render("razorpay-checkout", {
-      next,
-      razorpayKeyId,
-      proPriceINR: PRO_PRICE_INR,
-      orderId: order.id,
-      amount: amountPaise,
-      currency
-    });
-  } catch (error) {
-    return res.status(500).send(
-      error && typeof error.message === "string"
-        ? error.message
-        : "Failed to start checkout."
-    );
-  }
+  return res.redirect(`/pricing?reason=upgrade&plan=pro&next=${encodeURIComponent(next)}`);
 });
 
 app.post("/payment/verify", requireAuth, async (req, res) => {
@@ -2097,7 +2338,16 @@ app.post("/payment/verify", requireAuth, async (req, res) => {
     });
   }
 
-  activateProPlan(user);
+  const pending = req.session.pendingPlanPurchase;
+  if (!pending || pending.orderId !== razorpay_order_id || !isPaidPlanKey(pending.plan)) {
+    return res.status(400).json({
+      success: false,
+      error: "Purchase session expired. Please create a new order."
+    });
+  }
+
+  activatePaidPlan(user, pending.plan);
+  delete req.session.pendingPlanPurchase;
   await db.write();
 
   return res.json({
@@ -2132,7 +2382,8 @@ app.get("/portfolio/:portfolioId/edit", requireAuth, async (req, res) => {
   const editIdentifier = portfolio.portfolioId || portfolio.slug || portfolio.id;
 
   const user = getUserBySession(req);
-  const isPro = hasActivePro(user);
+  const canCustomize = canCustomizePortfolio(user);
+  const canUseBuilder = canUseWebsiteBuilder(user);
 
   const resolved = resolvePortfolioForView(portfolio);
   const formData = {
@@ -2170,7 +2421,7 @@ app.get("/portfolio/:portfolioId/edit", requireAuth, async (req, res) => {
     companyLogoUrl: resolved.companyLogoUrl
   };
 
-  return res.render("edit-portfolio", { portfolio: formData, isPro });
+  return res.render("edit-portfolio", { portfolio: formData, canCustomize, canUseBuilder });
 });
 
 app.post(
@@ -2197,11 +2448,11 @@ app.post(
   }
 
   const user = getUserBySession(req);
-  const isPro = hasActivePro(user);
+  const canCustomize = canCustomizePortfolio(user);
   applyUploadedImageUrlsToRequest(req, user);
 
   const payload = buildPortfolioPayload(req);
-  if (!isPro) {
+  if (!canCustomize) {
     payload.theme = portfolio.theme;
     payload.layoutVariant = portfolio.layoutVariant;
     payload.sectionOrder = portfolio.sectionOrder;
@@ -2238,6 +2489,84 @@ app.post(
   return res.redirect("/dashboard");
   }
 );
+
+app.get("/portfolio/:portfolioId/builder", requireAuth, async (req, res) => {
+  await loadDb();
+
+  const identifier = req.params.portfolioId;
+  const portfolio =
+    db.data.portfolios.find((item) => item.portfolioId === identifier) ||
+    db.data.portfolios.find(
+      (item) => item.slug === identifier || item.id === identifier
+    );
+
+  if (!portfolio) {
+    return res.status(404).send("Portfolio not found.");
+  }
+
+  if (portfolio.ownerUserId !== req.session.user.id) {
+    return res.status(403).send("You are not allowed to edit this portfolio.");
+  }
+
+  const user = getUserBySession(req);
+  if (!canUseWebsiteBuilder(user)) {
+    return res.redirect(
+      `/pricing?reason=builder&plan=pro&next=${encodeURIComponent(req.originalUrl)}`
+    );
+  }
+
+  const builder = normalizeBuilderConfig(portfolio.builder);
+  return res.render("builder", {
+    portfolio,
+    planLabel: getPlanLabel(user),
+    initialBuilderJson: JSON.stringify(builder),
+    livePageUrl: `/${portfolio.slug}`
+  });
+});
+
+app.post("/portfolio/:portfolioId/builder", requireAuth, async (req, res) => {
+  await loadDb();
+
+  const identifier = req.params.portfolioId;
+  const portfolio =
+    db.data.portfolios.find((item) => item.portfolioId === identifier) ||
+    db.data.portfolios.find(
+      (item) => item.slug === identifier || item.id === identifier
+    );
+
+  if (!portfolio) {
+    return res.status(404).send("Portfolio not found.");
+  }
+
+  if (portfolio.ownerUserId !== req.session.user.id) {
+    return res.status(403).send("You are not allowed to edit this portfolio.");
+  }
+
+  const user = getUserBySession(req);
+  if (!canUseWebsiteBuilder(user)) {
+    return res.redirect(
+      `/pricing?reason=builder&plan=pro&next=${encodeURIComponent(req.originalUrl)}`
+    );
+  }
+
+  let parsedBuilder = {};
+  try {
+    parsedBuilder = JSON.parse(String(req.body.builderPayload || "{}"));
+  } catch {
+    parsedBuilder = {};
+  }
+
+  portfolio.builder = normalizeBuilderConfig({
+    enabled: true,
+    sections: parsedBuilder.sections,
+    settings: parsedBuilder.settings,
+    htmlSnapshot: parsedBuilder.htmlSnapshot
+  });
+  portfolio.updatedAt = new Date().toISOString();
+  await db.write();
+
+  return res.redirect(`/${portfolio.slug}`);
+});
 
 app.post("/portfolio/:portfolioId/delete", requireAuth, async (req, res) => {
   await loadDb();
@@ -2303,6 +2632,36 @@ app.get("/asset/:token", async (req, res) => {
 app.get("/api/portfolios", async (req, res) => {
   await loadDb();
   return res.json(db.data.portfolios);
+});
+
+app.post("/api/portfolio/preview", requireAuth, (req, res) => {
+  try {
+    const previewReq = {
+      body: { ...req.body },
+      uploadedImageUrls: {}
+    };
+    const payload = buildPortfolioPayload(previewReq);
+    applyPortfolioDefaults(payload);
+    const resolved = resolvePortfolioForView(payload);
+
+    return res.render(
+      "portfolio",
+      {
+        portfolio: resolved,
+        outboundHref: (targetUrl) => String(targetUrl || "").trim()
+      },
+      (err, html) => {
+        if (err) {
+          console.error("Portfolio preview render failed:", err);
+          return res.status(500).send("Preview render failed.");
+        }
+        return res.type("html").send(html);
+      }
+    );
+  } catch (error) {
+    console.error("Portfolio preview build failed:", error);
+    return res.status(500).send("Preview render failed.");
+  }
 });
 
 app.post("/api/analytics/engage", async (req, res) => {
@@ -2399,6 +2758,21 @@ app.get("/:slug", async (req, res) => {
       visitorId
     });
     await db.write();
+  }
+
+  const builder = normalizeBuilderConfig(portfolio.builder);
+  const hasBuilderContent = builder.sections.some(
+    (section) => Array.isArray(section.elements) && section.elements.length > 0
+  );
+  if (builder.enabled && builder.htmlSnapshot) {
+    return res.type("html").send(builder.htmlSnapshot);
+  }
+  if (builder.enabled && hasBuilderContent) {
+    return res.render("portfolio-builder-render", {
+      portfolio: resolvePortfolioForView(portfolio),
+      builder,
+      outboundHref: (targetUrl) => buildTrackedOutboundHref(portfolio.slug, targetUrl)
+    });
   }
 
   return res.render("portfolio", {

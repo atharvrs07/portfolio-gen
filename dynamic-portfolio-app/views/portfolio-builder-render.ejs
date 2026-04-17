@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= portfolio.fullName %> | Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="<%= portfolio.googleFontHref %>" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: <%= builder.settings.backgroundColor || portfolio.colorBg %>;
+        --text: <%= builder.settings.textColor || portfolio.colorText %>;
+        --accent: <%= builder.settings.accentColor || portfolio.colorAccent %>;
+        --card: <%= portfolio.colorCard %>;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: <%= portfolio.fontFamilyCss %>;
+        font-size: <%= portfolio.fontBasePx %>px;
+        background: radial-gradient(circle at 20% -20%, rgba(136, 179, 255, 0.2), transparent 40%), var(--bg);
+        color: var(--text);
+      }
+      .wrap {
+        width: min(1100px, 92vw);
+        margin: 0 auto;
+        padding: 2.2rem 0 4rem;
+        display: grid;
+        gap: 1rem;
+      }
+      .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .pill {
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 999px;
+        padding: 0.3rem 0.8rem;
+        color: color-mix(in srgb, var(--text) 86%, transparent);
+        font-size: 0.85rem;
+      }
+      .section {
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 1rem;
+        background: color-mix(in srgb, var(--card) 88%, transparent);
+        padding: 0.8rem;
+        position: relative;
+        min-height: 560px;
+      }
+      .el {
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 0.8rem;
+        background: rgba(10, 15, 24, 0.5);
+        padding: 0.8rem;
+        position: absolute;
+        overflow: hidden;
+      }
+      .el--glass {
+        background: rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(10px);
+      }
+      .el h2 {
+        margin: 0;
+        font-size: clamp(1.2rem, 3vw, 1.9rem);
+      }
+      .el p {
+        margin: 0.1rem 0 0;
+        line-height: 1.65;
+        color: color-mix(in srgb, var(--text) 86%, transparent);
+      }
+      .cta-btn {
+        display: inline-block;
+        margin-top: 0.2rem;
+        text-decoration: none;
+        color: #fff;
+        background: var(--accent);
+        padding: 0.6rem 1rem;
+        border-radius: 999px;
+        font-weight: 600;
+      }
+      .img-el {
+        width: 100%;
+        border-radius: 0.8rem;
+        max-height: 420px;
+        object-fit: cover;
+      }
+      @media (max-width: 780px) {
+        .section {
+          min-height: 460px;
+        }
+      }
+    </style>
+  </head>
+  <body style="<% if (builder.settings.backgroundMode === 'image' && builder.settings.backgroundImageUrl) { %>background: linear-gradient(rgba(4,7,12,0.5), rgba(4,7,12,0.5)), url('<%= builder.settings.backgroundImageUrl %>') center / cover no-repeat;<% } %>">
+    <main class="wrap">
+      <section class="top">
+        <div>
+          <h1 style="margin:0;font-size:1.2rem;"><%= portfolio.fullName %></h1>
+          <p style="margin:0.2rem 0 0;color:color-mix(in srgb,var(--text) 78%, transparent);"><%= portfolio.role %></p>
+        </div>
+        <span class="pill">Built with LiquiLink Pro Builder</span>
+      </section>
+
+      <% builder.sections.forEach((section) => { %>
+      <section class="section" style="<%= section.bgColor ? ('background:' + section.bgColor + ';') : '' %>">
+        <div style="position:relative;min-height:520px;">
+        <% section.elements.forEach((el) => { %>
+        <article
+          class="el <%= el.type === 'glass-card' ? 'el--glass' : '' %>"
+          style="<%= (el.align === 'center' ? 'text-align:center;' : '') + (el.textColor ? ('color:' + el.textColor + ';') : '') + (el.bgColor ? ('background:' + el.bgColor + ';') : '') + 'left:' + (el.x || 0) + 'px;top:' + (el.y || 0) + 'px;width:' + (el.width || 320) + 'px;height:' + (el.height || 120) + 'px;' %>"
+        >
+          <% if (el.type === 'heading') { %>
+          <h2><%= el.text || 'Heading' %></h2>
+          <% } else if (el.type === 'image') { %>
+            <% if (el.imageUrl) { %>
+            <img class="img-el" src="<%= el.imageUrl %>" alt="Image block" />
+            <% } else { %>
+            <p>Image URL not set.</p>
+            <% } %>
+          <% } else if (el.type === 'button') { %>
+            <% if (el.href) { %>
+            <a class="cta-btn" href="<%= outboundHref(el.href) %>"><%= el.text || 'Button' %></a>
+            <% } else { %>
+            <a class="cta-btn" href="#"><%= el.text || 'Button' %></a>
+            <% } %>
+          <% } else if (el.type === 'link') { %>
+            <% if (el.href) { %>
+            <a href="<%= outboundHref(el.href) %>" style="color:var(--accent);text-decoration:none;"><%= el.text || 'Link' %></a>
+            <% } else { %>
+            <a href="#" style="color:var(--accent);text-decoration:none;"><%= el.text || 'Link' %></a>
+            <% } %>
+          <% } else { %>
+          <p><%= el.text || '' %></p>
+          <% } %>
+        </article>
+        <% }) %>
+        </div>
+      </section>
+      <% }) %>
+    </main>
+    <script src="/custom-cursor.js" defer></script>
+  </body>
+</html>

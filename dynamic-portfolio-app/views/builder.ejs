@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pro Builder | LiquiLink</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      html, body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family: Inter, system-ui, sans-serif;
+        background: #060b16;
+        color: #e8f0ff;
+      }
+      .app {
+        display: grid;
+        grid-template-rows: 56px 1fr;
+        height: 100vh;
+      }
+      .topbar {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(8, 13, 24, 0.95);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 0.8rem;
+      }
+      .topbar-left { display:flex; gap:0.5rem; align-items:center; }
+      .topbar-title { font-size:0.9rem; color:rgba(220,232,255,0.86); }
+      .workspace {
+        display: grid;
+        grid-template-columns: 280px 1fr 340px;
+        min-height: 0;
+      }
+      .panel {
+        border-right: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 0.75rem;
+        overflow: auto;
+        background: rgba(8, 13, 24, 0.82);
+      }
+      .panel-right {
+        border-right: none;
+        border-left: 1px solid rgba(255, 255, 255, 0.12);
+      }
+      .canvas-area {
+        display: grid;
+        grid-template-rows: 46px 1fr;
+        min-height: 0;
+      }
+      .canvas-toolbar {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(8, 13, 24, 0.75);
+        padding: 0.35rem 0.7rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .canvas-frame-wrap {
+        overflow: auto;
+        padding: 1rem;
+        background: linear-gradient(180deg, #070f20, #060a13);
+      }
+      .frame-host {
+        margin: 0 auto;
+        width: min(100%, 1320px);
+        min-height: 84vh;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        overflow: hidden;
+        background: #fff;
+      }
+      .frame-host.mode-mobile { max-width: 430px; }
+      .frame-host.mode-tablet { max-width: 860px; }
+      #liveFrame {
+        width: 100%;
+        min-height: 84vh;
+        border: none;
+        display: block;
+      }
+      .panel h4 {
+        margin: 0.1rem 0 0.45rem;
+        font-size: 0.8rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: rgba(208, 224, 255, 0.78);
+      }
+      .stack { display:grid; gap:0.45rem; margin-bottom:0.8rem; }
+      .panel label { display:grid; gap:0.25rem; font-size:0.82rem; color:rgba(220,232,255,0.86); }
+      .muted { font-size:0.78rem; color:rgba(184,202,230,0.8); }
+      .editor-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 999px;
+        border: 1px solid rgba(136, 179, 255, 0.7);
+        color: #88b3ff;
+        font-size: 0.74rem;
+      }
+      @media (max-width: 1380px) {
+        .workspace {
+          grid-template-columns: 1fr;
+          grid-template-rows: auto 1fr auto;
+        }
+        .panel, .panel-right {
+          border: none;
+          border-bottom: 1px solid rgba(255,255,255,0.12);
+          max-height: 32vh;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="topbar-left">
+          <a href="/dashboard" class="btn btn-ghost">Back</a>
+          <a href="/portfolio/<%= portfolio.portfolioId || portfolio.slug || portfolio.id %>/edit" class="btn btn-ghost">Content Editor</a>
+          <span class="topbar-title"><%= planLabel %> · Live Page Builder · <%= portfolio.fullName %></span>
+        </div>
+        <div>
+          <a href="/<%= portfolio.slug %>" target="_blank" rel="noreferrer" class="btn btn-ghost">Open Live</a>
+        </div>
+      </header>
+
+      <form method="POST" action="/portfolio/<%= portfolio.portfolioId || portfolio.slug || portfolio.id %>/builder" id="builderForm" class="workspace">
+        <input type="hidden" name="builderPayload" id="builderPayloadField" />
+
+        <aside class="panel">
+          <h4>Selection</h4>
+          <div class="stack">
+            <div class="editor-badge">Click any text/image/link in center preview</div>
+            <p class="muted" style="margin:0;">
+              The center now shows your actual generated page. Click an element there, then edit it from the right panel.
+            </p>
+          </div>
+
+          <h4>Actions</h4>
+          <div class="stack">
+            <button type="button" class="btn btn-ghost" id="reloadFromLiveBtn">Reload from live page</button>
+            <button type="button" class="btn btn-ghost" id="clearSelectionBtn">Clear selection</button>
+          </div>
+
+          <div style="margin-top:0.8rem;">
+            <button type="submit" class="btn btn-primary">Save & Publish</button>
+          </div>
+        </aside>
+
+        <section class="canvas-area">
+          <div class="canvas-toolbar">
+            <strong style="font-size:0.9rem;">Actual Live Page Canvas</strong>
+            <div class="preview-modes">
+              <button type="button" class="btn btn-ghost" data-preview-mode="desktop">Desktop</button>
+              <button type="button" class="btn btn-ghost" data-preview-mode="tablet">Tablet</button>
+              <button type="button" class="btn btn-ghost" data-preview-mode="mobile">Mobile</button>
+            </div>
+          </div>
+          <div class="canvas-frame-wrap">
+            <div id="frameHost" class="frame-host">
+              <iframe id="liveFrame" src="<%= livePageUrl %>" title="Live page editor frame"></iframe>
+            </div>
+          </div>
+        </section>
+
+        <aside class="panel panel-right">
+          <h4>Page Style</h4>
+          <div class="stack">
+            <label>Background mode
+              <select id="pageBgMode">
+                <option value="color">Color</option>
+                <option value="image">Image</option>
+              </select>
+            </label>
+            <label>Background color
+              <input type="color" id="pageBgColor" />
+            </label>
+            <label>Background image URL
+              <input type="url" id="pageBgImage" placeholder="https://..." />
+            </label>
+            <label>Text color
+              <input type="color" id="pageTextColor" />
+            </label>
+            <label>Accent color
+              <input type="color" id="pageAccentColor" />
+            </label>
+          </div>
+
+          <h4>Selected Node</h4>
+          <div class="stack">
+            <label>Tag
+              <input type="text" id="nodeTag" readonly />
+            </label>
+            <label>Text / Label
+              <textarea rows="4" id="nodeText"></textarea>
+            </label>
+            <label>URL / Link
+              <input type="url" id="nodeHref" />
+            </label>
+            <label>Image URL
+              <input type="url" id="nodeSrc" />
+            </label>
+            <label>Drag X
+              <input type="number" id="nodeDragX" />
+            </label>
+            <label>Drag Y
+              <input type="number" id="nodeDragY" />
+            </label>
+            <label>Text color
+              <input type="color" id="nodeTextColor" />
+            </label>
+            <label>Background color
+              <input type="color" id="nodeBgColor" />
+            </label>
+            <button type="button" class="btn btn-danger" id="removeNodeBtn">Remove selected node</button>
+          </div>
+        </aside>
+      </form>
+    </div>
+
+    <script>
+      (function () {
+        var initialBuilder = <%- initialBuilderJson %>;
+        var formEl = document.getElementById("builderForm");
+        var payloadField = document.getElementById("builderPayloadField");
+        var frameEl = document.getElementById("liveFrame");
+        var frameHost = document.getElementById("frameHost");
+        var previewMode = "desktop";
+        var selectedNode = null;
+        var selectedOriginalOutline = "";
+        var selectedOriginalCursor = "";
+        var frameReady = false;
+        var dragState = null;
+
+        var state = {
+          settings: {
+            backgroundMode: "color",
+            backgroundColor: "#05070d",
+            backgroundImageUrl: "",
+            textColor: "#f5f8ff",
+            accentColor: "#88b3ff"
+          },
+          htmlSnapshot: ""
+        };
+
+        function toHex(color, fallback) {
+          var fb = fallback || "#000000";
+          if (!color) return fb;
+          var s = String(color).trim();
+          if (/^#[0-9a-fA-F]{6}$/.test(s)) return s;
+          var m = s.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+          if (!m) return fb;
+          var r = Number(m[1]).toString(16).padStart(2, "0");
+          var g = Number(m[2]).toString(16).padStart(2, "0");
+          var b = Number(m[3]).toString(16).padStart(2, "0");
+          return "#" + r + g + b;
+        }
+
+        function updateFrameMode() {
+          frameHost.classList.remove("mode-mobile", "mode-tablet");
+          if (previewMode === "mobile") frameHost.classList.add("mode-mobile");
+          if (previewMode === "tablet") frameHost.classList.add("mode-tablet");
+        }
+
+        function frameDoc() {
+          try {
+            return frameEl.contentDocument || (frameEl.contentWindow && frameEl.contentWindow.document) || null;
+          } catch {
+            return null;
+          }
+        }
+
+        function applyPageStylesToFrame() {
+          var doc = frameDoc();
+          if (!doc || !doc.body) return;
+          if (state.settings.backgroundMode === "image" && String(state.settings.backgroundImageUrl || "").trim()) {
+            doc.body.style.background =
+              "linear-gradient(rgba(4,7,12,0.5), rgba(4,7,12,0.5)), url('" +
+              String(state.settings.backgroundImageUrl).trim() +
+              "') center / cover no-repeat";
+          } else {
+            doc.body.style.background = state.settings.backgroundColor || "#05070d";
+          }
+          doc.body.style.color = state.settings.textColor || "#f5f8ff";
+        }
+
+        function syncPayload() {
+          var doc = frameDoc();
+          if (doc && doc.documentElement) {
+            state.htmlSnapshot = "<!DOCTYPE html>\n" + doc.documentElement.outerHTML;
+          }
+          payloadField.value = JSON.stringify({
+            settings: state.settings,
+            htmlSnapshot: state.htmlSnapshot
+          });
+        }
+
+        function clearNodeHighlight() {
+          if (!selectedNode) return;
+          selectedNode.style.outline = selectedOriginalOutline || "";
+          selectedNode.style.cursor = selectedOriginalCursor || "";
+          selectedNode = null;
+          selectedOriginalOutline = "";
+          selectedOriginalCursor = "";
+        }
+
+        function getNodeTranslate(node) {
+          if (!node) return { x: 0, y: 0 };
+          var rawX = Number(node.getAttribute("data-ll-tx"));
+          var rawY = Number(node.getAttribute("data-ll-ty"));
+          return {
+            x: Number.isFinite(rawX) ? rawX : 0,
+            y: Number.isFinite(rawY) ? rawY : 0
+          };
+        }
+
+        function setNodeTranslate(node, x, y) {
+          if (!node) return;
+          var tx = Number.isFinite(x) ? Math.round(x) : 0;
+          var ty = Number.isFinite(y) ? Math.round(y) : 0;
+          node.setAttribute("data-ll-tx", String(tx));
+          node.setAttribute("data-ll-ty", String(ty));
+          node.style.transform = "translate(" + tx + "px, " + ty + "px)";
+          node.style.cursor = "move";
+          node.style.position = node.style.position || "relative";
+          node.style.zIndex = node.style.zIndex || "5";
+        }
+
+        function setSelectedNode(node) {
+          clearNodeHighlight();
+          selectedNode = node;
+          selectedOriginalOutline = node.style.outline || "";
+          selectedOriginalCursor = node.style.cursor || "";
+          node.style.outline = "2px solid #88b3ff";
+          node.style.cursor = "move";
+          refreshInspector();
+        }
+
+        function isEditableNode(node) {
+          if (!node || !node.tagName) return false;
+          var t = node.tagName.toLowerCase();
+          return ["h1","h2","h3","h4","h5","h6","p","span","a","button","li","img"].includes(t);
+        }
+
+        function pickEditableTarget(start) {
+          var node = start;
+          while (node && node.nodeType === 1) {
+            if (isEditableNode(node)) return node;
+            node = node.parentElement;
+          }
+          return null;
+        }
+
+        function attachFrameEditor() {
+          var doc = frameDoc();
+          if (!doc || !doc.body) return;
+
+          doc.addEventListener("click", function (evt) {
+            var target = pickEditableTarget(evt.target);
+            if (!target) return;
+            evt.preventDefault();
+            evt.stopPropagation();
+            setSelectedNode(target);
+          }, true);
+
+          doc.addEventListener("submit", function (evt) {
+            evt.preventDefault();
+          }, true);
+
+          doc.querySelectorAll("a").forEach(function (a) {
+            a.addEventListener("click", function (evt) {
+              evt.preventDefault();
+            });
+          });
+
+          doc.addEventListener("mousedown", function (evt) {
+            var target = pickEditableTarget(evt.target);
+            if (!target) return;
+            setSelectedNode(target);
+            var tr = getNodeTranslate(target);
+            dragState = {
+              node: target,
+              startX: evt.clientX,
+              startY: evt.clientY,
+              baseX: tr.x,
+              baseY: tr.y
+            };
+            evt.preventDefault();
+          }, true);
+
+          doc.addEventListener("mousemove", function (evt) {
+            if (!dragState || !dragState.node) return;
+            var dx = evt.clientX - dragState.startX;
+            var dy = evt.clientY - dragState.startY;
+            setNodeTranslate(dragState.node, dragState.baseX + dx, dragState.baseY + dy);
+            refreshInspector();
+            syncPayload();
+            evt.preventDefault();
+          }, true);
+
+          doc.addEventListener("mouseup", function () {
+            if (!dragState) return;
+            dragState = null;
+            syncPayload();
+          }, true);
+
+          frameReady = true;
+          applyPageStylesToFrame();
+          syncPayload();
+          refreshInspector();
+        }
+
+        function refreshInspector() {
+          document.getElementById("pageBgMode").value = state.settings.backgroundMode || "color";
+          document.getElementById("pageBgColor").value = state.settings.backgroundColor || "#05070d";
+          document.getElementById("pageBgImage").value = state.settings.backgroundImageUrl || "";
+          document.getElementById("pageTextColor").value = state.settings.textColor || "#f5f8ff";
+          document.getElementById("pageAccentColor").value = state.settings.accentColor || "#88b3ff";
+
+          var tag = selectedNode ? selectedNode.tagName.toLowerCase() : "";
+          document.getElementById("nodeTag").value = tag;
+          document.getElementById("nodeText").value = selectedNode ? (selectedNode.innerText || "") : "";
+          document.getElementById("nodeHref").value = selectedNode && selectedNode.tagName.toLowerCase() === "a" ? (selectedNode.getAttribute("href") || "") : "";
+          document.getElementById("nodeSrc").value = selectedNode && selectedNode.tagName.toLowerCase() === "img" ? (selectedNode.getAttribute("src") || "") : "";
+          var tr = getNodeTranslate(selectedNode);
+          document.getElementById("nodeDragX").value = tr.x;
+          document.getElementById("nodeDragY").value = tr.y;
+          document.getElementById("nodeTextColor").value = toHex(selectedNode ? selectedNode.style.color : "", "#f5f8ff");
+          document.getElementById("nodeBgColor").value = toHex(selectedNode ? selectedNode.style.backgroundColor : "", "#111827");
+        }
+
+        document.querySelectorAll("[data-preview-mode]").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            previewMode = btn.getAttribute("data-preview-mode") || "desktop";
+            updateFrameMode();
+          });
+        });
+
+        document.getElementById("reloadFromLiveBtn").addEventListener("click", function () {
+          clearNodeHighlight();
+          frameReady = false;
+          frameEl.removeAttribute("srcdoc");
+          frameEl.src = "<%= livePageUrl %>";
+        });
+
+        document.getElementById("clearSelectionBtn").addEventListener("click", function () {
+          clearNodeHighlight();
+          refreshInspector();
+        });
+
+        document.getElementById("pageBgMode").addEventListener("change", function (e) {
+          state.settings.backgroundMode = e.target.value === "image" ? "image" : "color";
+          applyPageStylesToFrame();
+          syncPayload();
+        });
+        document.getElementById("pageBgColor").addEventListener("input", function (e) {
+          state.settings.backgroundColor = e.target.value || "#05070d";
+          applyPageStylesToFrame();
+          syncPayload();
+        });
+        document.getElementById("pageBgImage").addEventListener("input", function (e) {
+          state.settings.backgroundImageUrl = String(e.target.value || "").trim();
+          applyPageStylesToFrame();
+          syncPayload();
+        });
+        document.getElementById("pageTextColor").addEventListener("input", function (e) {
+          state.settings.textColor = e.target.value || "#f5f8ff";
+          applyPageStylesToFrame();
+          syncPayload();
+        });
+        document.getElementById("pageAccentColor").addEventListener("input", function (e) {
+          state.settings.accentColor = e.target.value || "#88b3ff";
+          syncPayload();
+        });
+
+        document.getElementById("nodeText").addEventListener("input", function (e) {
+          if (!selectedNode) return;
+          if (selectedNode.tagName.toLowerCase() === "img") return;
+          selectedNode.innerText = e.target.value || "";
+          syncPayload();
+        });
+        document.getElementById("nodeHref").addEventListener("input", function (e) {
+          if (!selectedNode || selectedNode.tagName.toLowerCase() !== "a") return;
+          selectedNode.setAttribute("href", String(e.target.value || "").trim());
+          syncPayload();
+        });
+        document.getElementById("nodeSrc").addEventListener("input", function (e) {
+          if (!selectedNode || selectedNode.tagName.toLowerCase() !== "img") return;
+          selectedNode.setAttribute("src", String(e.target.value || "").trim());
+          syncPayload();
+        });
+        document.getElementById("nodeDragX").addEventListener("input", function (e) {
+          if (!selectedNode) return;
+          var tr = getNodeTranslate(selectedNode);
+          setNodeTranslate(selectedNode, Number(e.target.value) || 0, tr.y);
+          syncPayload();
+        });
+        document.getElementById("nodeDragY").addEventListener("input", function (e) {
+          if (!selectedNode) return;
+          var tr = getNodeTranslate(selectedNode);
+          setNodeTranslate(selectedNode, tr.x, Number(e.target.value) || 0);
+          syncPayload();
+        });
+        document.getElementById("nodeTextColor").addEventListener("input", function (e) {
+          if (!selectedNode) return;
+          selectedNode.style.color = e.target.value || "";
+          syncPayload();
+        });
+        document.getElementById("nodeBgColor").addEventListener("input", function (e) {
+          if (!selectedNode) return;
+          selectedNode.style.backgroundColor = e.target.value || "";
+          syncPayload();
+        });
+        document.getElementById("removeNodeBtn").addEventListener("click", function () {
+          if (!selectedNode) return;
+          var next = selectedNode.parentElement;
+          selectedNode.remove();
+          clearNodeHighlight();
+          selectedNode = null;
+          selectedOriginalOutline = "";
+          if (next && isEditableNode(next)) {
+            setSelectedNode(next);
+          }
+          dragState = null;
+          syncPayload();
+          refreshInspector();
+        });
+
+        var incoming = initialBuilder || {};
+        var incomingSettings = incoming.settings || {};
+        state.settings = {
+          backgroundMode: incomingSettings.backgroundMode === "image" ? "image" : "color",
+          backgroundColor: String(incomingSettings.backgroundColor || "#05070d"),
+          backgroundImageUrl: String(incomingSettings.backgroundImageUrl || ""),
+          textColor: String(incomingSettings.textColor || "#f5f8ff"),
+          accentColor: String(incomingSettings.accentColor || "#88b3ff")
+        };
+
+        if (incoming.htmlSnapshot) {
+          frameEl.setAttribute("srcdoc", incoming.htmlSnapshot);
+        } else {
+          frameEl.src = "<%= livePageUrl %>";
+        }
+
+        frameEl.addEventListener("load", function () {
+          attachFrameEditor();
+        });
+
+        updateFrameMode();
+        refreshInspector();
+        formEl.addEventListener("submit", function () {
+          if (frameReady) syncPayload();
+        });
+      })();
+    </script>
+    <script src="/custom-cursor.js" defer></script>
+  </body>
+</html>

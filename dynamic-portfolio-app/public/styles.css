@@ -729,6 +729,68 @@ h1 span {
   padding: 3rem 0;
 }
 
+.form-page--with-live-preview .form-wrap {
+  width: min(1360px, 94%);
+  max-width: none;
+}
+
+.form-editor-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 40%);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.form-editor-main {
+  min-width: 0;
+}
+
+.form-editor-preview {
+  min-width: 0;
+}
+
+.live-preview-panel {
+  position: sticky;
+  top: 1rem;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.live-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.live-preview-header .eyebrow {
+  margin: 0;
+}
+
+.live-preview-hint {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+@media (max-width: 1080px) {
+  .form-editor-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .live-preview-panel {
+    position: relative;
+    top: auto;
+  }
+
+  .live-preview-frame {
+    min-height: 52vh;
+    height: 52vh;
+  }
+}
+
 .form-card {
   border: 1px solid var(--glass-stroke-soft);
   border-radius: 1.35rem;
@@ -753,6 +815,14 @@ h1 span {
   align-items: center;
   gap: 0.8rem;
   margin-bottom: 0.9rem;
+}
+
+.form-topbar-cluster {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  min-width: 0;
 }
 
 .form-user {
@@ -1945,10 +2015,12 @@ body.theme-light.portfolio-page {
 
 .live-preview-frame {
   width: 100%;
-  min-height: 76vh;
+  min-height: min(78vh, 880px);
+  height: 78vh;
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 1rem;
-  background: rgba(3, 8, 18, 0.6);
+  background: rgba(3, 8, 18, 0.75);
+  display: block;
 }
 
 .experience-entry-list {

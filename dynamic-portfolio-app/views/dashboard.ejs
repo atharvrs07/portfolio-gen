@@ -29,7 +29,7 @@
           <div>
             <p class="eyebrow">Dashboard</p>
             <h1>Your generated portfolios</h1>
-            <p class="plan-chip <%= isPro ? 'plan-chip--pro' : 'plan-chip--basic' %>">
+            <p class="plan-chip <%= isPaidPlan ? 'plan-chip--pro' : 'plan-chip--basic' %>">
               <%= planLabel %>
             </p>
             <p class="hero-text">
@@ -55,12 +55,12 @@
           </div>
         </div>
 
-        <% if (!isPro) { %>
+        <% if (!canCustomize) { %>
         <div class="plan-banner-basic">
           <p>
-            Basic plan: you can create 1 portfolio and edit content fields. Layout, colors, and typography customization are Pro features.
+            Free plan: you can create 1 portfolio and edit content fields. Theme, layout, colors, and typography are Plus features.
           </p>
-          <a href="/pricing?reason=upgrade&next=%2Fdashboard" class="btn btn-primary">View all plans</a>
+          <a href="/pricing?reason=upgrade&plan=plus&next=%2Fdashboard" class="btn btn-primary">View all plans</a>
         </div>
         <% } %>
 
@@ -95,6 +95,21 @@
               >
                 Edit
               </a>
+              <% if (canUseBuilder) { %>
+              <a
+                href="/portfolio/<%= item.portfolioId || item.slug || item.id %>/builder"
+                class="btn btn-ghost"
+              >
+                Builder
+              </a>
+              <% } else { %>
+              <a
+                href="/pricing?reason=builder&plan=pro&next=<%= encodeURIComponent('/portfolio/' + (item.portfolioId || item.slug || item.id) + '/builder') %>"
+                class="btn btn-ghost"
+              >
+                Pro Builder
+              </a>
+              <% } %>
               <form
                 action="/portfolio/<%= item.portfolioId || item.slug || item.id %>/delete"
                 method="POST"

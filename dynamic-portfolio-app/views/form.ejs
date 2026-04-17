@@ -18,49 +18,20 @@
       referrerpolicy="no-referrer"
     />
     <link rel="stylesheet" href="/styles.css" />
-    <style>
-      .builder-live-layout {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(360px, 44%);
-        gap: 1rem;
-        align-items: start;
-      }
-      .builder-pane {
-        min-width: 0;
-      }
-      .builder-preview-pane {
-        position: sticky;
-        top: 1rem;
-      }
-      .builder-preview-pane h3 {
-        margin: 0 0 0.45rem;
-        font-size: 0.95rem;
-        color: var(--muted);
-      }
-      .builder-preview-pane .live-preview-frame {
-        min-height: 82vh;
-      }
-      @media (max-width: 1080px) {
-        .builder-live-layout {
-          grid-template-columns: 1fr;
-        }
-        .builder-preview-pane {
-          position: static;
-        }
-        .builder-preview-pane .live-preview-frame {
-          min-height: 64vh;
-        }
-      }
-    </style>
   </head>
-  <body class="form-page">
+  <body class="form-page form-page--with-live-preview">
     <div class="aurora aurora--one"></div>
     <div class="aurora aurora--two"></div>
 
     <main class="container form-wrap">
+      <div class="form-editor-shell">
+        <div class="form-editor-main">
       <section class="form-card">
         <div class="form-topbar">
-          <p class="form-user">Logged in as <%= currentUser ? currentUser.fullName : "User" %></p>
+          <div class="form-topbar-cluster">
+            <a href="/dashboard" class="btn btn-ghost">Back</a>
+            <p class="form-user">Logged in as <%= currentUser ? currentUser.fullName : "User" %></p>
+          </div>
           <form action="/logout" method="POST">
             <button type="submit" class="btn btn-ghost">Logout</button>
           </form>
@@ -73,8 +44,6 @@
           you are redirected to your own portfolio page.
         </p>
 
-        <div class="builder-live-layout">
-        <div class="builder-pane">
         <form action="/create" method="POST" enctype="multipart/form-data" class="portfolio-form" id="createPortfolioForm">
           <div class="grid-2">
             <label>
@@ -275,13 +244,28 @@
             Create My Portfolio
           </button>
         </form>
-        </div>
-        <div class="builder-preview-pane">
-          <h3>Live preview</h3>
-          <iframe id="createLivePreviewFrame" title="Live portfolio preview" class="live-preview-frame"></iframe>
-        </div>
-        </div>
       </section>
+        </div>
+        <aside class="form-editor-preview" aria-label="Live portfolio preview">
+          <div class="live-preview-panel form-card" style="padding:1rem 1.1rem;">
+            <div class="live-preview-header">
+              <div>
+                <p class="eyebrow">Live preview</p>
+                <p class="live-preview-hint">Updates as you type</p>
+              </div>
+              <button type="button" class="btn btn-ghost" id="openCreatePreviewTabBtn" style="flex-shrink:0;">
+                Open in new tab
+              </button>
+            </div>
+            <iframe
+              class="live-preview-frame"
+              id="portfolioLivePreview"
+              title="Portfolio live preview"
+              src="about:blank"
+            ></iframe>
+          </div>
+        </aside>
+      </div>
     </main>
     <template id="experienceEntryTemplateCreate">
       <article class="experience-entry-item">
@@ -330,6 +314,7 @@
         </div>
       </article>
     </template>
+    <script src="/portfolio-live-preview.js"></script>
     <script>
       (function () {
         var THEME_PRESETS = {
@@ -360,13 +345,11 @@
             editBtn.addEventListener("click", function () {
               var isReadOnly = item.querySelector("input").readOnly;
               setEditable(item, isReadOnly);
-              refreshLivePreview();
             });
           }
           if (removeBtn) {
             removeBtn.addEventListener("click", function () {
               item.remove();
-              refreshLivePreview();
             });
           }
           setEditable(item, true);
@@ -376,7 +359,6 @@
           var node = tpl.content.firstElementChild.cloneNode(true);
           listEl.appendChild(node);
           bindItem(node);
-          refreshLivePreview();
         }
 
         function setupList(listId, addBtnId, tplId) {
@@ -399,11 +381,9 @@
             var h = normHex(hexEl.value);
             pickEl.value = h;
             hexEl.value = h;
-            refreshLivePreview();
           }
           function fromPick() {
             hexEl.value = normHex(pickEl.value);
-            refreshLivePreview();
           }
           hexEl.addEventListener("input", fromHex);
           hexEl.addEventListener("change", fromHex);
@@ -427,109 +407,24 @@
               if (h) h.value = p[k];
               if (pick) pick.value = p[k];
             });
-            refreshLivePreview();
           });
         }
 
-        function escHtml(s) {
-          return String(s || "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/\"/g, "&quot;");
-        }
-
-        function getRows(fd, a, b, c) {
-          var aa = fd.getAll(a);
-          var bb = fd.getAll(b);
-          var cc = c ? fd.getAll(c) : [];
-          var max = Math.max(aa.length, bb.length, c ? cc.length : 0);
-          var out = [];
-          for (var i = 0; i < max; i += 1) {
-            var x = String(aa[i] || "").trim();
-            var y = String(bb[i] || "").trim();
-            var z = c ? String(cc[i] || "").trim() : "";
-            if (!x && !y && !z) continue;
-            out.push(c ? [x, y, z] : [x, y]);
-          }
-          return out;
-        }
-
-        function getModel() {
-          var form = document.getElementById("createPortfolioForm");
-          if (!form) return null;
-          var fd = new FormData(form);
-          return {
-            fullName: fd.get("fullName") || "",
-            role: fd.get("role") || "",
-            headline: fd.get("headline") || "",
-            heroText: fd.get("heroText") || "",
-            shippingTitle: fd.get("shippingTitle") || "",
-            shippingHeading: fd.get("shippingHeading") || "",
-            shippingDescription: fd.get("shippingDescription") || "",
-            aboutCards: getRows(fd, "aboutTitle", "aboutDescription"),
-            projects: getRows(fd, "projectTitle", "projectPlatform", "projectDescription"),
-            experiences: getRows(fd, "experiencePeriod", "experienceTitle", "experienceDescription"),
-            styleTheme: fd.get("styleTheme") || "liquid-glass",
-            colorBg: normHex(fd.get("colorBg") || "#05070d"),
-            colorText: normHex(fd.get("colorText") || "#f5f8ff"),
-            colorAccent: normHex(fd.get("colorAccent") || "#88b3ff"),
-            colorCard: normHex(fd.get("colorCard") || "#151d30"),
-            profileImageUrl: fd.get("profileImageUrl") || "",
-            companyLogoUrl: fd.get("companyLogoUrl") || ""
-          };
-        }
-
-        function renderPreviewHtml(m) {
-          var bodyClass = "theme-style-" + escHtml(m.styleTheme || "liquid-glass");
-          return (
-            "<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>" +
-            "<style>" +
-            "body{font-family:Inter,Arial,sans-serif;margin:0;background:" + escHtml(m.colorBg) + ";color:" + escHtml(m.colorText) + ";padding:20px;}" +
-            ".wrap{max-width:1000px;margin:0 auto}.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin:12px 0}.hero h1{margin:.2rem 0}.hero h1 span{display:block;font-weight:600;color:" + escHtml(m.colorAccent) + "}" +
-            ".card{background:" + escHtml(m.colorCard) + ";border-radius:14px;padding:14px;border:1px solid rgba(255,255,255,.16)}" +
-            ".grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.stack{display:grid;gap:10px}" +
-            ".eyebrow{font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;color:" + escHtml(m.colorAccent) + ";margin:0}" +
-            ".muted{opacity:.82}.avatar{width:84px;height:84px;border-radius:999px;object-fit:cover;border:2px solid " + escHtml(m.colorAccent) + ";display:block;margin:0 0 10px}" +
-            ".projects-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.logo{max-height:46px;max-width:120px;object-fit:contain}" +
-            ".theme-style-glow h1,.theme-style-glow h2{letter-spacing:.01em;text-shadow:0 3px 0 rgba(0,0,0,.2)}" +
-            "@media(max-width:860px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:1fr}}" +
-            "</style></head><body class='" + bodyClass + "'><div class='wrap'>" +
-            "<section class='hero'><div>" +
-            (m.profileImageUrl ? ("<img class='avatar' src='" + escHtml(m.profileImageUrl) + "' alt='Profile' />") : "") +
-            "<p class='eyebrow'>" + escHtml(m.role) + "</p>" +
-            "<h1>" + escHtml(m.fullName) + "<span>" + escHtml(m.headline) + "</span></h1>" +
-            "<p class='muted'>" + escHtml(m.heroText) + "</p></div>" +
-            "<aside class='card'><p class='eyebrow'>" + escHtml(m.shippingTitle) + "</p><h3>" + escHtml(m.shippingHeading) + "</h3><p class='muted'>" + escHtml(m.shippingDescription) + "</p></aside></section>" +
-            "<section><h2>About</h2><div class='grid'>" +
-            m.aboutCards.map(function (r) { return "<article class='card'><h4>" + escHtml(r[0]) + "</h4><p class='muted'>" + escHtml(r[1]) + "</p></article>"; }).join("") +
-            "</div></section>" +
-            "<section><div class='projects-head'><h2>Projects</h2>" +
-            (m.companyLogoUrl ? ("<img class='logo' src='" + escHtml(m.companyLogoUrl) + "' alt='Logo' />") : "") +
-            "</div><div class='grid'>" +
-            m.projects.map(function (r) { return "<article class='card'><p class='eyebrow'>" + escHtml(r[1]) + "</p><h4>" + escHtml(r[0]) + "</h4><p class='muted'>" + escHtml(r[2]) + "</p></article>"; }).join("") +
-            "</div></section>" +
-            (m.experiences.length ? ("<section><h2>Experience</h2><div class='stack'>" +
-              m.experiences.map(function (r) { return "<article class='card'><p class='eyebrow'>" + escHtml(r[0]) + "</p><h4>" + escHtml(r[1]) + "</h4><p class='muted'>" + escHtml(r[2]) + "</p></article>"; }).join("") +
-              "</div></section>") : "") +
-            "</div></body></html>"
-          );
-        }
-
-        function refreshLivePreview() {
-          var frame = document.getElementById("createLivePreviewFrame");
-          if (!frame) return;
-          var m = getModel();
-          if (!m) return;
-          frame.srcdoc = renderPreviewHtml(m);
-        }
-
         var createForm = document.getElementById("createPortfolioForm");
-        if (createForm) {
-          createForm.addEventListener("input", refreshLivePreview);
-          createForm.addEventListener("change", refreshLivePreview);
+        var previewIframe = document.getElementById("portfolioLivePreview");
+        if (createForm && previewIframe && window.attachPortfolioLivePreview) {
+          window.attachPortfolioLivePreview({
+            form: createForm,
+            iframe: previewIframe,
+            mode: "create"
+          });
         }
-        refreshLivePreview();
+        var openCreatePreviewTabBtn = document.getElementById("openCreatePreviewTabBtn");
+        if (openCreatePreviewTabBtn && window.openPortfolioPreviewInNewTab && createForm) {
+          openCreatePreviewTabBtn.addEventListener("click", function () {
+            window.openPortfolioPreviewInNewTab(createForm, "create");
+          });
+        }
       })();
     </script>
     <script src="/custom-cursor.js" defer></script>

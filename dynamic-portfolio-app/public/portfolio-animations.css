@@ -1,0 +1,439 @@
+/* ═══════════════════════════════════════════════════════════
+   PORTFOLIO APPLE-STYLE FLUID ANIMATIONS
+   Scroll-triggered reveals, bounce effects, parallax,
+   and cinematic micro-interactions.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Animation tokens ─────────────────────────────────── */
+:root {
+  --anim-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --anim-fluid: cubic-bezier(0.16, 1, 0.3, 1);
+  --anim-spring: cubic-bezier(0.22, 1.3, 0.36, 1);
+  --anim-ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+/* ═══════════════════════════════════════════════════════
+   SCROLL-TRIGGERED REVEAL SYSTEM
+   Elements start hidden and animate in when visible.
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Fade up (default reveal) ─────────────────────────── */
+[data-anim="fade-up"] {
+  opacity: 0;
+  transform: translateY(48px);
+  transition: opacity 0.75s var(--anim-fluid),
+              transform 0.75s var(--anim-fluid);
+}
+
+[data-anim="fade-up"].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Bounce up ────────────────────────────────────────── */
+[data-anim="bounce-up"] {
+  opacity: 0;
+  transform: translateY(60px) scale(0.92);
+  transition: opacity 0.6s var(--anim-fluid),
+              transform 0.8s var(--anim-bounce);
+}
+
+[data-anim="bounce-up"].is-revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* ── Scale in (for cards) ─────────────────────────────── */
+[data-anim="scale-in"] {
+  opacity: 0;
+  transform: scale(0.85) translateY(30px);
+  transition: opacity 0.6s var(--anim-fluid),
+              transform 0.7s var(--anim-spring);
+}
+
+[data-anim="scale-in"].is-revealed {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+/* ── Slide from left ──────────────────────────────────── */
+[data-anim="slide-left"] {
+  opacity: 0;
+  transform: translateX(-60px);
+  transition: opacity 0.6s var(--anim-fluid),
+              transform 0.75s var(--anim-bounce);
+}
+
+[data-anim="slide-left"].is-revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ── Slide from right ─────────────────────────────────── */
+[data-anim="slide-right"] {
+  opacity: 0;
+  transform: translateX(60px);
+  transition: opacity 0.6s var(--anim-fluid),
+              transform 0.75s var(--anim-bounce);
+}
+
+[data-anim="slide-right"].is-revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ── Stagger delay via data-anim-delay ────────────────── */
+[data-anim-delay="1"] { transition-delay: 0.1s; }
+[data-anim-delay="2"] { transition-delay: 0.2s; }
+[data-anim-delay="3"] { transition-delay: 0.3s; }
+[data-anim-delay="4"] { transition-delay: 0.4s; }
+[data-anim-delay="5"] { transition-delay: 0.5s; }
+
+/* ═══════════════════════════════════════════════════════
+   HERO ENTRANCE ANIMATIONS
+   Initial load — elements animate in sequentially.
+   ═══════════════════════════════════════════════════════ */
+.portfolio-page .hero-content .eyebrow {
+  opacity: 0;
+  animation: pfHeroBounceIn 0.9s 0.15s var(--anim-bounce) forwards;
+}
+
+.portfolio-page .hero-content h1 {
+  opacity: 0;
+  animation: pfHeroBounceIn 1s 0.3s var(--anim-bounce) forwards;
+}
+
+.portfolio-page .hero-content .hero-text {
+  opacity: 0;
+  animation: pfHeroFadeUp 0.85s 0.5s var(--anim-fluid) forwards;
+}
+
+.portfolio-page .hero-content .hero-actions {
+  opacity: 0;
+  animation: pfHeroFadeUp 0.85s 0.65s var(--anim-fluid) forwards;
+}
+
+.portfolio-page .hero-card {
+  opacity: 0;
+  animation: pfCardFloat 0.95s 0.55s var(--anim-spring) forwards;
+}
+
+.portfolio-page .hero-profile-image {
+  opacity: 0;
+  animation: pfProfilePop 0.8s 0.1s var(--anim-spring) forwards;
+}
+
+/* ═══════════════════════════════════════════════════════
+   ENHANCED HOVER MICRO-INTERACTIONS
+   Fluid, bouncy hovers for interactive elements.
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Glass cards: lift + glow on hover ────────────────── */
+.portfolio-page .glass-card {
+  transition: transform 0.4s var(--anim-bounce),
+              box-shadow 0.35s var(--anim-ease-out),
+              border-color 0.3s ease;
+}
+
+.portfolio-page .glass-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 28px 56px rgba(0, 0, 0, 0.45),
+              0 0 0 1px rgba(255, 255, 255, 0.12),
+              var(--glass-inner);
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+/* ── Project cards: tilt + bounce ─────────────────────── */
+.portfolio-page .project-card {
+  transition: transform 0.4s var(--anim-bounce),
+              box-shadow 0.35s var(--anim-ease-out),
+              border-color 0.3s ease;
+}
+
+.portfolio-page .project-card:hover {
+  transform: translateY(-10px) scale(1.02) rotate(-0.5deg);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5),
+              0 0 0 1px rgba(255, 255, 255, 0.14),
+              var(--glass-inner);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+/* ── Timeline items: slide + bounce ───────────────────── */
+.portfolio-page .timeline-item {
+  transition: transform 0.4s var(--anim-bounce),
+              box-shadow 0.35s var(--anim-ease-out),
+              border-color 0.3s ease;
+}
+
+.portfolio-page .timeline-item:hover {
+  transform: translateX(8px) translateY(-3px);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.4),
+              var(--glass-inner);
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+/* ── Buttons: spring press effect ─────────────────────── */
+.portfolio-page .btn {
+  transition: transform 0.35s var(--anim-bounce),
+              box-shadow 0.3s var(--anim-ease-out),
+              background 0.3s ease;
+}
+
+.portfolio-page .btn:hover {
+  transform: translateY(-3px) scale(1.04);
+}
+
+.portfolio-page .btn:active {
+  transform: translateY(0) scale(0.97);
+  transition-duration: 0.12s;
+}
+
+.portfolio-page .btn-primary:hover {
+  box-shadow: 0 14px 36px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+/* ── Nav links: fluid underline ───────────────────────── */
+.portfolio-page .nav-links a {
+  position: relative;
+}
+
+.portfolio-page .nav-links a::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 999px;
+  transition: width 0.35s var(--anim-bounce),
+              left 0.35s var(--anim-bounce);
+}
+
+.portfolio-page .nav-links a:hover::after {
+  width: 100%;
+  left: 0;
+}
+
+/* ── Contact links: bounce hover ──────────────────────── */
+.portfolio-page .contact-links a {
+  transition: transform 0.3s var(--anim-bounce),
+              color 0.25s ease;
+}
+
+.portfolio-page .contact-links a:hover {
+  transform: translateX(4px) scale(1.05);
+}
+
+/* ═══════════════════════════════════════════════════════
+   SECTION TITLE ANIMATIONS
+   Eyebrow + heading animate when section scrolls in.
+   ═══════════════════════════════════════════════════════ */
+.portfolio-page .section-title p {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s var(--anim-fluid),
+              transform 0.65s var(--anim-bounce);
+}
+
+.portfolio-page .section-title h2 {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.65s 0.08s var(--anim-fluid),
+              transform 0.7s 0.08s var(--anim-bounce);
+}
+
+.portfolio-page .section.is-section-visible .section-title p,
+.portfolio-page .section.is-section-visible .section-title h2 {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══════════════════════════════════════════════════════
+   AURORA ORB PARALLAX ENHANCEMENT
+   Orbs float with scroll and have subtle pulse.
+   ═══════════════════════════════════════════════════════ */
+.portfolio-page .aurora {
+  will-change: transform;
+  transition: transform 0.1s linear;
+  animation: pfAuroraFloat 12s ease-in-out infinite alternate;
+}
+
+.portfolio-page .aurora--two {
+  animation-duration: 15s;
+  animation-delay: -3s;
+}
+
+/* ═══════════════════════════════════════════════════════
+   NAVBAR SCROLL EFFECT
+   ═══════════════════════════════════════════════════════ */
+.portfolio-page .site-header {
+  transition: background 0.4s ease,
+              backdrop-filter 0.4s ease,
+              box-shadow 0.4s ease;
+}
+
+.portfolio-page .site-header.is-scrolled {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* ═══════════════════════════════════════════════════════
+   FOOTER ENTRANCE
+   ═══════════════════════════════════════════════════════ */
+.portfolio-page .footer .eyebrow,
+.portfolio-page .footer-content h2,
+.portfolio-page .footer-note {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.65s var(--anim-fluid),
+              transform 0.7s var(--anim-bounce);
+}
+
+.portfolio-page .footer.is-section-visible .eyebrow,
+.portfolio-page .footer.is-section-visible h2,
+.portfolio-page .footer.is-section-visible .footer-note {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.portfolio-page .footer.is-section-visible h2 {
+  transition-delay: 0.1s;
+}
+
+.portfolio-page .footer.is-section-visible .footer-note {
+  transition-delay: 0.18s;
+}
+
+.portfolio-page .contact-links a {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s var(--anim-fluid),
+              transform 0.55s var(--anim-bounce),
+              color 0.25s ease;
+}
+
+.portfolio-page .footer.is-section-visible .contact-links a {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger contact link entrances */
+.portfolio-page .footer.is-section-visible .contact-links a:nth-child(1) { transition-delay: 0.15s; }
+.portfolio-page .footer.is-section-visible .contact-links a:nth-child(2) { transition-delay: 0.22s; }
+.portfolio-page .footer.is-section-visible .contact-links a:nth-child(3) { transition-delay: 0.29s; }
+.portfolio-page .footer.is-section-visible .contact-links a:nth-child(4) { transition-delay: 0.36s; }
+.portfolio-page .footer.is-section-visible .contact-links a:nth-child(5) { transition-delay: 0.43s; }
+.portfolio-page .footer.is-section-visible .contact-links a:nth-child(6) { transition-delay: 0.50s; }
+
+/* ═══════════════════════════════════════════════════════
+   KEYFRAMES
+   ═══════════════════════════════════════════════════════ */
+@keyframes pfHeroBounceIn {
+  0% {
+    opacity: 0;
+    transform: translateY(50px) scale(0.9);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-8px) scale(1.02);
+  }
+  80% {
+    transform: translateY(3px) scale(0.995);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pfHeroFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pfCardFloat {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.92) rotate(1deg);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(-6px) scale(1.01) rotate(-0.3deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes pfProfilePop {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  75% {
+    transform: scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pfAuroraFloat {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-10px, 14px, 0) scale(1.04);
+  }
+  100% {
+    transform: translate3d(6px, -8px, 0) scale(1.02);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   REDUCED MOTION
+   ═══════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  [data-anim],
+  .portfolio-page .hero-content .eyebrow,
+  .portfolio-page .hero-content h1,
+  .portfolio-page .hero-content .hero-text,
+  .portfolio-page .hero-content .hero-actions,
+  .portfolio-page .hero-card,
+  .portfolio-page .hero-profile-image,
+  .portfolio-page .section-title p,
+  .portfolio-page .section-title h2,
+  .portfolio-page .footer .eyebrow,
+  .portfolio-page .footer-content h2,
+  .portfolio-page .footer-note,
+  .portfolio-page .contact-links a {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .portfolio-page .aurora {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .portfolio-page .glass-card,
+  .portfolio-page .project-card,
+  .portfolio-page .timeline-item,
+  .portfolio-page .btn {
+    transition-duration: 0s !important;
+  }
+}

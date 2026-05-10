@@ -575,6 +575,38 @@ function getPlanLabel(user) {
   return `${getPlanMeta(plan).label} Plan`;
 }
 
+function getRestorablePaidPlanForUser(user) {
+  if (!user) return null;
+  if (String(user.fullName || "").trim() !== "Atharv Raj Sharma") return null;
+
+  const candidate = normalizePlanKey(user.previousPlanBeforeDowngrade || "");
+  if (isPaidPlanKey(candidate)) return candidate;
+  if (user.proActivatedAt) return "pro";
+  return null;
+}
+
+function restorePreviousPlanForEligibleUser(user) {
+  const planKey = getRestorablePaidPlanForUser(user);
+  if (!planKey) return false;
+
+  const now = Date.now();
+  const previousExpiry =
+    typeof user.previousPlanExpiresAt === "string"
+      ? new Date(user.previousPlanExpiresAt).getTime()
+      : Number.NaN;
+
+  user.plan = planKey;
+  user.planStatus = "active";
+  user.planSchemaVersion = PLAN_SCHEMA_VERSION;
+  user.planActivatedAt = new Date().toISOString();
+  if (Number.isFinite(previousExpiry) && previousExpiry > now) {
+    user.planExpiresAt = new Date(previousExpiry).toISOString();
+  } else {
+    user.planExpiresAt = addDays(new Date(), getPlanMeta(planKey).durationDays).toISOString();
+  }
+  return true;
+}
+
 function normalizeBuilderText(value, maxLen = 4000) {
   const str = String(value || "").trim();
   if (!str) return "";
@@ -685,6 +717,12 @@ function normalizeBuilderHtmlSnapshot(value) {
   const raw = value.trim();
   if (!raw) return "";
   return raw.slice(0, 800000);
+}
+
+function normalizeBuilderFeedbackText(value, maxLen = 1200) {
+  const str = String(value || "").trim();
+  if (!str) return "";
+  return str.slice(0, maxLen);
 }
 
 function normalizeBuilderConfig(value) {
@@ -1675,6 +1713,11 @@ async function loadDb() {
       user.uploadedAssets = [];
       needsWrite = true;
     }
+
+    if (!Array.isArray(user.builderFeedback)) {
+      user.builderFeedback = [];
+      needsWrite = true;
+    }
   });
 
   if (needsWrite) {
@@ -2092,6 +2135,7 @@ app.get("/dashboard", requireAuth, async (req, res) => {
   const currentPlan = resolveCurrentPlan(user);
   const isPaidPlan = currentPlan !== "free";
   const isPro = currentPlan === "pro";
+  const restorePlanKey = getRestorablePaidPlanForUser(user);
 
   const myPortfolios = db.data.portfolios.filter(
     (item) => item.ownerUserId === req.session.user.id
@@ -2107,7 +2151,10 @@ app.get("/dashboard", requireAuth, async (req, res) => {
     isPro,
     canCustomize: canCustomizePortfolio(user),
     canUseBuilder: canUseWebsiteBuilder(user),
-    planLabel: getPlanLabel(user)
+    planLabel: getPlanLabel(user),
+    viewAllPlansHref: `/pricing?reason=upgrade&next=${encodeURIComponent("/dashboard")}`,
+    showRestorePreviousPlanBtn: Boolean(restorePlanKey),
+    restorePlanLabel: restorePlanKey ? getPlanMeta(restorePlanKey).label : ""
   });
 });
 
@@ -2516,11 +2563,17 @@ app.get("/portfolio/:portfolioId/builder", requireAuth, async (req, res) => {
   }
 
   const builder = normalizeBuilderConfig(portfolio.builder);
+  const restorePlanKey = getRestorablePaidPlanForUser(user);
+  const showRestorePreviousPlanBtn = Boolean(restorePlanKey);
   return res.render("builder", {
     portfolio,
     planLabel: getPlanLabel(user),
     initialBuilderJson: JSON.stringify(builder),
-    livePageUrl: `/${portfolio.slug}`
+    livePageUrl: `/${portfolio.slug}`,
+    reviewSubmitted: req.query.review === "sent",
+    viewAllPlansHref: `/pricing?reason=upgrade&next=${encodeURIComponent(req.originalUrl)}`,
+    showRestorePreviousPlanBtn,
+    restorePlanLabel: restorePlanKey ? getPlanMeta(restorePlanKey).label : ""
   });
 });
 
@@ -2566,6 +2619,76 @@ app.post("/portfolio/:portfolioId/builder", requireAuth, async (req, res) => {
   await db.write();
 
   return res.redirect(`/${portfolio.slug}`);
+});
+
+app.post("/portfolio/:portfolioId/builder/review", requireAuth, async (req, res) => {
+  await loadDb();
+
+  const identifier = req.params.portfolioId;
+  const portfolio =
+    db.data.portfolios.find((item) => item.portfolioId === identifier) ||
+    db.data.portfolios.find(
+      (item) => item.slug === identifier || item.id === identifier
+    );
+
+  if (!portfolio) {
+    return res.status(404).send("Portfolio not found.");
+  }
+
+  if (portfolio.ownerUserId !== req.session.user.id) {
+    return res.status(403).send("You are not allowed to submit feedback for this portfolio.");
+  }
+
+  const user = getUserBySession(req);
+  if (!user) {
+    return res.status(401).send("User session not found.");
+  }
+
+  const whatToAdd = normalizeBuilderFeedbackText(req.body.whatToAdd, 2000);
+  const whatToChange = normalizeBuilderFeedbackText(req.body.whatToChange, 2000);
+  const contactBack = req.body.contactBack === "1";
+
+  if (!whatToAdd && !whatToChange) {
+    return res.redirect(
+      `/portfolio/${encodeURIComponent(identifier)}/builder?review=sent`
+    );
+  }
+
+  user.builderFeedback.unshift({
+    id: nanoid(),
+    portfolioId: portfolio.portfolioId || portfolio.id || "",
+    portfolioSlug: portfolio.slug || "",
+    whatToAdd,
+    whatToChange,
+    contactBack,
+    createdAt: new Date().toISOString()
+  });
+
+  if (user.builderFeedback.length > 100) {
+    user.builderFeedback = user.builderFeedback.slice(0, 100);
+  }
+
+  await db.write();
+  return res.redirect(
+    `/portfolio/${encodeURIComponent(identifier)}/builder?review=sent`
+  );
+});
+
+app.post("/account/restore-previous-plan", requireAuth, async (req, res) => {
+  await loadDb();
+
+  const user = getUserBySession(req);
+  if (!user) {
+    return res.status(404).send("User not found.");
+  }
+
+  const restored = restorePreviousPlanForEligibleUser(user);
+  if (!restored) {
+    return res.status(403).send("Not eligible to restore a previous plan.");
+  }
+
+  await db.write();
+  return res.redirect(sanitizeNext(req.body.next || "/dashboard"));
 });
 
 app.post("/portfolio/:portfolioId/delete", requireAuth, async (req, res) => {

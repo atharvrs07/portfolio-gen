@@ -19,6 +19,7 @@
       referrerpolicy="no-referrer"
     />
     <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/portfolio-animations.css" />
   </head>
   <body
     class="theme-<%= portfolio.theme || 'dark' %> theme-style-<%= portfolio.styleTheme || 'liquid-glass' %> portfolio-page portfolio-page-root layout-<%= portfolio.layoutVariant || 'default' %>"
@@ -300,5 +301,53 @@
       })();
     </script>
     <script src="/custom-cursor.js" defer></script>
+    <script>
+      (() => {
+        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (prefersReducedMotion) return;
+
+        const observerOptions = {
+          root: null,
+          rootMargin: "0px 0px -10% 0px",
+          threshold: 0.1
+        };
+
+        const animElements = document.querySelectorAll("[data-anim]");
+        const animObserver = new IntersectionObserver((entries, observer) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-revealed");
+              observer.unobserve(entry.target);
+            }
+          });
+        }, observerOptions);
+
+        animElements.forEach(el => animObserver.observe(el));
+
+        const sectionObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-section-visible");
+            }
+          });
+        }, { threshold: 0.1, rootMargin: "0px 0px -20% 0px" });
+
+        document.querySelectorAll(".section, .footer").forEach(el => {
+          sectionObserver.observe(el);
+        });
+        
+        // Sticky header
+        const header = document.querySelector(".site-header");
+        if (header) {
+          window.addEventListener("scroll", () => {
+            if (window.scrollY > 50) {
+              header.classList.add("is-scrolled");
+            } else {
+              header.classList.remove("is-scrolled");
+            }
+          }, { passive: true });
+        }
+      })();
+    </script>
   </body>
 </html>

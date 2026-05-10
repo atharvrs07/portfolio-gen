@@ -42,6 +42,15 @@
           </div>
           <div class="dashboard-actions">
             <a href="/form.html" class="btn btn-primary">Create New Portfolio</a>
+            <a href="<%= viewAllPlansHref %>" class="btn btn-ghost">View All Plans</a>
+            <% if (showRestorePreviousPlanBtn) { %>
+            <form action="/account/restore-previous-plan" method="POST">
+              <input type="hidden" name="next" value="/dashboard" />
+              <button type="submit" class="btn btn-primary">
+                Go Back to Previous Plan (<%= restorePlanLabel %>)
+              </button>
+            </form>
+            <% } %>
             <form action="/logout" method="POST">
               <button type="submit" class="btn btn-ghost">Logout</button>
             </form>

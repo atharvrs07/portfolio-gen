@@ -15,7 +15,7 @@
   </div>
   <div class="project-grid projects-layout--<%= portfolio.projectsLayout %>">
     <% portfolio.projects.forEach((project, idx) => { %>
-    <article class="project-card">
+    <article class="project-card" data-anim="bounce-up" data-anim-delay="<%= (idx % 3) + 1 %>">
       <div class="project-head">
         <p><%= String(idx + 1).padStart(2, "0") %></p>
         <span><%= project.platform %></span>

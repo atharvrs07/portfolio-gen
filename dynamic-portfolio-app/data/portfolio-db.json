@@ -106,10 +106,10 @@
       "colorText": "#f5f8ff",
       "colorAccent": "#008000",
       "colorCard": "#151d30",
-      "updatedAt": "2026-04-12T13:48:43.712Z",
-      "styleTheme": "glow",
+      "updatedAt": "2026-05-10T10:36:40.750Z",
+      "styleTheme": "liquid-glass",
       "analytics": {
-        "views": 174,
+        "views": 179,
         "linkClicks": 4,
         "daily": {
           "2026-04-14": {
@@ -125,24 +125,28 @@
             "linkClicks": 0
           },
           "2026-04-17": {
-            "views": 6,
+            "views": 8,
+            "linkClicks": 0
+          },
+          "2026-05-10": {
+            "views": 3,
             "linkClicks": 0
           }
         },
         "referrers": {
           "Direct": 38,
-          "Internal Portfolio": 129,
-          "Internal": 132
+          "Internal Portfolio": 133,
+          "Internal": 137
         },
         "devices": {
-          "Desktop": 299
+          "Desktop": 308
         },
         "browsers": {
-          "Firefox": 283,
-          "Chrome": 16
+          "Firefox": 289,
+          "Chrome": 19
         },
         "operatingSystems": {
-          "Windows": 299
+          "Windows": 308
         },
         "links": {},
         "utmSources": {},
@@ -152,10 +156,172 @@
           "9": 2,
           "13": 70,
           "15": 8,
-          "16": 203,
-          "18": 16
+          "16": 209,
+          "18": 19
         },
         "events": [
+          {
+            "type": "engagement",
+            "at": "2026-05-10T10:36:58.812Z",
+            "day": "2026-05-10",
+            "hour": 16,
+            "referrer": "Internal Portfolio",
+            "device": "Desktop",
+            "browser": "Firefox",
+            "os": "Windows",
+            "target": "",
+            "visitorId": "v_x2xbuqzomnzw6bl7",
+            "sessionId": "s_y4knnd5vhdmozn14hz",
+            "utmSource": "",
+            "utmMedium": "",
+            "utmCampaign": "",
+            "engagedMs": 6857,
+            "scrollDepth": 58.68
+          },
+          {
+            "type": "engagement",
+            "at": "2026-05-10T10:36:51.925Z",
+            "day": "2026-05-10",
+            "hour": 16,
+            "referrer": "Internal Portfolio",
+            "device": "Desktop",
+            "browser": "Firefox",
+            "os": "Windows",
+            "target": "",
+            "visitorId": "v_x2xbuqzomnzw6bl7",
+            "sessionId": "s_y4knnd5vhdmozn14hz",
+            "utmSource": "",
+            "utmMedium": "",
+            "utmCampaign": "",
+            "engagedMs": 10131,
+            "scrollDepth": 100
+          },
+          {
+            "type": "view",
+            "at": "2026-05-10T10:36:51.913Z",
+            "day": "2026-05-10",
+            "hour": 16,
+            "referrer": "Internal",
+            "device": "Desktop",
+            "browser": "Firefox",
+            "os": "Windows",
+            "target": "",
+            "visitorId": "v_x2xbuqzomnzw6bl7",
+            "sessionId": "",
+            "utmSource": "",
+            "utmMedium": "",
+            "utmCampaign": "",
+            "engagedMs": 0,
+            "scrollDepth": 0
+          },
+          {
+            "type": "view",
+            "at": "2026-05-10T10:36:41.735Z",
+            "day": "2026-05-10",
+            "hour": 16,
+            "referrer": "Internal",
+            "device": "Desktop",
+            "browser": "Firefox",
+            "os": "Windows",
+            "target": "",
+            "visitorId": "v_x2xbuqzomnzw6bl7",
+            "sessionId": "",
+            "utmSource": "",
+            "utmMedium": "",
+            "utmCampaign": "",
+            "engagedMs": 0,
+            "scrollDepth": 0
+          },
+          {
+            "type": "engagement",
+            "at": "2026-05-10T10:36:32.958Z",
+            "day": "2026-05-10",
+            "hour": 16,
+            "referrer": "Internal Portfolio",
+            "device": "Desktop",
+            "browser": "Firefox",
+            "os": "Windows",
+            "target": "",
+            "visitorId": "v_x2xbuqzomnzw6bl7",
+            "sessionId": "s_y4knnd5vhdmozn14hz",
+            "utmSource": "",
+            "utmMedium": "",
+            "utmCampaign": "",
+            "engagedMs": 6946,
+            "scrollDepth": 100
+          },
+          {
+            "type": "view",
+            "at": "2026-05-10T10:36:25.901Z",
+            "day": "2026-05-10",
+            "hour": 16,
+            "referrer": "Internal",
+            "device": "Desktop",
+            "browser": "Firefox",
+            "os": "Windows",
+            "target": "",
+            "visitorId": "v_x2xbuqzomnzw6bl7",
+            "sessionId": "",
+            "utmSource": "",
+            "utmMedium": "",
+            "utmCampaign": "",
+            "engagedMs": 0,
+            "scrollDepth": 0
+          },
+          {
+            "type": "engagement",
+            "at": "2026-04-17T12:54:33.372Z",
+            "day": "2026-04-17",
+            "hour": 18,
+            "referrer": "Internal Portfolio",
+            "device": "Desktop",
+            "browser": "Chrome",
+            "os": "Windows",
+            "target": "",
+            "visitorId": "v_pm2li3ytlcrmo2u8ejk",
+            "sessionId": "s_g4dilnjkj5mo2wu3jp",
+            "utmSource": "",
+            "utmMedium": "",
+            "utmCampaign": "",
+            "engagedMs": 2851,
+            "scrollDepth": 0
+          },
+          {
+            "type": "view",
+            "at": "2026-04-17T12:54:30.497Z",
+            "day": "2026-04-17",
+            "hour": 18,
+            "referrer": "Internal",
+            "device": "Desktop",
+            "browser": "Chrome",
+            "os": "Windows",
+            "target": "",
+            "visitorId": "v_pm2li3ytlcrmo2u8ejk",
+            "sessionId": "",
+            "utmSource": "",
+            "utmMedium": "",
+            "utmCampaign": "",
+            "engagedMs": 0,
+            "scrollDepth": 0
+          },
+          {
+            "type": "view",
+            "at": "2026-04-17T12:54:30.482Z",
+            "day": "2026-04-17",
+            "hour": 18,
+            "referrer": "Internal",
+            "device": "Desktop",
+            "browser": "Chrome",
+            "os": "Windows",
+            "target": "",
+            "visitorId": "v_pm2li3ytlcrmo2u8ejk",
+            "sessionId": "",
+            "utmSource": "",
+            "utmMedium": "",
+            "utmCampaign": "",
+            "engagedMs": 0,
+            "scrollDepth": 0
+          },
           {
             "type": "engagement",
             "at": "2026-04-17T12:39:27.586Z",
@@ -5539,9 +5705,9 @@
             "scrollDepth": 0
           }
         ],
-        "totalEngagedMs": 359297,
+        "totalEngagedMs": 386082,
         "maxScrollDepth": 100,
-        "lastSeenAt": "2026-04-17T12:39:27.586Z"
+        "lastSeenAt": "2026-05-10T10:36:58.812Z"
       },
       "builder": {
         "enabled": false,
@@ -5678,7 +5844,8 @@
       "planStatus": "inactive",
       "planExpiresAt": null,
       "uploadedAssets": [],
-      "planSchemaVersion": 2
+      "planSchemaVersion": 2,
+      "builderFeedback": []
     },
     {
       "id": "ypuawd9b",
@@ -5688,7 +5855,7 @@
       "createdAt": "2026-03-26T08:11:38.603Z",
       "plan": "pro",
       "planStatus": "active",
-      "planExpiresAt": "2026-05-17T12:09:26.240Z",
+      "planExpiresAt": "2026-06-09T09:45:40.184Z",
       "proActivatedAt": "2026-04-08T10:12:55.806Z",
       "uploadedAssets": [
         {
@@ -5773,7 +5940,8 @@
         }
       ],
       "planSchemaVersion": 2,
-      "planActivatedAt": "2026-04-17T12:09:26.240Z"
+      "planActivatedAt": "2026-05-10T09:45:40.184Z",
+      "builderFeedback": []
     },
     {
       "id": "4u67bn86",
@@ -5786,7 +5954,8 @@
       "proActivatedAt": "2026-03-25T16:13:17.101Z",
       "planExpiresAt": null,
       "uploadedAssets": [],
-      "planSchemaVersion": 2
+      "planSchemaVersion": 2,
+      "builderFeedback": []
     }
   ],
   "pendingSignups": []

@@ -4,8 +4,8 @@
     <h2>Get to know more about me.</h2>
   </div>
   <div class="about-grid about-layout--<%= portfolio.aboutLayout %>">
-    <% portfolio.aboutCards.forEach((card) => { %>
-    <article class="glass-card">
+    <% portfolio.aboutCards.forEach((card, idx) => { %>
+    <article class="glass-card" data-anim="scale-in" data-anim-delay="<%= (idx % 3) + 1 %>">
       <h3><%= card.title %></h3>
       <div data-read-more-container>
         <p class="text-clamp-3" data-read-more-text><%= card.description %></p>

@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
     <link
@@ -22,134 +22,237 @@
       referrerpolicy="no-referrer"
     />
     <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/ds-landing.css" />
   </head>
-  <body class="landing-page ll-landing">
-    <div class="ll-landing__bg" aria-hidden="true"></div>
-    <div class="ll-landing__orb ll-landing__orb--one" aria-hidden="true"></div>
-    <div class="ll-landing__orb ll-landing__orb--two" aria-hidden="true"></div>
-    <main>
-      <section class="container ll-landing__hero">
-        <div class="ll-landing__hero-grid">
-          <div class="ll-landing__copy">
-            <p class="eyebrow">Free to start</p>
-            <h1>
-              LiquiLink
-              <span>Make your link-in-bio feel premium.</span>
-            </h1>
-            <p class="hero-text">
-              One short form, one polished page, one shareable URL like
-              <span class="mono">https://yoursite.com/your-name</span>. See how a
-              finished page can look in the preview — then build your own in
-              minutes.
-            </p>
-            <div class="landing-actions">
-              <% if (currentUser) { %>
-              <a class="btn btn-primary" href="/dashboard">
-                <i class="fa-solid fa-table-columns" aria-hidden="true"></i>
-                Go to my dashboard
-              </a>
-              <a class="btn btn-ghost" href="/form.html">Create new portfolio</a>
-              <form action="/logout" method="POST">
-                <button type="submit" class="btn btn-ghost">Logout</button>
-              </form>
-              <% } else { %>
-              <a class="btn btn-primary" href="/signup">
-                <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
-                Create your account
-              </a>
-              <a class="btn btn-ghost" href="/login">
-                <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i>
-                Log in to dashboard
-              </a>
-              <% } %>
-            </div>
-            <div class="ll-landing__quick-stats">
-              <article>
-                <h2>Fast setup</h2>
-                <p>Fill a form and go live in minutes.</p>
+  <body class="landing-page ll-landing ds-landing">
+
+    <!-- ─── Fixed background canvas ─── -->
+    <div class="ds-bg" aria-hidden="true">
+      <div class="ds-bg__gradient"></div>
+      <div class="ds-bg__grid"></div>
+      <div class="ds-bg__orb ds-bg__orb--1"></div>
+      <div class="ds-bg__orb ds-bg__orb--2"></div>
+      <div class="ds-bg__orb ds-bg__orb--3"></div>
+    </div>
+
+    <!-- ─── Floating nav ─── -->
+    <nav class="ds-nav" id="ds-nav">
+      <a href="/" class="ds-nav__brand">Liqui<span>Link</span></a>
+      <div class="ds-nav__links">
+        <% if (currentUser) { %>
+        <a class="ds-nav__link" href="/dashboard">Dashboard</a>
+        <% } else { %>
+        <a class="ds-nav__link" href="#ds-features">Features</a>
+        <a class="ds-nav__link" href="#ds-steps">How it works</a>
+        <a class="ds-nav__link ds-nav__link--cta" href="/signup">Get Started</a>
+        <% } %>
+      </div>
+    </nav>
+
+    <main class="ds-main">
+
+      <!-- ═══════════════════════════════════════════════════
+           SECTION 1 — HERO  (full-viewport, text scales on scroll)
+           ═══════════════════════════════════════════════════ -->
+      <section class="ds-section ds-hero" id="ds-hero" data-ds-section="hero">
+        <div class="ds-hero__content">
+          <p class="ds-hero__eyebrow">
+            <span class="ds-eyebrow-dot"></span> Free to start
+          </p>
+          <h1 class="ds-hero__title">
+            <span class="ds-reveal-word">LiquiLink</span>
+          </h1>
+          <p class="ds-hero__subtitle ds-reveal-line">
+            Make your link-in-bio<br />feel <em>premium</em>.
+          </p>
+          <p class="ds-hero__body ds-reveal-line" data-delay="1">
+            One short form, one polished page, one shareable URL.<br />
+            Build your own in minutes.
+          </p>
+          <div class="ds-hero__actions ds-reveal-line" data-delay="2">
+            <% if (currentUser) { %>
+            <a class="ds-btn ds-btn--primary" href="/dashboard">
+              <i class="fa-solid fa-table-columns" aria-hidden="true"></i>
+              Go to my dashboard
+            </a>
+            <a class="ds-btn ds-btn--ghost" href="/form.html">Create new portfolio</a>
+            <form action="/logout" method="POST" style="display:inline">
+              <button type="submit" class="ds-btn ds-btn--ghost">Logout</button>
+            </form>
+            <% } else { %>
+            <a class="ds-btn ds-btn--primary" href="/signup">
+              <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
+              Create your account
+            </a>
+            <a class="ds-btn ds-btn--ghost" href="/login">
+              <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i>
+              Log in
+            </a>
+            <% } %>
+          </div>
+        </div>
+        <div class="ds-hero__scroll-hint" aria-hidden="true">
+          <span>Scroll</span>
+          <div class="ds-hero__scroll-arrow">
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════
+           SECTION 2 — VALUE PROP (sticky pin with stat cards)
+           ═══════════════════════════════════════════════════ -->
+      <section class="ds-section ds-value" id="ds-value" data-ds-section="value">
+        <div class="ds-sticky-wrap">
+          <div class="ds-value__inner">
+            <h2 class="ds-section-heading ds-reveal-line">
+              Everything you need.<br /><span class="ds-text-gradient">Nothing you don't.</span>
+            </h2>
+            <div class="ds-value__cards">
+              <article class="ds-value__card" data-ds-stagger="0">
+                <div class="ds-value__card-icon">
+                  <i class="fa-solid fa-rocket"></i>
+                </div>
+                <h3>Fast setup</h3>
+                <p>Fill a form and go live in minutes. No coding required.</p>
               </article>
-              <article>
-                <h2>Built-in tracking</h2>
-                <p>See views and click trends from dashboard.</p>
+              <article class="ds-value__card" data-ds-stagger="1">
+                <div class="ds-value__card-icon">
+                  <i class="fa-solid fa-chart-simple"></i>
+                </div>
+                <h3>Built-in tracking</h3>
+                <p>See views and click trends right from your dashboard.</p>
+              </article>
+              <article class="ds-value__card" data-ds-stagger="2">
+                <div class="ds-value__card-icon">
+                  <i class="fa-solid fa-palette"></i>
+                </div>
+                <h3>Fully customizable</h3>
+                <p>Themes, fonts, colors, layouts — make it truly yours.</p>
               </article>
             </div>
           </div>
-          <div class="ll-landing__visual">
-            <figure class="ll-landing__mockup">
-              <img
-                src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1400&q=82"
-                width="1400"
-                height="1050"
-                alt="Example only: laptop on a desk with a web project on screen — not a specific LiquiLink profile"
-                loading="eager"
-                decoding="async"
-              />
-            </figure>
-            <p class="ll-landing__caption">
-              Example image (stock photo) for atmosphere — not a real user profile.
-              Your published page uses your content, colors, and layout.
-            </p>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════
+           SECTION 3 — FEATURES SHOWCASE (parallax cards)
+           ═══════════════════════════════════════════════════ -->
+      <section class="ds-section ds-features" id="ds-features" data-ds-section="features">
+        <div class="ds-features__inner">
+          <p class="ds-eyebrow-label ds-reveal-line">Why LiquiLink</p>
+          <h2 class="ds-section-heading ds-reveal-line">
+            Built for creators<br />who mean business.
+          </h2>
+          <div class="ds-features__grid">
+            <article class="ds-feature-card" data-ds-stagger="0">
+              <div class="ds-feature-card__glow" aria-hidden="true"></div>
+              <div class="ds-feature-card__icon">
+                <i class="fa-solid fa-bolt"></i>
+              </div>
+              <h3>Ship in one sitting</h3>
+              <p>
+                Guided form, live-feeling preview, and a single URL you can
+                drop into every bio. No CMS rabbit holes.
+              </p>
+            </article>
+            <article class="ds-feature-card" data-ds-stagger="1">
+              <div class="ds-feature-card__glow" aria-hidden="true"></div>
+              <div class="ds-feature-card__icon">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+              </div>
+              <h3>Looks intentional</h3>
+              <p>
+                Themes, typography, and layout options so the page matches
+                your brand — not a generic link list.
+              </p>
+            </article>
+            <article class="ds-feature-card" data-ds-stagger="2">
+              <div class="ds-feature-card__glow" aria-hidden="true"></div>
+              <div class="ds-feature-card__icon">
+                <i class="fa-solid fa-chart-line"></i>
+              </div>
+              <h3>Built-in analytics</h3>
+              <p>
+                Your dashboard shows page views and outbound link clicks so
+                you can see what people actually use.
+              </p>
+            </article>
           </div>
         </div>
       </section>
 
-      <section class="container ll-landing__features" aria-label="Why LiquiLink">
-        <div class="ll-landing__feature-grid">
-          <article class="ll-landing__feature">
-            <div class="ll-landing__feature-icon" aria-hidden="true">
-              <i class="fa-solid fa-bolt"></i>
+      <!-- ═══════════════════════════════════════════════════
+           SECTION 4 — STEPS (horizontal progress)
+           ═══════════════════════════════════════════════════ -->
+      <section class="ds-section ds-steps" id="ds-steps" data-ds-section="steps">
+        <div class="ds-steps__inner">
+          <p class="ds-eyebrow-label ds-reveal-line">How it works</p>
+          <h2 class="ds-section-heading ds-reveal-line">
+            Three steps.<br /><span class="ds-text-gradient">That's it.</span>
+          </h2>
+          <div class="ds-steps__track">
+            <div class="ds-steps__progress-bar">
+              <div class="ds-steps__progress-fill" id="ds-steps-fill"></div>
             </div>
-            <h2>Ship in one sitting</h2>
-            <p>
-              Guided form, live-feeling preview, and a single URL you can drop
-              into every bio. No CMS rabbit holes.
-            </p>
-          </article>
-          <article class="ll-landing__feature">
-            <div class="ll-landing__feature-icon" aria-hidden="true">
-              <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <div class="ds-steps__items">
+              <article class="ds-step" data-ds-step="0">
+                <div class="ds-step__num"><span>01</span></div>
+                <h3>Create your page</h3>
+                <p>Add your role, links, and highlights in one guided form.</p>
+              </article>
+              <article class="ds-step" data-ds-step="1">
+                <div class="ds-step__num"><span>02</span></div>
+                <h3>Publish instantly</h3>
+                <p>Get a clean shareable URL and update anytime from your dashboard.</p>
+              </article>
+              <article class="ds-step" data-ds-step="2">
+                <div class="ds-step__num"><span>03</span></div>
+                <h3>Track engagement</h3>
+                <p>Understand what visitors click and optimize your profile over time.</p>
+              </article>
             </div>
-            <h2>Looks intentional</h2>
-            <p>
-              Themes, typography, and layout options so the page matches your
-              brand — not a generic link list.
-            </p>
-          </article>
-          <article class="ll-landing__feature">
-            <div class="ll-landing__feature-icon" aria-hidden="true">
-              <i class="fa-solid fa-chart-line"></i>
-            </div>
-            <h2>Built-in analytics</h2>
-            <p>
-              Your dashboard shows page views and outbound link clicks so you
-              can see what people actually use.
-            </p>
-          </article>
+          </div>
         </div>
       </section>
 
-      <section class="container ll-landing__steps" aria-label="How it works">
-        <h2>Build. Publish. Grow.</h2>
-        <div class="ll-landing__steps-grid">
-          <article class="ll-landing__step">
-            <span>01</span>
-            <h3>Create your page</h3>
-            <p>Add your role, links, and highlights in one guided form.</p>
-          </article>
-          <article class="ll-landing__step">
-            <span>02</span>
-            <h3>Publish instantly</h3>
-            <p>Get a clean shareable URL and update anytime from your dashboard.</p>
-          </article>
-          <article class="ll-landing__step">
-            <span>03</span>
-            <h3>Track engagement</h3>
-            <p>Understand what visitors click and optimize your profile over time.</p>
-          </article>
+      <!-- ═══════════════════════════════════════════════════
+           SECTION 5 — CTA (cinematic final reveal)
+           ═══════════════════════════════════════════════════ -->
+      <section class="ds-section ds-cta" id="ds-cta" data-ds-section="cta">
+        <div class="ds-cta__inner">
+          <h2 class="ds-cta__title ds-reveal-line">
+            Ready to build<br />something <span class="ds-text-gradient">extraordinary</span>?
+          </h2>
+          <p class="ds-cta__body ds-reveal-line" data-delay="1">
+            Join creators who use LiquiLink to share everything from one clean URL.
+          </p>
+          <div class="ds-cta__actions ds-reveal-line" data-delay="2">
+            <% if (currentUser) { %>
+            <a class="ds-btn ds-btn--primary ds-btn--lg" href="/dashboard">
+              Go to dashboard
+            </a>
+            <% } else { %>
+            <a class="ds-btn ds-btn--primary ds-btn--lg" href="/signup">
+              Get started — it's free
+            </a>
+            <a class="ds-btn ds-btn--ghost ds-btn--lg" href="/login">
+              Log in
+            </a>
+            <% } %>
+          </div>
+        </div>
+        <div class="ds-cta__rings" aria-hidden="true">
+          <div class="ds-cta__ring ds-cta__ring--1"></div>
+          <div class="ds-cta__ring ds-cta__ring--2"></div>
+          <div class="ds-cta__ring ds-cta__ring--3"></div>
         </div>
       </section>
 
-      <div class="container ll-landing__prose">
+      <!-- ═══════════════════════════════════════════════════
+           PROSE (SEO text — kept from original)
+           ═══════════════════════════════════════════════════ -->
+      <div class="container ds-prose">
         <h2 id="what-is-liquilink">What is LiquiLink?</h2>
         <p>
           LiquiLink is a link-in-bio builder and lightweight portfolio host. You
@@ -173,76 +276,164 @@
           analytics so you know what visitors engage with.
         </p>
       </div>
+
     </main>
+
+    <!-- ═══════════════════════════════════════════════════
+         SCROLL ENGINE
+         ═══════════════════════════════════════════════════ -->
     <script>
       (() => {
+        /* ── Reduced-motion check ─────────────────────── */
         const prefersReducedMotion = window.matchMedia(
           "(prefers-reduced-motion: reduce)"
         ).matches;
 
-        const revealTargets = document.querySelectorAll(
-          ".ll-landing__feature, .ll-landing__step, .ll-landing__quick-stats article, .ll-landing__mockup"
-        );
+        /* ── Nav background on scroll ─────────────────── */
+        const nav = document.getElementById("ds-nav");
+        let navSolid = false;
 
+        /* ── Reveal elements ──────────────────────────── */
+        const revealEls = document.querySelectorAll(".ds-reveal-line, .ds-reveal-word");
+        const staggerEls = document.querySelectorAll("[data-ds-stagger]");
+        const stepEls = document.querySelectorAll(".ds-step");
+        const stepFill = document.getElementById("ds-steps-fill");
+
+        /* ── Hero parallax ────────────────────────────── */
+        const heroSection = document.getElementById("ds-hero");
+        const heroContent = heroSection?.querySelector(".ds-hero__content");
+        const heroHint = heroSection?.querySelector(".ds-hero__scroll-hint");
+
+        /* ── Orbs parallax ────────────────────────────── */
+        const orbs = document.querySelectorAll(".ds-bg__orb");
+
+        /* ── IntersectionObserver for reveals ─────────── */
         if ("IntersectionObserver" in window) {
           const revealObserver = new IntersectionObserver(
             (entries, observer) => {
               entries.forEach((entry) => {
                 if (!entry.isIntersecting) return;
+                const delay = parseInt(entry.target.dataset.delay || "0", 10);
+                entry.target.style.transitionDelay = `${delay * 0.15}s`;
                 entry.target.classList.add("is-visible");
                 observer.unobserve(entry.target);
               });
             },
-            { threshold: 0.2 }
+            { threshold: 0.15, rootMargin: "0px 0px -60px 0px" }
           );
-          revealTargets.forEach((el) => revealObserver.observe(el));
-        } else {
-          revealTargets.forEach((el) => el.classList.add("is-visible"));
-        }
+          revealEls.forEach((el) => revealObserver.observe(el));
 
-        const heroVisual = document.querySelector(".ll-landing__visual");
-        if (heroVisual && !prefersReducedMotion) {
-          let heroRect = null;
-          let tiltRafId = null;
-          let tiltX = "0deg";
-          let tiltY = "0deg";
-
-          const renderTilt = () => {
-            heroVisual.style.setProperty("--tilt-x", tiltX);
-            heroVisual.style.setProperty("--tilt-y", tiltY);
-            tiltRafId = null;
-          };
-
-          const queueTiltRender = () => {
-            if (tiltRafId) return;
-            tiltRafId = window.requestAnimationFrame(renderTilt);
-          };
-
-          heroVisual.addEventListener("pointerenter", () => {
-            heroRect = heroVisual.getBoundingClientRect();
-          });
-
-          heroVisual.addEventListener("pointermove", (event) => {
-            heroRect ||= heroVisual.getBoundingClientRect();
-            const px = (event.clientX - heroRect.left) / heroRect.width - 0.5;
-            const py = (event.clientY - heroRect.top) / heroRect.height - 0.5;
-            tiltX = `${py * -6}deg`;
-            tiltY = `${px * 7}deg`;
-            queueTiltRender();
-          });
-          heroVisual.addEventListener("pointerleave", () => {
-            tiltX = "0deg";
-            tiltY = "0deg";
-            queueTiltRender();
-          });
-          window.addEventListener(
-            "resize",
-            () => {
-              heroRect = null;
+          const staggerObserver = new IntersectionObserver(
+            (entries, observer) => {
+              entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+                const idx = parseInt(entry.target.dataset.dsStagger || "0", 10);
+                entry.target.style.transitionDelay = `${idx * 0.12 + 0.1}s`;
+                entry.target.classList.add("is-visible");
+                observer.unobserve(entry.target);
+              });
             },
-            { passive: true }
+            { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }
           );
+          staggerEls.forEach((el) => staggerObserver.observe(el));
+
+          /* Steps progress */
+          const stepObserver = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add("is-active");
+                }
+              });
+            },
+            { threshold: 0.4 }
+          );
+          stepEls.forEach((el) => stepObserver.observe(el));
+        } else {
+          revealEls.forEach((el) => el.classList.add("is-visible"));
+          staggerEls.forEach((el) => el.classList.add("is-visible"));
+          stepEls.forEach((el) => el.classList.add("is-active"));
         }
+
+        /* ── Scroll-driven effects ────────────────────── */
+        if (!prefersReducedMotion) {
+          let ticking = false;
+
+          const onScroll = () => {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(() => {
+              const scrollY = window.scrollY;
+              const vh = window.innerHeight;
+
+              /* Nav solid background */
+              const shouldBeSolid = scrollY > 80;
+              if (shouldBeSolid !== navSolid) {
+                navSolid = shouldBeSolid;
+                nav.classList.toggle("is-solid", navSolid);
+              }
+
+              /* Hero parallax: scale down + fade out as user scrolls away */
+              if (heroContent && scrollY < vh * 1.5) {
+                const progress = Math.min(scrollY / (vh * 0.7), 1);
+                const scale = 1 - progress * 0.15;
+                const opacity = 1 - progress * 1.2;
+                heroContent.style.transform = `scale(${scale}) translateY(${progress * -40}px)`;
+                heroContent.style.opacity = Math.max(0, opacity);
+              }
+
+              /* Hide scroll hint */
+              if (heroHint) {
+                heroHint.style.opacity = scrollY > 100 ? "0" : "1";
+              }
+
+              /* Orb parallax */
+              orbs.forEach((orb, i) => {
+                const rate = (i + 1) * 0.03;
+                orb.style.transform = `translate3d(0, ${scrollY * rate}px, 0)`;
+              });
+
+              /* Steps progress bar */
+              if (stepFill) {
+                const stepsSection = document.getElementById("ds-steps");
+                if (stepsSection) {
+                  const rect = stepsSection.getBoundingClientRect();
+                  const sectionProgress = Math.max(
+                    0,
+                    Math.min(1, (vh - rect.top) / (rect.height + vh * 0.3))
+                  );
+                  stepFill.style.width = `${sectionProgress * 100}%`;
+                }
+              }
+
+              ticking = false;
+            });
+          };
+
+          window.addEventListener("scroll", onScroll, { passive: true });
+          onScroll(); // initial
+        } else {
+          /* Reduced motion: show everything, no transforms */
+          if (heroContent) {
+            heroContent.style.transform = "none";
+            heroContent.style.opacity = "1";
+          }
+          revealEls.forEach((el) => el.classList.add("is-visible"));
+          staggerEls.forEach((el) => el.classList.add("is-visible"));
+          stepEls.forEach((el) => el.classList.add("is-active"));
+          if (stepFill) stepFill.style.width = "100%";
+        }
+
+        /* ── Smooth scroll for anchor links ───────────── */
+        document.querySelectorAll('a[href^="#ds-"]').forEach((link) => {
+          link.addEventListener("click", (e) => {
+            const target = document.querySelector(link.getAttribute("href"));
+            if (target) {
+              e.preventDefault();
+              target.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+          });
+        });
       })();
     </script>
     <script src="/custom-cursor.js" defer></script>

@@ -12,6 +12,12 @@ const multer = require("multer");
 const { Low } = require("lowdb");
 const { JSONFile } = require("lowdb/node");
 const { customAlphabet } = require("nanoid");
+const { GoogleGenAI } = require("@google/genai");
+
+let aiClient = null;
+if (process.env.GEMINI_API_KEY) {
+  aiClient = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+}
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -441,7 +447,7 @@ function normalizeHexColor(value) {
   if (typeof value !== "string") return null;
   let s = value.trim();
   if (!s.startsWith("#")) s = `#${s}`;
-  if (!/^#[0-9A-Fa-f]{6}$/.test(s)) return null;
+  if (!/^#[0-9A-Fa-f]{3,8}$/.test(s)) return null;
   return s.toLowerCase();
 }
 
@@ -798,6 +804,7 @@ function registerPrivateAssetForUser(user, uploadedFile, kind) {
 function applyUploadedImageUrlsToRequest(req, user) {
   const profileImageFile = req.uploadedFilesMeta?.profileImageFile || null;
   const companyLogoFile = req.uploadedFilesMeta?.companyLogoFile || null;
+  const backgroundImageFile = req.uploadedFilesMeta?.backgroundImageFile || null;
 
   req.uploadedImageUrls = {
     profileImageUrl: profileImageFile
@@ -805,6 +812,9 @@ function applyUploadedImageUrlsToRequest(req, user) {
       : "",
     companyLogoUrl: companyLogoFile
       ? registerPrivateAssetForUser(user, companyLogoFile, "company-logo")
+      : "",
+    backgroundUrl: backgroundImageFile
+      ? registerPrivateAssetForUser(user, backgroundImageFile, "background")
       : ""
   };
 }
@@ -904,6 +914,7 @@ function resolvePortfolioForView(record) {
     colorCard: normalizeHexColor(record.colorCard) || preset.colorCard,
     profileImageUrl: normalizeImageUrl(record.profileImageUrl),
     companyLogoUrl: normalizeImageUrl(record.companyLogoUrl),
+    backgroundUrl: normalizeImageUrl(record.backgroundUrl),
     googleFontHref: buildGoogleFontHref(fontFamily),
     fontFamilyCss: FONT_STACK_CSS[fontFamily] || FONT_STACK_CSS.inter,
     fontBasePx: FONT_BASE_PX[fontScale] ?? 16
@@ -981,6 +992,9 @@ function buildPortfolioPayload(req) {
     companyLogoUrl:
       req.uploadedImageUrls?.companyLogoUrl ||
       normalizeImageUrl(req.body.companyLogoUrl),
+    backgroundUrl:
+      req.uploadedImageUrls?.backgroundUrl ||
+      normalizeImageUrl(req.body.backgroundUrl),
     aboutLayout: normalizeAboutLayout(req.body.aboutLayout),
     projectsLayout: normalizeProjectsLayout(req.body.projectsLayout),
     experienceLayout: normalizeExperienceLayout(req.body.experienceLayout),
@@ -2401,6 +2415,95 @@ app.post("/payment/verify", requireAuth, async (req, res) => {
     success: true,
     next: sanitizeNext(next || "/dashboard")
   });
+});
+
+app.post("/api/ai/generate", requireAuth, async (req, res) => {
+  if (!aiClient) {
+    return res.status(500).json({ error: "Gemini AI is not configured on the server." });
+  }
+
+  const prompt = String(req.body.prompt || "").trim();
+  const targetField = String(req.body.targetField || "bio").trim();
+
+  if (!prompt) {
+    return res.status(400).json({ error: "Prompt is required." });
+  }
+
+  try {
+    let systemInstruction = "You are an expert portfolio copywriter.";
+    if (targetField === "headline") {
+      systemInstruction += " Your task is to write a single, catchy headline sentence (under 12 words) summarizing what the user does.";
+    } else if (targetField === "heroText") {
+      systemInstruction += " Your task is to write a short, professional, and engaging hero description (2-3 sentences) based on the user's input. Do not include greetings. Avoid using markdown formatting or asterisks.";
+    } else {
+      systemInstruction += " Your task is to write professional text based on the user's input. Avoid using markdown formatting or asterisks.";
+    }
+
+    const response = await aiClient.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: {
+        systemInstruction,
+        temperature: 0.7,
+      }
+    });
+
+    return res.json({
+      success: true,
+      text: response.text
+    });
+  } catch (err) {
+    console.error("AI Generate Error:", err);
+    return res.status(500).json({ error: "Failed to generate AI content." });
+  }
+});
+
+app.post("/api/ai/theme", requireAuth, async (req, res) => {
+  if (!aiClient) {
+    return res.status(500).json({ error: "Gemini AI is not configured on the server." });
+  }
+
+  const prompt = String(req.body.prompt || "").trim();
+
+  if (!prompt) {
+    return res.status(400).json({ error: "Prompt is required." });
+  }
+
+  try {
+    const systemInstruction = `You are an expert UI/UX designer. Based on the user's vibe description, generate a cohesive color palette, choose the best matching font from this exact list: inter, poppins, roboto, playfair-display, space-grotesk. Also generate an image search query for the background.
+Return ONLY valid JSON in this exact format:
+{
+  "colorBg": "#HEX",
+  "colorText": "#HEX",
+  "colorAccent": "#HEX",
+  "colorCard": "#HEX",
+  "fontFamily": "font-name-from-list",
+  "imageQuery": "short-search-query-for-background"
+}`;
+
+    const response = await aiClient.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: {
+        systemInstruction,
+        temperature: 0.8,
+        responseMimeType: "application/json",
+      }
+    });
+
+    const themeData = JSON.parse(response.text);
+    if (themeData.imageQuery) {
+      themeData.backgroundUrl = `https://loremflickr.com/1920/1080/${encodeURIComponent(themeData.imageQuery.replace(/\s+/g, ','))}`;
+    }
+
+    return res.json({
+      success: true,
+      theme: themeData
+    });
+  } catch (err) {
+    console.error("AI Theme Error:", err);
+    return res.status(500).json({ error: "Failed to generate AI theme." });
+  }
 });
 
 app.get("/portfolio/:portfolioId/edit", requireAuth, async (req, res) => {

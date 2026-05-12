@@ -1,0 +1,171 @@
+<div class="modal-backdrop" id="aiModal" hidden style="display: none">
+  <section class="upgrade-modal" role="dialog" aria-modal="true" aria-labelledby="aiModalTitle">
+    <p class="eyebrow" style="color: var(--color-accent, #3b82f6);">
+      <i class="fa-solid fa-wand-magic-sparkles"></i> AI Generator
+    </p>
+    <h2 id="aiModalTitle" style="margin:0.3rem 0 0.65rem;">Generate professional copy</h2>
+    <p class="hero-text" style="margin:0 0 1rem 0; font-size: 0.9rem;">
+      Tell us briefly what you do, and we'll write the perfect text for you.
+    </p>
+    
+    <input type="hidden" id="aiTargetField" value="">
+    <textarea 
+      id="aiPromptInput" 
+      rows="3" 
+      placeholder="E.g. I am a frontend developer who loves React and clean animations..."
+      style="width: 100%; border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); padding: 0.75rem; color: inherit; font-family: inherit; margin-bottom: 1rem; resize: vertical;"
+    ></textarea>
+    
+    <div class="upgrade-modal-actions" style="margin-top: 0;">
+      <button type="button" class="btn btn-primary" id="aiGenerateBtn">
+        <span class="btn-text">Generate</span>
+        <i class="fa-solid fa-circle-notch fa-spin btn-loading-icon" style="display: none;"></i>
+      </button>
+      <button type="button" class="btn btn-ghost" id="aiCancelBtn">Cancel</button>
+    </div>
+  </section>
+</div>
+
+<script>
+  (function() {
+    var aiModal = document.getElementById("aiModal");
+    var aiPromptInput = document.getElementById("aiPromptInput");
+    var aiTargetField = document.getElementById("aiTargetField");
+    var aiGenerateBtn = document.getElementById("aiGenerateBtn");
+    var aiCancelBtn = document.getElementById("aiCancelBtn");
+    var btnText = aiGenerateBtn ? aiGenerateBtn.querySelector(".btn-text") : null;
+    var btnLoadingIcon = aiGenerateBtn ? aiGenerateBtn.querySelector(".btn-loading-icon") : null;
+
+    function openAiModal(targetFieldName) {
+      if (!aiModal) return;
+      aiTargetField.value = targetFieldName;
+      aiPromptInput.value = "";
+      aiModal.removeAttribute("hidden");
+      aiModal.style.display = "grid";
+      aiModal.style.visibility = "visible";
+      setTimeout(function() {
+        aiPromptInput.focus();
+      }, 50);
+    }
+
+    function closeAiModal() {
+      if (!aiModal) return;
+      aiModal.setAttribute("hidden", "");
+      aiModal.style.display = "none";
+      aiModal.style.visibility = "hidden";
+    }
+
+    function setGenerating(isGenerating) {
+      if (!aiGenerateBtn) return;
+      if (isGenerating) {
+        aiGenerateBtn.disabled = true;
+        aiCancelBtn.disabled = true;
+        if (btnText) btnText.textContent = "Generating...";
+        if (btnLoadingIcon) btnLoadingIcon.style.display = "inline-block";
+      } else {
+        aiGenerateBtn.disabled = false;
+        aiCancelBtn.disabled = false;
+        if (btnText) btnText.textContent = "Generate";
+        if (btnLoadingIcon) btnLoadingIcon.style.display = "none";
+      }
+    }
+
+    if (aiCancelBtn) {
+      aiCancelBtn.addEventListener("click", closeAiModal);
+    }
+
+    if (aiGenerateBtn) {
+      aiGenerateBtn.addEventListener("click", function() {
+        var prompt = aiPromptInput.value.trim();
+        var target = aiTargetField.value;
+        if (!prompt) return;
+
+        setGenerating(true);
+
+        var isTheme = (target === "theme");
+        var endpoint = isTheme ? "/api/ai/theme" : "/api/ai/generate";
+
+        fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            prompt: prompt,
+            targetField: target
+          })
+        })
+        .then(function(res) {
+          return res.json();
+        })
+        .then(function(data) {
+          if (data.success) {
+            if (isTheme && data.theme) {
+              var t = data.theme;
+              var fields = ["colorBg", "colorText", "colorAccent", "colorCard"];
+              fields.forEach(function(f) {
+                var hexInput = document.querySelector('[name="' + f + '"]');
+                var pickInput = document.querySelector('input[data-hex-field="' + f + '"]') || document.querySelector('input[data-hex-field="create-' + f + '"]');
+                if (hexInput) {
+                  hexInput.value = t[f];
+                  hexInput.dispatchEvent(new Event('input', { bubbles: true }));
+                  hexInput.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+                if (pickInput) {
+                  pickInput.value = t[f];
+                  pickInput.dispatchEvent(new Event('input', { bubbles: true }));
+                  pickInput.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+              });
+              var fontInput = document.querySelector('[name="fontFamily"]');
+              if (fontInput && t.fontFamily) {
+                fontInput.value = t.fontFamily;
+                fontInput.dispatchEvent(new Event('change', { bubbles: true }));
+              }
+              var bgUrlInput = document.querySelector('[name="backgroundUrl"]');
+              if (bgUrlInput && t.backgroundUrl) {
+                bgUrlInput.value = t.backgroundUrl;
+                bgUrlInput.dispatchEvent(new Event('input', { bubbles: true }));
+              }
+            } else if (data.text) {
+              var targetEl = document.querySelector('[name="' + target + '"]');
+              if (targetEl) {
+                targetEl.value = data.text;
+                targetEl.dispatchEvent(new Event('input', { bubbles: true }));
+              }
+            }
+            closeAiModal();
+          } else {
+            alert(data.error || "Failed to generate content.");
+          }
+        })
+        .catch(function(err) {
+          alert("An error occurred while communicating with the AI service.");
+          console.error(err);
+        })
+        .finally(function() {
+          setGenerating(false);
+        });
+      });
+    }
+
+    // Attach to all elements with class 'ai-generate-btn'
+    document.addEventListener("click", function(e) {
+      var btn = e.target.closest(".ai-generate-btn");
+      if (btn) {
+        e.preventDefault();
+        var targetName = btn.getAttribute("data-target");
+        if (targetName) {
+          openAiModal(targetName);
+        }
+      }
+    });
+    
+    // Close on escape
+    document.addEventListener("keydown", function(e) {
+      if (e.key === "Escape" && aiModal && !aiModal.hasAttribute("hidden")) {
+        closeAiModal();
+      }
+    });
+  })();
+</script>

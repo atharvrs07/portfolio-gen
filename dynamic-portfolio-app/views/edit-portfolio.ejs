@@ -124,7 +124,12 @@
             </label>
           </div>
 
-          <p class="eyebrow" style="margin-top:0.5rem;">Colors</p>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.5rem; margin-bottom: 0.5rem;">
+            <p class="eyebrow" style="margin:0;">Colors</p>
+            <button type="button" class="btn btn-ghost ai-generate-btn" data-target="theme" style="padding: 0.2rem 0.5rem; font-size: 0.8rem; height: auto;">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> AI Theme
+            </button>
+          </div>
           <div class="color-field-grid">
             <label>
               Background
@@ -163,6 +168,28 @@
             aria-label="Theme and colors are Plus only. Click for upgrade options."
           ></button>
           <% } %>
+          </div>
+
+          <div class="<%= canCustomize ? '' : 'pro-locked-block' %>" data-pro-feature="Custom background">
+            <p class="eyebrow" style="margin-top:0.5rem;">Background</p>
+            <div class="grid-2">
+              <label>
+                Background Image URL
+                <input
+                  type="text"
+                  name="backgroundUrl"
+                  value="<%= portfolio.backgroundUrl || '' %>"
+                  placeholder="https://images.unsplash.com/photo-..."
+                />
+              </label>
+              <label>
+                Background Upload
+                <input type="file" name="backgroundImageFile" accept="image/*" />
+              </label>
+            </div>
+            <% if (!canCustomize) { %>
+            <button type="button" class="pro-lock-overlay" aria-label="Custom background is Plus only."></button>
+            <% } %>
           </div>
 
           <div class="<%= canCustomize ? '' : 'pro-locked-block' %>" data-pro-feature="Portfolio layout">
@@ -276,12 +303,22 @@
           </div>
 
           <label>
-            Headline
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span>Headline</span>
+              <button type="button" class="btn btn-ghost ai-generate-btn" data-target="headline" style="padding: 0.2rem 0.5rem; font-size: 0.8rem; height: auto;">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> AI Enhance
+              </button>
+            </div>
             <input type="text" name="headline" value="<%= portfolio.headline %>" required />
           </label>
 
           <label>
-            Hero Description
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span>Hero Description</span>
+              <button type="button" class="btn btn-ghost ai-generate-btn" data-target="heroText" style="padding: 0.2rem 0.5rem; font-size: 0.8rem; height: auto;">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> AI Enhance
+              </button>
+            </div>
             <textarea name="heroText" rows="3" required><%= portfolio.heroText %></textarea>
           </label>
 
@@ -767,6 +804,7 @@
         }
       })();
     </script>
+    <%- include('partials/ai-modal') %>
     <script src="/custom-cursor.js" defer></script>
   </body>
 </html>

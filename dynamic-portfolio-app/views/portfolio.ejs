@@ -23,7 +23,7 @@
   </head>
   <body
     class="theme-<%= portfolio.theme || 'dark' %> theme-style-<%= portfolio.styleTheme || 'liquid-glass' %> portfolio-page portfolio-page-root layout-<%= portfolio.layoutVariant || 'default' %>"
-    style="font-family: <%- portfolio.fontFamilyCss %>; --bg: <%= portfolio.colorBg %>; --text: <%= portfolio.colorText %>; --accent: <%= portfolio.colorAccent %>; --accent-2: <%= portfolio.colorAccent %>; --card-bg: <%= portfolio.colorCard %>;"
+    style="font-family: <%- portfolio.fontFamilyCss %>; --bg: <%= portfolio.colorBg %>; --text: <%= portfolio.colorText %>; --accent: <%= portfolio.colorAccent %>; --accent-2: <%= portfolio.colorAccent %>; --card-bg: <%= portfolio.colorCard %>; <%- portfolio.backgroundUrl ? `--bg-image: url('${portfolio.backgroundUrl}'); --bg-overlay: block;` : '' %>"
   >
     <div class="aurora aurora--one"></div>
     <div class="aurora aurora--two"></div>
@@ -336,17 +336,45 @@
           sectionObserver.observe(el);
         });
         
-        // Sticky header
+        // Fluid scroll-linked parallax for Hero
+        const heroContent = document.querySelector(".hero-content");
+        const heroCard = document.querySelector(".hero-card");
         const header = document.querySelector(".site-header");
-        if (header) {
-          window.addEventListener("scroll", () => {
-            if (window.scrollY > 50) {
-              header.classList.add("is-scrolled");
-            } else {
-              header.classList.remove("is-scrolled");
-            }
-          }, { passive: true });
-        }
+        
+        let ticking = false;
+        window.addEventListener("scroll", () => {
+          if (!ticking) {
+            window.requestAnimationFrame(() => {
+              const scrolled = window.scrollY;
+              
+              if (heroContent && scrolled < window.innerHeight) {
+                // Fade out and move down slightly
+                const opacity = Math.max(0, 1 - scrolled / 400);
+                const yPos = scrolled * 0.4;
+                const scale = Math.max(0.9, 1 - scrolled / 1500);
+                heroContent.style.transform = `translateY(${yPos}px) scale(${scale})`;
+                heroContent.style.opacity = opacity;
+              }
+              
+              if (heroCard && scrolled < window.innerHeight) {
+                const yPos = scrolled * 0.25;
+                heroCard.style.transform = `translateY(${yPos}px)`;
+              }
+
+              // Sticky header
+              if (header) {
+                if (scrolled > 50) {
+                  header.classList.add("is-scrolled");
+                } else {
+                  header.classList.remove("is-scrolled");
+                }
+              }
+              
+              ticking = false;
+            });
+            ticking = true;
+          }
+        }, { passive: true });
       })();
     </script>
   </body>

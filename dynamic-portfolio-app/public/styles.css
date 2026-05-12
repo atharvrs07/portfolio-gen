@@ -33,10 +33,24 @@ body {
   margin: 0;
   font-family: "Inter", sans-serif;
   color: var(--text);
-  background: radial-gradient(circle at 20% 15%, #10182a 0%, var(--bg) 50%);
+  background-color: var(--bg);
+  background-image: var(--bg-image, radial-gradient(circle at 20% 15%, #10182a 0%, var(--bg) 50%));
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   min-height: 100vh;
   line-height: 1.6;
   overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: -2;
+  pointer-events: none;
+  display: var(--bg-overlay, none);
 }
 
 body.theme-light {
@@ -59,7 +73,7 @@ body.theme-light {
 
 /* Portfolio light theme: elements that used fixed “dark UI” text colors */
 body.theme-light {
-  background: radial-gradient(circle at 20% 15%, #ffffff 0%, var(--bg) 55%);
+  background-image: var(--bg-image, radial-gradient(circle at 20% 15%, #ffffff 0%, var(--bg) 55%));
 }
 
 body.theme-light .aurora {
@@ -1517,7 +1531,7 @@ h1 span {
   --aurora-one: color-mix(in srgb, var(--accent) 64%, var(--bg));
   --aurora-two: color-mix(in srgb, var(--card-bg) 52%, var(--accent));
   color: var(--text);
-  background: radial-gradient(
+  background-image: var(--bg-image, radial-gradient(
     circle at 20% 15%,
     color-mix(in srgb, var(--bg) 82%, var(--accent)) 0%,
     var(--bg) 50%
@@ -1526,17 +1540,19 @@ h1 span {
       circle at 90% 92%,
       color-mix(in srgb, var(--accent) 24%, var(--card-bg)) 0%,
       transparent 45%
-  );
+  ));
+  background-color: var(--bg);
 }
 
 body.theme-light.portfolio-page {
   --aurora-one: color-mix(in srgb, var(--accent) 48%, white);
   --aurora-two: color-mix(in srgb, var(--accent) 32%, var(--card-bg));
-  background: radial-gradient(
+  background-image: var(--bg-image, radial-gradient(
     circle at 20% 15%,
     color-mix(in srgb, var(--bg) 92%, white) 0%,
     var(--bg) 55%
-  );
+  ));
+  background-color: var(--bg);
 }
 
 .portfolio-page .aurora--one {
@@ -1694,10 +1710,11 @@ body.theme-light.portfolio-page {
 /* Liquid Glass: compatibility-safe fallback (no color-mix) */
 .portfolio-page.theme-style-liquid-glass {
   --muted: rgba(245, 248, 255, 0.76);
-  background:
+  background-image: var(--bg-image, 
     radial-gradient(circle at 18% 14%, var(--accent) 0%, transparent 34%),
-    radial-gradient(circle at 88% 90%, var(--card-bg) 0%, transparent 42%),
-    var(--bg);
+    radial-gradient(circle at 88% 90%, var(--card-bg) 0%, transparent 42%)
+  );
+  background-color: var(--bg);
   color: var(--text);
 }
 
@@ -1708,10 +1725,11 @@ body.theme-light.portfolio-page {
   --accent-2: #7de3ff;
   --card-bg: #151d30;
   --muted: rgba(230, 238, 255, 0.74);
-  background:
+  background-image: var(--bg-image, 
     radial-gradient(circle at 20% 15%, #1a2a4b 0%, rgba(26, 42, 75, 0.45) 22%, transparent 45%),
-    radial-gradient(circle at 86% 88%, rgba(83, 224, 255, 0.22) 0%, transparent 40%),
-    #05070d;
+    radial-gradient(circle at 86% 88%, rgba(83, 224, 255, 0.22) 0%, transparent 40%)
+  );
+  background-color: var(--bg);
 }
 
 .portfolio-page.theme-light.theme-style-liquid-glass {
@@ -1721,10 +1739,11 @@ body.theme-light.portfolio-page {
   --accent-2: #0b7dcf;
   --card-bg: #ffffff;
   --muted: rgba(30, 47, 75, 0.7);
-  background:
+  background-image: var(--bg-image, 
     radial-gradient(circle at 18% 14%, rgba(53, 110, 213, 0.24) 0%, transparent 34%),
-    radial-gradient(circle at 88% 90%, rgba(125, 165, 235, 0.2) 0%, transparent 42%),
-    var(--bg);
+    radial-gradient(circle at 88% 90%, rgba(125, 165, 235, 0.2) 0%, transparent 42%)
+  );
+  background-color: var(--bg);
 }
 
 .portfolio-page.theme-style-liquid-glass .site-header {
@@ -2919,4 +2938,5 @@ body.ll-cursor-preset-diamond .ll-site-cursor__trail {
     translate: 0 0 !important;
   }
 }
+
 

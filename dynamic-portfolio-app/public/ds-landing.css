@@ -1986,3 +1986,167 @@ html[data-theme="dark"] .ds-footer__link:hover { color: #e6ecff; }
 html[data-theme="dark"] .ds-footer__divider { background: rgba(255, 255, 255, 0.07); }
 html[data-theme="dark"] .ds-footer__copy,
 html[data-theme="dark"] .ds-footer__made { color: rgba(230, 236, 255, 0.28); }
+
+/* ═══════════════════════════════════════════════════════
+   LIQUID GLASS — landing surfaces (nav, toggle, tabs, cards)
+   True refraction (#liquid-lens) + beveled specular edges.
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Nav pill (scrolled state) ───────────────────────── */
+.ds-nav.is-solid .ds-nav__inner {
+  background: rgba(255, 255, 255, 0.55);
+  -webkit-backdrop-filter: blur(8px) saturate(190%) brightness(1.08);
+  backdrop-filter: blur(8px) saturate(190%) brightness(1.08);
+  box-shadow:
+    inset 1.6px 1.6px 1.4px -1.2px rgba(255, 255, 255, 0.95),
+    inset -1.2px -1.2px 1.2px -1.2px rgba(255, 255, 255, 0.55),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+    0 6px 20px rgba(15, 26, 47, 0.12),
+    0 14px 40px rgba(15, 26, 47, 0.10);
+  border-color: transparent;
+}
+html[data-theme="dark"] .ds-nav.is-solid .ds-nav__inner {
+  background: rgba(10, 13, 26, 0.50);
+  box-shadow:
+    inset 1.6px 1.6px 1.4px -1.2px rgba(255, 255, 255, 0.45),
+    inset -1.2px -1.2px 1.2px -1.2px rgba(255, 255, 255, 0.14),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.10),
+    0 8px 24px rgba(0, 0, 0, 0.45),
+    0 18px 50px rgba(0, 0, 0, 0.40);
+}
+
+/* ── Showcase tab pill ───────────────────────────────── */
+.ds-showcase__tabs {
+  background: rgba(255, 255, 255, 0.45);
+  -webkit-backdrop-filter: blur(7px) saturate(180%) brightness(1.06);
+  backdrop-filter: blur(7px) saturate(180%) brightness(1.06);
+  box-shadow:
+    inset 1.4px 1.4px 1.2px -1px rgba(255, 255, 255, 0.9),
+    inset -1px -1px 1px -1px rgba(255, 255, 255, 0.5),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    0 4px 16px rgba(15, 26, 47, 0.10);
+  border-color: transparent;
+}
+html[data-theme="dark"] .ds-showcase__tabs {
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow:
+    inset 1.4px 1.4px 1.2px -1px rgba(255, 255, 255, 0.4),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.10),
+    0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Value / Feature / Step cards → liquid glass ─────── */
+.ds-value__card,
+.ds-feature-card,
+.ds-step {
+  background: rgba(255, 255, 255, 0.52);
+  border: 1px solid transparent;
+  -webkit-backdrop-filter: blur(6px) saturate(180%) brightness(1.06);
+  backdrop-filter: blur(6px) saturate(180%) brightness(1.06);
+  box-shadow:
+    inset 1.8px 1.8px 1.6px -1.4px rgba(255, 255, 255, 0.95),
+    inset -1.4px -1.4px 1.4px -1.4px rgba(255, 255, 255, 0.55),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    0 6px 18px rgba(15, 26, 47, 0.09),
+    0 18px 44px rgba(15, 26, 47, 0.10);
+}
+.ds-value__card:hover,
+.ds-feature-card:hover {
+  box-shadow:
+    inset 1.8px 1.8px 1.6px -1.4px rgba(255, 255, 255, 0.95),
+    inset -1.4px -1.4px 1.4px -1.4px rgba(255, 255, 255, 0.55),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+    0 12px 28px rgba(15, 26, 47, 0.14),
+    0 30px 66px rgba(15, 26, 47, 0.16);
+}
+
+/* Dark-theme card tints (override the earlier dark block) */
+html[data-theme="dark"] .ds-value__card,
+html[data-theme="dark"] .ds-feature-card,
+html[data-theme="dark"] .ds-step {
+  background: rgba(255, 255, 255, 0.055);
+  border-color: transparent;
+  box-shadow:
+    inset 1.8px 1.8px 1.6px -1.4px rgba(255, 255, 255, 0.5),
+    inset -1.4px -1.4px 1.4px -1.4px rgba(255, 255, 255, 0.16),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.10),
+    0 8px 22px rgba(0, 0, 0, 0.42),
+    0 22px 58px rgba(0, 0, 0, 0.38);
+}
+html[data-theme="dark"] .ds-value__card:hover,
+html[data-theme="dark"] .ds-feature-card:hover {
+  box-shadow:
+    inset 1.8px 1.8px 1.6px -1.4px rgba(255, 255, 255, 0.55),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 12px 30px rgba(0, 0, 0, 0.5),
+    0 32px 78px rgba(0, 0, 0, 0.46);
+}
+
+/* Refraction layer — Chromium only (graceful elsewhere) */
+@supports (backdrop-filter: url("#liquid-lens")) or (-webkit-backdrop-filter: url("#liquid-lens")) {
+  .ds-nav.is-solid .ds-nav__inner,
+  .ds-showcase__tabs {
+    -webkit-backdrop-filter: blur(7px) saturate(185%) brightness(1.07) url("#liquid-lens-soft");
+    backdrop-filter: blur(7px) saturate(185%) brightness(1.07) url("#liquid-lens-soft");
+  }
+  .ds-value__card,
+  .ds-feature-card,
+  .ds-step {
+    -webkit-backdrop-filter: blur(6px) saturate(180%) brightness(1.06) url("#liquid-lens");
+    backdrop-filter: blur(6px) saturate(180%) brightness(1.06) url("#liquid-lens");
+  }
+  .ds-theme-toggle {
+    -webkit-backdrop-filter: blur(8px) saturate(160%) url("#liquid-lens-soft");
+    backdrop-filter: blur(8px) saturate(160%) url("#liquid-lens-soft");
+  }
+}
+
+/* Specular hotspot on landing cards */
+.ds-value__card::after,
+.ds-feature-card::after,
+.ds-step::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    130% 100% at 12% -8%,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0.08) 26%,
+    rgba(255, 255, 255, 0) 50%
+  );
+  mix-blend-mode: screen;
+  opacity: 0.7;
+  z-index: 0;
+}
+.ds-value__card > *,
+.ds-feature-card > *,
+.ds-step > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Dark-theme refraction (defeats earlier dark backdrop rules) ── */
+html[data-theme="dark"] .ds-value__card,
+html[data-theme="dark"] .ds-feature-card,
+html[data-theme="dark"] .ds-step {
+  -webkit-backdrop-filter: blur(7px) saturate(165%) brightness(1.10);
+  backdrop-filter: blur(7px) saturate(165%) brightness(1.10);
+}
+html[data-theme="dark"] .ds-nav.is-solid .ds-nav__inner {
+  -webkit-backdrop-filter: blur(8px) saturate(180%) brightness(1.08);
+  backdrop-filter: blur(8px) saturate(180%) brightness(1.08);
+}
+@supports (backdrop-filter: url("#liquid-lens")) or (-webkit-backdrop-filter: url("#liquid-lens")) {
+  html[data-theme="dark"] .ds-value__card,
+  html[data-theme="dark"] .ds-feature-card,
+  html[data-theme="dark"] .ds-step {
+    -webkit-backdrop-filter: blur(7px) saturate(165%) brightness(1.10) url("#liquid-lens");
+    backdrop-filter: blur(7px) saturate(165%) brightness(1.10) url("#liquid-lens");
+  }
+  html[data-theme="dark"] .ds-nav.is-solid .ds-nav__inner {
+    -webkit-backdrop-filter: blur(8px) saturate(180%) brightness(1.08) url("#liquid-lens-soft");
+    backdrop-filter: blur(8px) saturate(180%) brightness(1.08) url("#liquid-lens-soft");
+  }
+}

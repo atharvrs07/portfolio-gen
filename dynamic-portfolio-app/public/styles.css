@@ -17,6 +17,32 @@
     inset 0 0 0 1px rgba(255, 255, 255, 0.5);
   --glass-shadow: 0 8px 32px rgba(15, 26, 47, 0.10),
     0 2px 8px rgba(59, 110, 245, 0.08);
+
+  /* ── Liquid Glass material (Apple iOS 26 style) ──────────
+     Clear, refractive surface with bright beveled edges.
+     Low blur keeps it transparent; the bevel + refraction
+     (SVG #liquid-lens) sell the "thick liquid glass" look. */
+  --lg-blur: 6px;
+  --lg-saturate: 180%;
+  --lg-brightness: 1.06;
+  --lg-tint: linear-gradient(
+    147deg,
+    rgba(255, 255, 255, 0.20) 0%,
+    rgba(255, 255, 255, 0.07) 46%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  /* Beveled glass rim: bright top-left, soft bottom-right, full rim */
+  --lg-bevel:
+    inset 1.8px 1.8px 1.6px -1.4px rgba(255, 255, 255, 0.95),
+    inset -1.4px -1.4px 1.4px -1.4px rgba(255, 255, 255, 0.55),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    inset 0 1px 1px rgba(255, 255, 255, 0.40);
+  --lg-float:
+    0 6px 16px rgba(15, 26, 47, 0.10),
+    0 18px 50px rgba(15, 26, 47, 0.12);
+  --lg-float-hover:
+    0 10px 24px rgba(15, 26, 47, 0.14),
+    0 28px 70px rgba(15, 26, 47, 0.18);
 }
 
 /* ─── Dark theme variables ───────────────────────────────── */
@@ -42,6 +68,28 @@
     0 20px 60px rgba(0, 0, 0, 0.45),
     0 2px 8px rgba(92, 135, 255, 0.12);
   --bg-image: radial-gradient(circle at 20% 15%, #0d1540 0%, #06070e 55%);
+
+  /* Liquid Glass — dark context */
+  --lg-blur: 7px;
+  --lg-saturate: 165%;
+  --lg-brightness: 1.10;
+  --lg-tint: linear-gradient(
+    147deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.05) 46%,
+    rgba(255, 255, 255, 0.015) 100%
+  );
+  --lg-bevel:
+    inset 1.8px 1.8px 1.6px -1.4px rgba(255, 255, 255, 0.65),
+    inset -1.4px -1.4px 1.4px -1.4px rgba(255, 255, 255, 0.22),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+    inset 0 1px 1px rgba(255, 255, 255, 0.28);
+  --lg-float:
+    0 8px 22px rgba(0, 0, 0, 0.45),
+    0 22px 60px rgba(0, 0, 0, 0.40);
+  --lg-float-hover:
+    0 12px 30px rgba(0, 0, 0, 0.50),
+    0 32px 80px rgba(0, 0, 0, 0.48);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -67,6 +115,27 @@
       0 20px 60px rgba(0, 0, 0, 0.45),
       0 2px 8px rgba(92, 135, 255, 0.12);
     --bg-image: radial-gradient(circle at 20% 15%, #0d1540 0%, #06070e 55%);
+
+    --lg-blur: 7px;
+    --lg-saturate: 165%;
+    --lg-brightness: 1.10;
+    --lg-tint: linear-gradient(
+      147deg,
+      rgba(255, 255, 255, 0.14) 0%,
+      rgba(255, 255, 255, 0.05) 46%,
+      rgba(255, 255, 255, 0.015) 100%
+    );
+    --lg-bevel:
+      inset 1.8px 1.8px 1.6px -1.4px rgba(255, 255, 255, 0.65),
+      inset -1.4px -1.4px 1.4px -1.4px rgba(255, 255, 255, 0.22),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+      inset 0 1px 1px rgba(255, 255, 255, 0.28);
+    --lg-float:
+      0 8px 22px rgba(0, 0, 0, 0.45),
+      0 22px 60px rgba(0, 0, 0, 0.40);
+    --lg-float-hover:
+      0 12px 30px rgba(0, 0, 0, 0.50),
+      0 32px 80px rgba(0, 0, 0, 0.48);
   }
 }
 
@@ -3015,6 +3084,165 @@ body.ll-cursor-preset-diamond .ll-site-cursor__trail {
     transform: none !important;
     opacity: 1 !important;
     translate: 0 0 !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LIQUID GLASS — unified material (Apple iOS 26)
+   Refraction (#liquid-lens) + beveled specular edge + clear
+   translucency. Applied last so it governs every glass surface.
+   ═══════════════════════════════════════════════════════════ */
+.glass-card,
+.hero-card,
+.project-card,
+.timeline-item,
+.form-card,
+.auth-card,
+.dashboard-card,
+.landing-card,
+.upgrade-modal {
+  background: var(--lg-tint);
+  border: 1px solid transparent;
+  box-shadow: var(--lg-bevel), var(--lg-float);
+  -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness));
+  backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness));
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition: transform 0.34s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.34s ease;
+}
+
+/* Refraction layer — only where the browser truly supports an
+   SVG filter ref in backdrop-filter (Chromium). Elsewhere the
+   declaration above (blur+saturate) remains as the fallback. */
+@supports (backdrop-filter: url("#liquid-lens")) or (-webkit-backdrop-filter: url("#liquid-lens")) {
+  .glass-card,
+  .hero-card,
+  .project-card,
+  .timeline-item,
+  .form-card,
+  .auth-card,
+  .dashboard-card,
+  .landing-card,
+  .upgrade-modal {
+    -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness)) url("#liquid-lens");
+    backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness)) url("#liquid-lens");
+  }
+}
+
+/* Specular hotspot — bright top-left gloss like light on wet glass */
+.glass-card::before,
+.hero-card::before,
+.project-card::before,
+.timeline-item::before,
+.form-card::before,
+.auth-card::before,
+.dashboard-card::before,
+.landing-card::before,
+.upgrade-modal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    135% 100% at 12% -8%,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.10) 28%,
+    rgba(255, 255, 255, 0) 52%
+  );
+  mix-blend-mode: screen;
+  opacity: 0.85;
+  z-index: 0;
+}
+
+/* Chromatic edge fringe — faint cyan→violet lens dispersion */
+.glass-card::after,
+.hero-card::after,
+.project-card::after,
+.timeline-item::after,
+.form-card::after,
+.auth-card::after,
+.dashboard-card::after,
+.landing-card::after,
+.upgrade-modal::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    128deg,
+    rgba(120, 220, 255, 0.16) 0%,
+    rgba(255, 255, 255, 0) 16%,
+    rgba(255, 255, 255, 0) 84%,
+    rgba(170, 130, 255, 0.16) 100%
+  );
+  mix-blend-mode: screen;
+  opacity: 0.7;
+  z-index: 0;
+  border: none;
+  mask: none;
+}
+
+/* Keep real content above the glass layers */
+.glass-card > *,
+.hero-card > *,
+.project-card > *,
+.timeline-item > *,
+.form-card > *,
+.auth-card > *,
+.dashboard-card > *,
+.landing-card > *,
+.upgrade-modal > * {
+  position: relative;
+  z-index: 1;
+}
+
+.glass-card:hover,
+.project-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--lg-bevel), var(--lg-float-hover);
+}
+
+/* Liquid-glass STYLE-THEME portfolios get the full refractive
+   material too (higher specificity than the base rule above). */
+.portfolio-page.theme-style-liquid-glass .hero-card,
+.portfolio-page.theme-style-liquid-glass .glass-card,
+.portfolio-page.theme-style-liquid-glass .project-card,
+.portfolio-page.theme-style-liquid-glass .timeline-item {
+  background: var(--lg-tint);
+  border: 1px solid transparent;
+  box-shadow: var(--lg-bevel), var(--lg-float);
+  -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness));
+  backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness));
+}
+
+@supports (backdrop-filter: url("#liquid-lens")) or (-webkit-backdrop-filter: url("#liquid-lens")) {
+  .portfolio-page.theme-style-liquid-glass .hero-card,
+  .portfolio-page.theme-style-liquid-glass .glass-card,
+  .portfolio-page.theme-style-liquid-glass .project-card,
+  .portfolio-page.theme-style-liquid-glass .timeline-item {
+    -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness)) url("#liquid-lens");
+    backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness)) url("#liquid-lens");
+  }
+}
+
+/* Reduced transparency: drop blur/refraction, keep solid surface */
+@media (prefers-reduced-transparency: reduce) {
+  .glass-card,
+  .hero-card,
+  .project-card,
+  .timeline-item,
+  .form-card,
+  .auth-card,
+  .dashboard-card,
+  .landing-card,
+  .upgrade-modal {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: var(--surface-strong, rgba(255, 255, 255, 0.9));
   }
 }
 

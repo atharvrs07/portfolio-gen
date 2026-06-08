@@ -21,8 +21,18 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-    <link rel="stylesheet" href="/styles.css?v=3" />
-    <link rel="stylesheet" href="/ds-landing.css?v=3" />
+    <link rel="stylesheet" href="/styles.css?v=4" />
+    <link rel="stylesheet" href="/ds-landing.css?v=4" />
+    <!-- Anti-FOUC: set theme before CSS renders -->
+    <script>
+      (function(){
+        try {
+          var t = localStorage.getItem('ll-theme') ||
+            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', t);
+        } catch(e) {}
+      })();
+    </script>
   </head>
   <body class="landing-page ll-landing ds-landing">
 
@@ -51,6 +61,12 @@
           <% } %>
         </div>
         <div class="ds-nav__actions">
+          <!-- iOS 26-style liquid glass theme toggle -->
+          <button class="ds-theme-toggle" id="ds-theme-toggle" aria-label="Toggle dark / light mode" title="Toggle theme">
+            <span class="ds-theme-toggle__icon ds-theme-toggle__icon--sun">☀</span>
+            <span class="ds-theme-toggle__thumb"></span>
+            <span class="ds-theme-toggle__icon ds-theme-toggle__icon--moon">☽</span>
+          </button>
           <% if (currentUser) { %>
           <form action="/logout" method="POST" style="display:inline">
             <button type="submit" class="ds-nav__login-btn">Log out</button>
@@ -529,14 +545,8 @@
                 nav.classList.toggle("is-solid", navSolid);
               }
 
-              /* Subtle hero text fade only — product frame stays fully visible */
-              if (heroContent && scrollY < vh * 0.6) {
-                const progress = Math.min(scrollY / (vh * 0.5), 1);
-                const opacity = 1 - progress * 0.6;
-                heroContent.style.opacity = Math.max(0, opacity);
-              } else if (heroContent && scrollY >= vh * 0.6) {
-                heroContent.style.opacity = "0";
-              }
+              /* Hero stays fully visible at all scroll positions */
+              if (heroContent) heroContent.style.opacity = '';
 
               /* Orb parallax */
               orbs.forEach((orb, i) => {
@@ -598,6 +608,19 @@
         if (browser) {
           // Small delay so the CSS animation chain feels natural
           setTimeout(() => browser.classList.add('is-visible'), 200);
+        }
+
+        /* ── Theme toggle ────────────────────────────── */
+        const themeToggle = document.getElementById('ds-theme-toggle');
+        if (themeToggle) {
+          const applyTheme = (theme) => {
+            document.documentElement.setAttribute('data-theme', theme);
+            try { localStorage.setItem('ll-theme', theme); } catch(e) {}
+          };
+          themeToggle.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            applyTheme(current === 'dark' ? 'light' : 'dark');
+          });
         }
 
         /* ── Smooth scroll for anchor links ───────────── */

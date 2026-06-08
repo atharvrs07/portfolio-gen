@@ -21,8 +21,8 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-    <link rel="stylesheet" href="/styles.css?v=2" />
-    <link rel="stylesheet" href="/ds-landing.css?v=2" />
+    <link rel="stylesheet" href="/styles.css?v=3" />
+    <link rel="stylesheet" href="/ds-landing.css?v=3" />
   </head>
   <body class="landing-page ll-landing ds-landing">
 
@@ -67,55 +67,196 @@
     <main class="ds-main">
 
       <!-- ═══════════════════════════════════════════════════
-           SECTION 1 — HERO  (full-viewport, text scales on scroll)
+           SECTION 1 — HERO (text + product preview below the fold)
            ═══════════════════════════════════════════════════ -->
       <section class="ds-section ds-hero" id="ds-hero" data-ds-section="hero">
         <div class="ds-hero__content">
-          <p class="ds-hero__eyebrow">
-            <span class="ds-eyebrow-dot"></span> Free to start
-          </p>
-          <h1 class="ds-hero__title">
-            <span class="ds-reveal-word">LiquiLink</span>
-          </h1>
-          <p class="ds-hero__subtitle ds-reveal-line">
-            Make your link-in-bio<br />feel <em>premium</em>.
-          </p>
-          <p class="ds-hero__body ds-reveal-line" data-delay="1">
-            One short form, one polished page, one shareable URL.<br />
-            Build your own in minutes.
-          </p>
-          <div class="ds-hero__actions ds-reveal-line" data-delay="2">
-            <% if (currentUser) { %>
-            <a class="ds-btn ds-btn--primary" href="/dashboard">
-              <i class="fa-solid fa-table-columns" aria-hidden="true"></i>
-              Go to my dashboard
-            </a>
-            <a class="ds-btn ds-btn--ghost" href="/form.html">Create new portfolio</a>
-            <form action="/logout" method="POST" style="display:inline">
-              <button type="submit" class="ds-btn ds-btn--ghost">Logout</button>
-            </form>
-            <% } else { %>
-            <a class="ds-btn ds-btn--primary" href="/signup">
-              <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
-              Create your account
-            </a>
-            <a class="ds-btn ds-btn--ghost" href="/login">
-              <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i>
-              Log in
-            </a>
-            <% } %>
+
+          <!-- Text block -->
+          <div class="ds-hero__text">
+            <p class="ds-hero__eyebrow">
+              <span class="ds-eyebrow-dot"></span> Free to start
+            </p>
+            <h1 class="ds-hero__title">LiquiLink</h1>
+            <p class="ds-hero__subtitle">
+              Make your link-in-bio<br />feel <em>premium</em>.
+            </p>
+            <p class="ds-hero__body">
+              One short form, one polished page, one shareable URL.
+              Build your own in minutes.
+            </p>
+            <div class="ds-hero__actions">
+              <% if (currentUser) { %>
+              <a class="ds-btn ds-btn--primary" href="/dashboard">
+                <i class="fa-solid fa-table-columns" aria-hidden="true"></i>
+                Go to my dashboard
+              </a>
+              <a class="ds-btn ds-btn--ghost" href="/form.html">Create new portfolio</a>
+              <% } else { %>
+              <a class="ds-btn ds-btn--primary" href="/signup">
+                <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
+                Create your account
+              </a>
+              <a class="ds-btn ds-btn--ghost" href="/login">
+                <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i>
+                Log in
+              </a>
+              <% } %>
+            </div>
           </div>
-        </div>
-        <div class="ds-hero__scroll-hint" aria-hidden="true">
-          <span>Scroll</span>
-          <div class="ds-hero__scroll-arrow">
-            <i class="fa-solid fa-chevron-down"></i>
-          </div>
-        </div>
+
+          <!-- Product preview -->
+          <div class="ds-hero__preview">
+
+            <!-- Tab switcher -->
+            <div class="ds-showcase__tabs">
+              <button class="ds-showcase__tab is-active" data-tab="dark">🌑 Dark Portfolio</button>
+              <button class="ds-showcase__tab" data-tab="light">☀️ Light Portfolio</button>
+              <button class="ds-showcase__tab" data-tab="analytics">📊 Analytics</button>
+            </div>
+
+            <!-- Browser frame -->
+            <div class="ds-browser" id="ds-browser">
+              <div class="ds-browser__chrome">
+                <div class="ds-browser__dots">
+                  <span></span><span></span><span></span>
+                </div>
+                <div class="ds-browser__url">
+                  <span class="ds-browser__url-text" id="ds-browser-url">liquilink.app/atharv-raj-sharma</span>
+                </div>
+                <div style="width:52px;flex-shrink:0"></div>
+              </div>
+
+              <div class="ds-browser__content">
+
+                <!-- PANEL: Dark Portfolio -->
+                <div class="ds-tab-panel is-active" data-panel="dark">
+                  <div class="ds-mock-dark">
+                    <div class="ds-mock-nav ds-mock-nav--dark">
+                      <span class="ds-mock-nav-brand">Atharv Raj Sharma</span>
+                      <div class="ds-mock-nav-links"><span>About</span><span>Projects</span><span>Experience</span><span>Contact</span></div>
+                    </div>
+                    <div class="ds-mock-hero--dark">
+                      <div class="ds-mock-avatar">&lt;/&gt;</div>
+                      <p class="ds-mock-role">Founder · Developer · Tennis Player</p>
+                      <h2 class="ds-mock-name">Atharv Raj Sharma</h2>
+                      <p class="ds-mock-tagline">Founder shipping live code,<br>building tech ventures.</p>
+                      <div class="ds-mock-btns">
+                        <button class="ds-mock-btn ds-mock-btn--primary">View Work</button>
+                        <button class="ds-mock-btn ds-mock-btn--ghost">Let's Connect</button>
+                      </div>
+                    </div>
+                    <div class="ds-mock-about-row">
+                      <div class="ds-mock-about-card">
+                        <p>Right Now</p>
+                        <span>Founder of LiquiLink — building and shipping live products.</span>
+                      </div>
+                      <div class="ds-mock-about-card">
+                        <p>Background</p>
+                        <span>Full-stack developer, competitive tennis player, serial builder.</span>
+                      </div>
+                      <div class="ds-mock-about-card">
+                        <p>Currently</p>
+                        <span>Open to collaborations, internships &amp; cool side projects.</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- PANEL: Light Portfolio -->
+                <div class="ds-tab-panel" data-panel="light">
+                  <div class="ds-mock-light">
+                    <div class="ds-mock-nav ds-mock-nav--light">
+                      <span class="ds-mock-nav-brand ds-mock-nav-brand--light">Adarsh Sharma</span>
+                      <div class="ds-mock-nav-links ds-mock-nav-links--light"><span>About</span><span>Projects</span><span>Experience</span><span>Contact</span></div>
+                    </div>
+                    <div class="ds-mock-hero--light">
+                      <div class="ds-mock-hero-card">
+                        <p class="ds-mock-small-label">Now giving</p>
+                        <h3>Apple Ecosystem Features</h3>
+                        <p>Helping you with every step of your life, step by step</p>
+                        <ul>
+                          <li>Trusted by many customers.</li>
+                          <li>Many clients internationally.</li>
+                          <li>AUM of 16+ Cr.</li>
+                        </ul>
+                      </div>
+                      <div class="ds-mock-hero-text">
+                        <p class="ds-mock-role-light">Certified Financial Planner</p>
+                        <h2>Adarsh Sharma</h2>
+                        <p class="ds-mock-tagline-light">Managing your wealth<br>and family portfolios</p>
+                        <p class="ds-mock-desc-light">I manage your wealth and family portfolios. As a CFP I'll help you and guide you with everything related to financial planning.</p>
+                        <div class="ds-mock-btns">
+                          <button class="ds-mock-btn ds-mock-btn--blue">View Work</button>
+                          <button class="ds-mock-btn ds-mock-btn--outline-dark">Let's Connect</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="ds-mock-cards--light">
+                      <div class="ds-mock-card--l">Design + Code</div>
+                      <div class="ds-mock-card--l">Performance Obsessed</div>
+                      <div class="ds-mock-card--l">Mentorship</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- PANEL: Analytics -->
+                <div class="ds-tab-panel" data-panel="analytics">
+                  <div class="ds-mock-analytics">
+                    <div class="ds-mock-analytics-header">
+                      <h3>Analytics Dashboard</h3>
+                      <span class="ds-mock-badge">Last 30 days</span>
+                    </div>
+                    <div class="ds-mock-stats">
+                      <div class="ds-mock-stat"><p>Page Views</p><h2>2,341</h2><span class="ds-mock-up">↑ 12.4%</span></div>
+                      <div class="ds-mock-stat"><p>Link Clicks</p><h2>847</h2><span class="ds-mock-up">↑ 8.1%</span></div>
+                      <div class="ds-mock-stat"><p>Click Rate</p><h2>36.2%</h2><span class="ds-mock-up">↑ 3.2%</span></div>
+                      <div class="ds-mock-stat"><p>Avg. Time</p><h2>1m 42s</h2><span class="ds-mock-up">↑ 0.4%</span></div>
+                    </div>
+                    <div class="ds-mock-chart-wrap">
+                      <p class="ds-mock-chart-label">Daily Views</p>
+                      <svg viewBox="0 0 960 80" preserveAspectRatio="none" fill="none">
+                        <defs>
+                          <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#3b6ef5" stop-opacity="0.25"/>
+                            <stop offset="100%" stop-color="#3b6ef5" stop-opacity="0"/>
+                          </linearGradient>
+                        </defs>
+                        <polygon fill="url(#chartGrad)" points="0,80 0,62 60,54 120,58 180,46 240,50 300,40 360,44 420,32 480,36 540,26 600,30 660,18 720,22 780,12 840,16 900,8 960,10 960,80"/>
+                        <polyline stroke="#3b6ef5" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" fill="none"
+                          points="0,62 60,54 120,58 180,46 240,50 300,40 360,44 420,32 480,36 540,26 600,30 660,18 720,22 780,12 840,16 900,8 960,10"/>
+                        <circle cx="900" cy="8" r="4" fill="#3b6ef5"/>
+                      </svg>
+                    </div>
+                    <div class="ds-mock-sources">
+                      <div class="ds-mock-source">
+                        <span>Instagram</span>
+                        <div class="ds-mock-bar-track"><div class="ds-mock-bar-fill" style="width:65%"></div></div>
+                        <span>65%</span>
+                      </div>
+                      <div class="ds-mock-source">
+                        <span>Twitter / X</span>
+                        <div class="ds-mock-bar-track"><div class="ds-mock-bar-fill" style="width:22%"></div></div>
+                        <span>22%</span>
+                      </div>
+                      <div class="ds-mock-source">
+                        <span>Direct</span>
+                        <div class="ds-mock-bar-track"><div class="ds-mock-bar-fill" style="width:13%"></div></div>
+                        <span>13%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div><!-- /.ds-browser__content -->
+            </div><!-- /.ds-browser -->
+
+          </div><!-- /.ds-hero__preview -->
+        </div><!-- /.ds-hero__content -->
       </section>
 
       <!-- ═══════════════════════════════════════════════════
-           SECTION 2 — VALUE PROP (sticky pin with stat cards)
+           SECTION 2 — VALUE PROP
            ═══════════════════════════════════════════════════ -->
       <section class="ds-section ds-value" id="ds-value" data-ds-section="value">
         <div class="ds-sticky-wrap">
@@ -147,182 +288,6 @@
               </article>
             </div>
           </div>
-        </div>
-      </section>
-
-      <!-- ═══════════════════════════════════════════════════
-           SECTION 2.5 — PRODUCT SHOWCASE
-           ═══════════════════════════════════════════════════ -->
-      <section class="ds-section ds-showcase" id="ds-showcase" data-ds-section="showcase">
-        <div class="ds-showcase__inner">
-          <p class="ds-eyebrow-label ds-reveal-line">Real pages, real product</p>
-          <h2 class="ds-section-heading ds-reveal-line">
-            See what you can build.
-          </h2>
-          <p class="ds-showcase__sub ds-reveal-line" data-delay="1">
-            From dark glassmorphism portfolios to clean light-theme pages — the same form, endless looks.
-          </p>
-
-          <!-- Tab switcher -->
-          <div class="ds-showcase__tabs ds-reveal-line" data-delay="2">
-            <button class="ds-showcase__tab is-active" data-tab="dark">🌑 Dark Portfolio</button>
-            <button class="ds-showcase__tab" data-tab="light">☀️ Light Portfolio</button>
-            <button class="ds-showcase__tab" data-tab="analytics">📊 Analytics</button>
-          </div>
-
-          <!-- Browser frame -->
-          <div class="ds-browser" id="ds-browser">
-            <!-- Chrome bar -->
-            <div class="ds-browser__chrome">
-              <div class="ds-browser__dots">
-                <span></span><span></span><span></span>
-              </div>
-              <div class="ds-browser__url">
-                <span class="ds-browser__url-text" id="ds-browser-url">liquilink.app/atharv-raj-sharma</span>
-              </div>
-              <div style="width:52px;flex-shrink:0"></div>
-            </div>
-
-            <!-- Content area -->
-            <div class="ds-browser__content">
-
-              <!-- PANEL: Dark Portfolio -->
-              <div class="ds-tab-panel is-active" data-panel="dark">
-                <div class="ds-mock-dark">
-                  <div class="ds-mock-nav ds-mock-nav--dark">
-                    <span class="ds-mock-nav-brand">Atharv Raj Sharma</span>
-                    <div class="ds-mock-nav-links"><span>About</span><span>Projects</span><span>Experience</span><span>Contact</span></div>
-                  </div>
-                  <div class="ds-mock-hero--dark">
-                    <div class="ds-mock-avatar">&lt;/&gt;</div>
-                    <p class="ds-mock-role">Founder · Developer · Tennis Player</p>
-                    <h2 class="ds-mock-name">Atharv Raj Sharma</h2>
-                    <p class="ds-mock-tagline">Founder shipping live code,<br>building tech ventures.</p>
-                    <div class="ds-mock-btns">
-                      <button class="ds-mock-btn ds-mock-btn--primary">View Work</button>
-                      <button class="ds-mock-btn ds-mock-btn--ghost">Let's Connect</button>
-                    </div>
-                  </div>
-                  <div class="ds-mock-about-row">
-                    <div class="ds-mock-about-card">
-                      <p>Right Now</p>
-                      <span>Founder of LiquiLink — building and shipping live products.</span>
-                    </div>
-                    <div class="ds-mock-about-card">
-                      <p>Background</p>
-                      <span>Full-stack developer, competitive tennis player, serial builder.</span>
-                    </div>
-                    <div class="ds-mock-about-card">
-                      <p>Currently</p>
-                      <span>Open to collaborations, internships &amp; cool side projects.</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- PANEL: Light Portfolio -->
-              <div class="ds-tab-panel" data-panel="light">
-                <div class="ds-mock-light">
-                  <div class="ds-mock-nav ds-mock-nav--light">
-                    <span class="ds-mock-nav-brand ds-mock-nav-brand--light">Adarsh Sharma</span>
-                    <div class="ds-mock-nav-links ds-mock-nav-links--light"><span>About</span><span>Projects</span><span>Experience</span><span>Contact</span></div>
-                  </div>
-                  <div class="ds-mock-hero--light">
-                    <div class="ds-mock-hero-card">
-                      <p class="ds-mock-small-label">Now giving</p>
-                      <h3>Apple Ecosystem Features</h3>
-                      <p>Helping you with every step of your life, step by step</p>
-                      <ul>
-                        <li>Trusted by many customers.</li>
-                        <li>Many clients internationally.</li>
-                        <li>AUM of 16+ Cr.</li>
-                      </ul>
-                    </div>
-                    <div class="ds-mock-hero-text">
-                      <p class="ds-mock-role-light">Certified Financial Planner</p>
-                      <h2>Adarsh Sharma</h2>
-                      <p class="ds-mock-tagline-light">Managing your wealth<br>and family portfolios</p>
-                      <p class="ds-mock-desc-light">I manage your wealth and family portfolios. As a CFP I'll help you and guide you with everything related to financial planning.</p>
-                      <div class="ds-mock-btns">
-                        <button class="ds-mock-btn ds-mock-btn--blue">View Work</button>
-                        <button class="ds-mock-btn ds-mock-btn--outline-dark">Let's Connect</button>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="ds-mock-cards--light">
-                    <div class="ds-mock-card--l">Design + Code</div>
-                    <div class="ds-mock-card--l">Performance Obsessed</div>
-                    <div class="ds-mock-card--l">Mentorship</div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- PANEL: Analytics -->
-              <div class="ds-tab-panel" data-panel="analytics">
-                <div class="ds-mock-analytics">
-                  <div class="ds-mock-analytics-header">
-                    <h3>Analytics Dashboard</h3>
-                    <span class="ds-mock-badge">Last 30 days</span>
-                  </div>
-                  <div class="ds-mock-stats">
-                    <div class="ds-mock-stat">
-                      <p>Page Views</p>
-                      <h2>2,341</h2>
-                      <span class="ds-mock-up">↑ 12.4%</span>
-                    </div>
-                    <div class="ds-mock-stat">
-                      <p>Link Clicks</p>
-                      <h2>847</h2>
-                      <span class="ds-mock-up">↑ 8.1%</span>
-                    </div>
-                    <div class="ds-mock-stat">
-                      <p>Click Rate</p>
-                      <h2>36.2%</h2>
-                      <span class="ds-mock-up">↑ 3.2%</span>
-                    </div>
-                    <div class="ds-mock-stat">
-                      <p>Avg. Time</p>
-                      <h2>1m 42s</h2>
-                      <span class="ds-mock-up">↑ 0.4%</span>
-                    </div>
-                  </div>
-                  <div class="ds-mock-chart-wrap">
-                    <p class="ds-mock-chart-label">Daily Views</p>
-                    <svg viewBox="0 0 960 80" preserveAspectRatio="none" fill="none">
-                      <defs>
-                        <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stop-color="#7de3ff" stop-opacity="0.25"/>
-                          <stop offset="100%" stop-color="#7de3ff" stop-opacity="0"/>
-                        </linearGradient>
-                      </defs>
-                      <polygon fill="url(#chartGrad)" points="0,80 0,62 60,54 120,58 180,46 240,50 300,40 360,44 420,32 480,36 540,26 600,30 660,18 720,22 780,12 840,16 900,8 960,10 960,80"/>
-                      <polyline stroke="#7de3ff" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" fill="none"
-                        points="0,62 60,54 120,58 180,46 240,50 300,40 360,44 420,32 480,36 540,26 600,30 660,18 720,22 780,12 840,16 900,8 960,10"/>
-                      <circle cx="900" cy="8" r="4" fill="#7de3ff"/>
-                    </svg>
-                  </div>
-                  <div class="ds-mock-sources">
-                    <div class="ds-mock-source">
-                      <span>Instagram</span>
-                      <div class="ds-mock-bar-track"><div class="ds-mock-bar-fill" style="width:65%"></div></div>
-                      <span>65%</span>
-                    </div>
-                    <div class="ds-mock-source">
-                      <span>Twitter / X</span>
-                      <div class="ds-mock-bar-track"><div class="ds-mock-bar-fill" style="width:22%"></div></div>
-                      <span>22%</span>
-                    </div>
-                    <div class="ds-mock-source">
-                      <span>Direct</span>
-                      <div class="ds-mock-bar-track"><div class="ds-mock-bar-fill" style="width:13%"></div></div>
-                      <span>13%</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div><!-- /.ds-browser__content -->
-          </div><!-- /.ds-browser -->
         </div>
       </section>
 
@@ -564,18 +529,13 @@
                 nav.classList.toggle("is-solid", navSolid);
               }
 
-              /* Hero parallax: scale down + fade out as user scrolls away */
-              if (heroContent && scrollY < vh * 1.5) {
-                const progress = Math.min(scrollY / (vh * 0.7), 1);
-                const scale = 1 - progress * 0.15;
-                const opacity = 1 - progress * 1.2;
-                heroContent.style.transform = `scale(${scale}) translateY(${progress * -40}px)`;
+              /* Subtle hero text fade only — product frame stays fully visible */
+              if (heroContent && scrollY < vh * 0.6) {
+                const progress = Math.min(scrollY / (vh * 0.5), 1);
+                const opacity = 1 - progress * 0.6;
                 heroContent.style.opacity = Math.max(0, opacity);
-              }
-
-              /* Hide scroll hint */
-              if (heroHint) {
-                heroHint.style.opacity = scrollY > 100 ? "0" : "1";
+              } else if (heroContent && scrollY >= vh * 0.6) {
+                heroContent.style.opacity = "0";
               }
 
               /* Orb parallax */
@@ -633,15 +593,11 @@
           });
         });
 
-        /* ── Browser window scroll reveal ────────────── */
+        /* ── Browser window — reveal on page load (it's in the hero now) ── */
         const browser = document.getElementById('ds-browser');
-        if (browser && 'IntersectionObserver' in window) {
-          const bObs = new IntersectionObserver(entries => {
-            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-visible'); bObs.unobserve(e.target); } });
-          }, { threshold: 0.15 });
-          bObs.observe(browser);
-        } else if (browser) {
-          browser.classList.add('is-visible');
+        if (browser) {
+          // Small delay so the CSS animation chain feels natural
+          setTimeout(() => browser.classList.add('is-visible'), 200);
         }
 
         /* ── Smooth scroll for anchor links ───────────── */

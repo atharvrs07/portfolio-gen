@@ -109,7 +109,7 @@
       "updatedAt": "2026-05-12T05:52:37.121Z",
       "styleTheme": "liquid-glass",
       "analytics": {
-        "views": 199,
+        "views": 200,
         "linkClicks": 4,
         "daily": {
           "2026-04-14": {
@@ -135,22 +135,26 @@
           "2026-05-12": {
             "views": 4,
             "linkClicks": 0
+          },
+          "2026-06-08": {
+            "views": 1,
+            "linkClicks": 0
           }
         },
         "referrers": {
-          "Direct": 38,
-          "Internal Portfolio": 157,
+          "Direct": 39,
+          "Internal Portfolio": 158,
           "Internal": 157
         },
         "devices": {
-          "Desktop": 352
+          "Desktop": 354
         },
         "browsers": {
           "Firefox": 333,
-          "Chrome": 19
+          "Chrome": 21
         },
         "operatingSystems": {
-          "Windows": 352
+          "Windows": 354
         },
         "links": {},
         "utmSources": {},
@@ -159,12 +163,49 @@
         "hourly": {
           "9": 2,
           "11": 10,
+          "12": 2,
           "13": 70,
           "15": 8,
           "16": 243,
           "18": 19
         },
         "events": [
+          {
+            "type": "engagement",
+            "at": "2026-06-08T07:04:01.921Z",
+            "day": "2026-06-08",
+            "hour": 12,
+            "referrer": "Internal Portfolio",
+            "device": "Desktop",
+            "browser": "Chrome",
+            "os": "Windows",
+            "target": "",
+            "visitorId": "v_jcyvuga8mq4v7gbi",
+            "sessionId": "s_n75au255xzmq4v7gq6",
+            "utmSource": "",
+            "utmMedium": "",
+            "utmCampaign": "",
+            "engagedMs": 9964,
+            "scrollDepth": 0
+          },
+          {
+            "type": "view",
+            "at": "2026-06-08T07:03:51.392Z",
+            "day": "2026-06-08",
+            "hour": 12,
+            "referrer": "Direct",
+            "device": "Desktop",
+            "browser": "Chrome",
+            "os": "Windows",
+            "target": "",
+            "visitorId": "v_jcyvuga8mq4v7gbi",
+            "sessionId": "",
+            "utmSource": "",
+            "utmMedium": "",
+            "utmCampaign": "",
+            "engagedMs": 0,
+            "scrollDepth": 0
+          },
           {
             "type": "engagement",
             "at": "2026-05-12T05:52:41.377Z",
@@ -6502,9 +6543,9 @@
             "scrollDepth": 0
           }
         ],
-        "totalEngagedMs": 702610,
+        "totalEngagedMs": 712574,
         "maxScrollDepth": 100,
-        "lastSeenAt": "2026-05-12T05:52:41.377Z"
+        "lastSeenAt": "2026-06-08T07:04:01.921Z"
       },
       "builder": {
         "enabled": false,
@@ -6600,22 +6641,75 @@
       "profileImageUrl": "",
       "companyLogoUrl": "",
       "analytics": {
-        "views": 0,
+        "views": 1,
         "linkClicks": 0,
-        "daily": {},
-        "referrers": {},
-        "devices": {},
-        "browsers": {},
-        "operatingSystems": {},
+        "daily": {
+          "2026-06-08": {
+            "views": 1,
+            "linkClicks": 0
+          }
+        },
+        "referrers": {
+          "Direct": 1,
+          "Internal Portfolio": 1
+        },
+        "devices": {
+          "Desktop": 2
+        },
+        "browsers": {
+          "Chrome": 2
+        },
+        "operatingSystems": {
+          "Windows": 2
+        },
         "links": {},
         "utmSources": {},
         "utmMediums": {},
         "utmCampaigns": {},
-        "hourly": {},
-        "events": [],
-        "totalEngagedMs": 0,
+        "hourly": {
+          "12": 2
+        },
+        "events": [
+          {
+            "type": "engagement",
+            "at": "2026-06-08T07:04:13.866Z",
+            "day": "2026-06-08",
+            "hour": 12,
+            "referrer": "Internal Portfolio",
+            "device": "Desktop",
+            "browser": "Chrome",
+            "os": "Windows",
+            "target": "",
+            "visitorId": "v_jcyvuga8mq4v7gbi",
+            "sessionId": "s_n75au255xzmq4v7gq6",
+            "utmSource": "",
+            "utmMedium": "",
+            "utmCampaign": "",
+            "engagedMs": 11926,
+            "scrollDepth": 0
+          },
+          {
+            "type": "view",
+            "at": "2026-06-08T07:04:01.866Z",
+            "day": "2026-06-08",
+            "hour": 12,
+            "referrer": "Direct",
+            "device": "Desktop",
+            "browser": "Chrome",
+            "os": "Windows",
+            "target": "",
+            "visitorId": "v_jcyvuga8mq4v7gbi",
+            "sessionId": "",
+            "utmSource": "",
+            "utmMedium": "",
+            "utmCampaign": "",
+            "engagedMs": 0,
+            "scrollDepth": 0
+          }
+        ],
+        "totalEngagedMs": 11926,
         "maxScrollDepth": 0,
-        "lastSeenAt": ""
+        "lastSeenAt": "2026-06-08T07:04:13.866Z"
       },
       "builder": {
         "enabled": false,

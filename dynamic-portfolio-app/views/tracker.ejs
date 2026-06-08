@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %> | LiquiLink</title>
+    <meta name="description" content="<%= description %>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      html, body {
+        margin: 0;
+        min-height: 100%;
+        font-family: Inter, system-ui, sans-serif;
+        background: #060b16;
+        color: #e8f0ff;
+      }
+      .tracker-page {
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 15% 10%, rgba(136, 179, 255, 0.18), transparent 42%),
+          radial-gradient(circle at 85% 0%, rgba(125, 227, 255, 0.12), transparent 38%),
+          #060b16;
+      }
+      .tracker-topbar {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 0.85rem 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+      }
+      .tracker-topbar a {
+        color: #c8d8ff;
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .tracker-topbar a:hover {
+        color: #fff;
+      }
+      .tracker-wrap {
+        width: min(1180px, 92vw);
+        margin: 0 auto;
+        padding: 2rem 1.25rem 3rem;
+      }
+      .tracker-hero {
+        text-align: center;
+        max-width: 760px;
+        margin: 0 auto 2rem;
+      }
+      .tracker-hero .eyebrow {
+        display: inline-block;
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #88b3ff;
+        margin-bottom: 0.6rem;
+      }
+      .tracker-hero h1 {
+        margin: 0 0 0.75rem;
+        font-size: clamp(2rem, 5vw, 3rem);
+        line-height: 1.1;
+      }
+      .tracker-hero p {
+        margin: 0;
+        color: rgba(220, 232, 255, 0.82);
+        line-height: 1.65;
+      }
+      .tracker-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.65rem;
+        margin: 1.5rem 0 2rem;
+      }
+      .tracker-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 0.75rem;
+        margin-bottom: 2rem;
+      }
+      .tracker-card {
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 12px;
+        background: rgba(12, 20, 35, 0.55);
+        padding: 1rem;
+      }
+      .tracker-card strong {
+        display: block;
+        color: #88b3ff;
+        font-size: 0.78rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-bottom: 0.35rem;
+      }
+      .tracker-card p {
+        margin: 0;
+        color: rgba(220, 232, 255, 0.88);
+        line-height: 1.5;
+        font-size: 0.95rem;
+      }
+      .tracker-preview-shell {
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 14px;
+        overflow: hidden;
+        background: rgba(8, 14, 24, 0.65);
+      }
+      .tracker-preview-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding: 0.65rem 0.85rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(6, 10, 18, 0.75);
+        flex-wrap: wrap;
+      }
+      .tracker-preview-head strong {
+        font-size: 0.95rem;
+      }
+      .tracker-preview-head span {
+        font-size: 0.8rem;
+        color: rgba(184, 202, 230, 0.85);
+      }
+      .tracker-preview-viewport {
+        width: 100%;
+        height: min(78vh, 820px);
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        background: #fff;
+      }
+      .tracker-iframe-scale {
+        display: block;
+        line-height: 0;
+        margin: 0 auto;
+      }
+      .tracker-iframe {
+        border: none;
+        display: block;
+        background: #fff;
+        transform-origin: 0 0;
+      }
+      .tracker-note {
+        margin-top: 1rem;
+        font-size: 0.82rem;
+        color: rgba(184, 202, 230, 0.78);
+        text-align: center;
+        line-height: 1.55;
+      }
+      .tracker-note a {
+        color: #88b3ff;
+      }
+    </style>
+  </head>
+  <body class="tracker-page">
+    <header class="tracker-topbar">
+      <a href="/">← LiquiLink</a>
+      <div style="display:flex;gap:0.65rem;flex-wrap:wrap;">
+        <% if (currentUser) { %>
+        <a href="/dashboard">Dashboard</a>
+        <% } else { %>
+        <a href="/login">Login</a>
+        <a href="/signup">Sign up</a>
+        <% } %>
+      </div>
+    </header>
+
+    <main class="tracker-wrap">
+      <section class="tracker-hero">
+        <p class="eyebrow">Free downloadable template</p>
+        <h1><%= title %></h1>
+        <p><%= description %></p>
+      </section>
+
+      <div class="tracker-actions">
+        <a
+          class="btn btn-primary"
+          href="<%= copyUrl %>"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <i class="fa-solid fa-copy" aria-hidden="true"></i>
+          Make a copy in Google Drive
+        </a>
+      </div>
+
+      <p class="tracker-note">
+        The copy button opens Google Sheets and saves an editable copy to your Google account
+        (you need to be signed in to Google). The preview below is view-only — use copy to get
+        your own editable version.
+      </p>
+
+      <div class="tracker-grid">
+        <% highlights.forEach(function (item) { %>
+        <article class="tracker-card">
+          <strong><%= item.label %></strong>
+          <p><%= item.value %></p>
+        </article>
+        <% }); %>
+      </div>
+
+      <section class="tracker-preview-shell" aria-label="Spreadsheet live preview">
+        <div class="tracker-preview-head">
+          <strong>View-only preview</strong>
+          <span>Read-only — scroll sideways to see all columns</span>
+        </div>
+        <div class="tracker-preview-viewport" id="tracker-preview-viewport">
+          <div class="tracker-iframe-scale" id="tracker-iframe-scale">
+            <iframe
+              class="tracker-iframe"
+              id="tracker-iframe"
+              src="<%= previewUrl %>"
+              title="<%= title %> preview"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              allow="clipboard-read; clipboard-write"
+            ></iframe>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      (function () {
+        /** Approximate Google Sheets preview canvas (px) for this template. */
+        var SHEET_REF_WIDTH = 2480;
+        var SHEET_REF_HEIGHT = 1080;
+
+        var viewport = document.getElementById("tracker-preview-viewport");
+        var scaleWrap = document.getElementById("tracker-iframe-scale");
+        var iframe = document.getElementById("tracker-iframe");
+        if (!viewport || !scaleWrap || !iframe) return;
+
+        function layoutTrackerPreview() {
+          var availH = viewport.clientHeight;
+          var availW = viewport.clientWidth;
+          if (availH < 1 || availW < 1) return;
+
+          var scale = availH / SHEET_REF_HEIGHT;
+          var scaledW = Math.ceil(SHEET_REF_WIDTH * scale);
+          var scaledH = availH;
+
+          iframe.style.width = SHEET_REF_WIDTH + "px";
+          iframe.style.height = SHEET_REF_HEIGHT + "px";
+          iframe.style.transform = "scale(" + scale + ")";
+          iframe.style.transformOrigin = "0 0";
+
+          scaleWrap.style.width = scaledW + "px";
+          scaleWrap.style.height = scaledH + "px";
+          scaleWrap.style.minWidth = scaledW + "px";
+
+          if (scaledW <= availW) {
+            scaleWrap.style.marginLeft = "auto";
+            scaleWrap.style.marginRight = "auto";
+          } else {
+            scaleWrap.style.marginLeft = "0";
+            scaleWrap.style.marginRight = "0";
+          }
+        }
+
+        viewport.addEventListener(
+          "wheel",
+          function (event) {
+            if (viewport.scrollWidth <= viewport.clientWidth) return;
+            if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+            viewport.scrollLeft += event.deltaY;
+            event.preventDefault();
+          },
+          { passive: false }
+        );
+
+        layoutTrackerPreview();
+        window.addEventListener("resize", layoutTrackerPreview);
+        iframe.addEventListener("load", layoutTrackerPreview);
+      })();
+    </script>
+    <script src="/custom-cursor.js" defer></script>
+  </body>
+</html>

@@ -364,7 +364,11 @@ function slugifyName(value) {
 }
 
 /** Paths registered before `GET /:slug` — slugs must not collide. */
-const RESERVED_SINGLE_SEGMENT_SLUGS = new Set(["out", "vcard"]);
+const RESERVED_SINGLE_SEGMENT_SLUGS = new Set(["out", "vcard", "tracker"]);
+
+const TRACKER_SHEET_ID = "1q2Wr_S_HeUPQXtIzQbwKZtvIlAur8c1jqZwBP4p_8dw";
+const TRACKER_COPY_URL = `https://docs.google.com/spreadsheets/d/${TRACKER_SHEET_ID}/copy`;
+const TRACKER_PREVIEW_URL = `https://docs.google.com/spreadsheets/d/${TRACKER_SHEET_ID}/preview`;
 
 function uniqueSlugFromName(fullName, portfolios) {
   const base = slugifyName(fullName) || `portfolio-${nanoid()}`;
@@ -1826,6 +1830,22 @@ app.get("/vcard", (_req, res) => {
   }
 
   return res.redirect(302, VCARD_REDIRECT_URL);
+});
+
+app.get("/tracker", (req, res) => {
+  res.render("tracker", {
+    title: "Habit Tracker Final",
+    description:
+      "A Focus · Repeat · Execute habit tracker with monthly goals, weekly progress, daily habits, streaks, and notes. Copy the Google Sheet to your Drive or preview it below.",
+    copyUrl: TRACKER_COPY_URL,
+    previewUrl: TRACKER_PREVIEW_URL,
+    highlights: [
+      { label: "Framework", value: "Focus · Repeat · Execute" },
+      { label: "Monthly view", value: "Overall growth, daily progress, and habit goals" },
+      { label: "Weekly view", value: "Week-by-week progress tracking" },
+      { label: "Daily grid", value: "Habits, streaks, scores, and notes" }
+    ]
+  });
 });
 
 app.get("/signup", (req, res) => {

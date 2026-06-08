@@ -909,6 +909,7 @@ function resolvePortfolioForView(record) {
     projectsLayout: normalizeProjectsLayout(record.projectsLayout),
     experienceLayout: normalizeExperienceLayout(record.experienceLayout),
     showNavbar: normalizeShowNavFooter(record.showNavbar, true),
+    navCollapsible: normalizeShowNavFooter(record.navCollapsible, false),
     showFooterContact: normalizeShowNavFooter(record.showFooterContact, true),
     fontFamily,
     fontScale,
@@ -1003,6 +1004,7 @@ function buildPortfolioPayload(req) {
     projectsLayout: normalizeProjectsLayout(req.body.projectsLayout),
     experienceLayout: normalizeExperienceLayout(req.body.experienceLayout),
     showNavbar: normalizeShowNavFooter(req.body.showNavbar, true),
+    navCollapsible: normalizeShowNavFooter(req.body.navCollapsible, false),
     showFooterContact: normalizeShowNavFooter(req.body.showFooterContact, true),
     fontFamily: normalizeFontFamily(req.body.fontFamily),
     fontScale: normalizeFontScale(req.body.fontScale),
@@ -2580,6 +2582,7 @@ app.get("/portfolio/:portfolioId/edit", requireAuth, async (req, res) => {
     projectsLayout: resolved.projectsLayout,
     experienceLayout: resolved.experienceLayout,
     showNavbar: resolved.showNavbar ? "1" : "0",
+    navCollapsible: resolved.navCollapsible ? "1" : "0",
     showFooterContact: resolved.showFooterContact ? "1" : "0",
     fontFamily: resolved.fontFamily,
     fontScale: resolved.fontScale,
@@ -2631,6 +2634,7 @@ app.post(
     payload.projectsLayout = portfolio.projectsLayout;
     payload.experienceLayout = portfolio.experienceLayout;
     payload.showNavbar = portfolio.showNavbar;
+    payload.navCollapsible = portfolio.navCollapsible;
     payload.showFooterContact = portfolio.showFooterContact;
     payload.colorBg = portfolio.colorBg;
     payload.colorText = portfolio.colorText;

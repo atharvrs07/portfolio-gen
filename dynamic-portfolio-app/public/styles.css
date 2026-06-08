@@ -1676,11 +1676,15 @@ h1 span {
 /* ——— Public portfolio: custom colors & layouts ——— */
 .portfolio-page {
   /* Portfolios are fully self-themed (theme-light / theme-dark +
-     inline colors). Reset any --bg-image leaked from the app's
-     global light/dark (OS prefers-color-scheme) so each portfolio
-     uses its OWN background. An explicit backgroundUrl set inline
-     on <body> still overrides this. */
+     inline colors). Reset every app-level token that the global
+     light/dark system (OS prefers-color-scheme) could leak in, so
+     a portfolio always renders from its OWN colors regardless of
+     the visitor's OS. An explicit backgroundUrl inline still wins. */
   --bg-image: initial;
+  --border: color-mix(in srgb, var(--text) 16%, transparent);
+  --surface: color-mix(in srgb, var(--text) 5%, transparent);
+  --surface-strong: color-mix(in srgb, var(--text) 9%, transparent);
+  --shadow: 0 18px 40px color-mix(in srgb, var(--text) 14%, transparent);
   --muted: color-mix(in srgb, var(--text) 58%, transparent);
   --aurora-one: color-mix(in srgb, var(--accent) 64%, var(--bg));
   --aurora-two: color-mix(in srgb, var(--card-bg) 52%, var(--accent));
@@ -2746,9 +2750,14 @@ body.theme-light.portfolio-page {
   border: none;
   -webkit-mask: none;
   mask: none;
+  /* Crisp continuous glass rim (like Apple's reference): a thin
+     bright edge all the way around, brightest at the very top,
+     with a faint depth shade at the bottom for volume. */
   box-shadow:
-    inset 0 -10px 18px -12px rgba(8, 14, 30, 0.30),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.30);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.28),
+    inset 0 1.5px 0.5px 0 rgba(255, 255, 255, 0.70),
+    inset 0 -1px 0.5px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -14px 24px -16px rgba(8, 14, 30, 0.26);
   opacity: 1;
   z-index: 0;
 }
@@ -2814,3 +2823,52 @@ body.theme-light.portfolio-page {
 }
 
 
+
+/* ═══════════════════════════════════════════════════════════
+   COLLAPSIBLE PORTFOLIO NAVBAR
+   Full-width bar at the top; on scroll the inner nav collapses
+   into a centered Liquid Glass pill (opt-in via "Navbar behavior").
+   Reuses the existing .is-scrolled class the portfolio JS toggles.
+   ═══════════════════════════════════════════════════════════ */
+.site-header--collapsible {
+  background: transparent !important;
+  border-bottom-color: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.site-header--collapsible .nav {
+  max-width: 1120px;
+  border-radius: 0;
+  border: 1px solid transparent;
+  transition:
+    max-width 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    padding 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    margin 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    border-radius 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.45s ease,
+    box-shadow 0.45s ease;
+}
+
+.site-header--collapsible.is-scrolled .nav {
+  max-width: 760px;
+  margin: 0.55rem auto;
+  padding: 0.5rem 0.8rem 0.5rem 1.4rem;
+  border-radius: 999px;
+  background: var(--lg-tint);
+  box-shadow: var(--lg-bevel), var(--lg-float);
+  -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness));
+  backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness));
+}
+
+@supports (backdrop-filter: url("#liquid-lens-soft")) or (-webkit-backdrop-filter: url("#liquid-lens-soft")) {
+  .site-header--collapsible.is-scrolled .nav {
+    -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness)) url("#liquid-lens-soft");
+    backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness)) url("#liquid-lens-soft");
+  }
+}
+
+/* Tighten link spacing inside the collapsed pill so it stays compact */
+.site-header--collapsible.is-scrolled .nav-links {
+  gap: 1rem;
+}

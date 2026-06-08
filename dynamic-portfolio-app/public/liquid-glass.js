@@ -38,6 +38,15 @@
         '<feDisplacementMap in="SourceGraphic" in2="noiseBlur" scale="12" ' +
           'xChannelSelector="R" yChannelSelector="G"/>' +
       '</filter>' +
+      /* Gooey metaball — blurs then sharpens alpha so nearby shapes
+         merge and separate like drops of water (iOS-style fluid
+         transitions: "water connecting and leaving"). */
+      '<filter id="liquid-goo">' +
+        '<feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>' +
+        '<feColorMatrix in="blur" mode="matrix" ' +
+          'values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -9" result="goo"/>' +
+        '<feComposite in="SourceGraphic" in2="goo" operator="atop"/>' +
+      '</filter>' +
     '</defs>';
 
   function inject() {

@@ -21,8 +21,8 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-    <link rel="stylesheet" href="/styles.css?v=7" />
-    <link rel="stylesheet" href="/ds-landing.css?v=7" />
+    <link rel="stylesheet" href="/styles.css?v=8" />
+    <link rel="stylesheet" href="/ds-landing.css?v=8" />
     <!-- Anti-FOUC: set theme before CSS renders -->
     <script>
       (function(){
@@ -124,8 +124,9 @@
           <!-- Product preview -->
           <div class="ds-hero__preview">
 
-            <!-- Tab switcher -->
-            <div class="ds-showcase__tabs">
+            <!-- Tab switcher (liquid sliding indicator) -->
+            <div class="ds-showcase__tabs" id="ds-showcase-tabs">
+              <span class="ds-showcase__indicator" id="ds-tab-indicator" aria-hidden="true"></span>
               <button class="ds-showcase__tab is-active" data-tab="dark">🌑 Dark Portfolio</button>
               <button class="ds-showcase__tab" data-tab="light">☀️ Light Portfolio</button>
               <button class="ds-showcase__tab" data-tab="analytics">📊 Analytics</button>
@@ -585,23 +586,71 @@
           if (stepFill) stepFill.style.width = "100%";
         }
 
-        /* ── Browser showcase tabs ───────────────────── */
+        /* ── Browser showcase tabs (liquid sliding indicator) ── */
         const urlMap = {
           dark: 'liquilink.app/atharv-raj-sharma',
           light: 'liquilink.app/adarsh-sharma',
           analytics: 'liquilink.app/dashboard/analytics'
         };
-        document.querySelectorAll('.ds-showcase__tab').forEach(tab => {
+        const tabsWrap = document.getElementById('ds-showcase-tabs');
+        const indicator = document.getElementById('ds-tab-indicator');
+        const tabEls = Array.from(document.querySelectorAll('.ds-showcase__tab'));
+
+        /* Position the blue pill; on switch it first stretches to
+           bridge the old + new tab (a liquid "reach"), then pulls in
+           — water connecting and leaving. */
+        let stretchTimer = 0;
+        const placeIndicator = (tab, animate) => {
+          if (!indicator || !tab) return;
+          const targetLeft = tab.offsetLeft;
+          const targetWidth = tab.offsetWidth;
+          if (!animate) {
+            indicator.style.transition = 'none';
+            indicator.style.transform = 'translateX(' + targetLeft + 'px)';
+            indicator.style.width = targetWidth + 'px';
+            void indicator.offsetWidth;
+            indicator.style.transition = '';
+          } else {
+            const curLeft = parseFloat(indicator.dataset.left || targetLeft);
+            const curWidth = parseFloat(indicator.dataset.width || targetWidth);
+            const bridgeLeft = Math.min(curLeft, targetLeft);
+            const bridgeRight = Math.max(curLeft + curWidth, targetLeft + targetWidth);
+            indicator.style.transform = 'translateX(' + bridgeLeft + 'px)';
+            indicator.style.width = (bridgeRight - bridgeLeft) + 'px';
+            clearTimeout(stretchTimer);
+            stretchTimer = setTimeout(() => {
+              indicator.style.transform = 'translateX(' + targetLeft + 'px)';
+              indicator.style.width = targetWidth + 'px';
+            }, 190);
+          }
+          indicator.dataset.left = targetLeft;
+          indicator.dataset.width = targetWidth;
+        };
+
+        tabEls.forEach(tab => {
           tab.addEventListener('click', () => {
             const target = tab.dataset.tab;
-            document.querySelectorAll('.ds-showcase__tab').forEach(t => t.classList.remove('is-active'));
+            tabEls.forEach(t => t.classList.remove('is-active'));
             document.querySelectorAll('.ds-tab-panel').forEach(p => p.classList.remove('is-active'));
             tab.classList.add('is-active');
             document.querySelector(`.ds-tab-panel[data-panel="${target}"]`).classList.add('is-active');
             const urlEl = document.getElementById('ds-browser-url');
             if (urlEl) urlEl.textContent = urlMap[target] || '';
+            placeIndicator(tab, true);
           });
         });
+
+        /* Initial placement (after layout settles) + keep in sync on resize */
+        const initialTab = document.querySelector('.ds-showcase__tab.is-active') || tabEls[0];
+        requestAnimationFrame(() => placeIndicator(initialTab, false));
+        window.addEventListener('load', () => placeIndicator(
+          document.querySelector('.ds-showcase__tab.is-active') || tabEls[0], false));
+        let resizeT = 0;
+        window.addEventListener('resize', () => {
+          clearTimeout(resizeT);
+          resizeT = setTimeout(() => placeIndicator(
+            document.querySelector('.ds-showcase__tab.is-active') || tabEls[0], false), 120);
+        }, { passive: true });
 
         /* ── Browser window — reveal on page load (it's in the hero now) ── */
         const browser = document.getElementById('ds-browser');
@@ -635,7 +684,7 @@
         });
       })();
     </script>
-    <script src="/liquid-glass.js?v=2"></script>
+    <script src="/liquid-glass.js?v=3"></script>
 
     <!-- ═══════════════════════════════════════════════════
          FOOTER

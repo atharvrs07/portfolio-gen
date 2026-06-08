@@ -421,6 +421,7 @@
    PRODUCT SHOWCASE (used inside hero preview)
    ═══════════════════════════════════════════════════════ */
 .ds-showcase__tabs {
+  position: relative;
   display: inline-flex;
   gap: 0.3rem;
   padding: 0.3rem;
@@ -431,7 +432,32 @@
   box-shadow: 0 2px 12px rgba(15, 26, 47, 0.07);
 }
 
+/* Liquid sliding indicator — the blue pill that flows between tabs.
+   JS animates transform + width; it briefly stretches to bridge the
+   old and new tab, then pulls in (water connecting and leaving). */
+.ds-showcase__indicator {
+  position: absolute;
+  top: 0.3rem;
+  left: 0;
+  height: calc(100% - 0.6rem);
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #4f7df8 0%, #3b6ef5 100%);
+  z-index: 0;
+  pointer-events: none;
+  transform: translateX(0);
+  /* Gooey metaball filter makes the pill flow like liquid as it
+     stretches and settles between tabs. */
+  filter: url("#liquid-goo");
+  transition:
+    transform 0.5s cubic-bezier(0.45, 0.05, 0.2, 1.1),
+    width 0.5s cubic-bezier(0.45, 0.05, 0.2, 1.1);
+  will-change: transform, width;
+}
+
 .ds-showcase__tab {
+  position: relative;
+  z-index: 1;
   padding: 0.45rem 1.1rem;
   border-radius: 999px;
   font-size: 0.82rem;
@@ -441,7 +467,7 @@
   border: none;
   cursor: pointer;
   font-family: inherit;
-  transition: color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+  transition: color 0.3s ease;
 }
 
 .ds-showcase__tab:hover {
@@ -450,8 +476,8 @@
 
 .ds-showcase__tab.is-active {
   color: #ffffff;
-  background: #3b6ef5;
-  box-shadow: 0 2px 12px rgba(59, 110, 245, 0.30);
+  background: none;
+  box-shadow: none;
 }
 
 /* ── Browser window frame ─────────────────────────────── */
@@ -1806,9 +1832,12 @@ html[data-theme="dark"] .ds-showcase__tab {
 }
 html[data-theme="dark"] .ds-showcase__tab:hover { color: #e6ecff; }
 html[data-theme="dark"] .ds-showcase__tab.is-active {
-  background: #5c87ff;
-  box-shadow: 0 2px 12px rgba(92, 135, 255, 0.40);
+  background: none;
+  box-shadow: none;
   color: #fff;
+}
+html[data-theme="dark"] .ds-showcase__indicator {
+  background: linear-gradient(180deg, #6e97ff 0%, #5c87ff 100%);
 }
 
 /* Browser frame */

@@ -1675,6 +1675,12 @@ h1 span {
 
 /* ——— Public portfolio: custom colors & layouts ——— */
 .portfolio-page {
+  /* Portfolios are fully self-themed (theme-light / theme-dark +
+     inline colors). Reset any --bg-image leaked from the app's
+     global light/dark (OS prefers-color-scheme) so each portfolio
+     uses its OWN background. An explicit backgroundUrl set inline
+     on <body> still overrides this. */
+  --bg-image: initial;
   --muted: color-mix(in srgb, var(--text) 58%, transparent);
   --aurora-one: color-mix(in srgb, var(--accent) 64%, var(--bg));
   --aurora-two: color-mix(in srgb, var(--card-bg) 52%, var(--accent));
@@ -1905,26 +1911,56 @@ body.theme-light.portfolio-page {
   border-bottom-color: rgba(30, 47, 75, 0.18);
 }
 
+/* Portfolios derive their Liquid Glass tokens from their OWN
+   theme-light / theme-dark class — never from the visitor's OS
+   color-scheme — so a light portfolio always gets light glass. */
+.portfolio-page.theme-light {
+  --lg-tint: linear-gradient(
+    147deg,
+    rgba(255, 255, 255, 0.60) 0%,
+    rgba(255, 255, 255, 0.36) 46%,
+    rgba(255, 255, 255, 0.24) 100%
+  );
+  --lg-bevel:
+    inset 1.8px 1.8px 1.6px -1.4px rgba(255, 255, 255, 0.95),
+    inset -1.2px -1.2px 1.2px -1.4px rgba(255, 255, 255, 0.50),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+    inset 0 1px 1px rgba(255, 255, 255, 0.40);
+  --lg-float:
+    0 6px 16px rgba(40, 60, 100, 0.10),
+    0 18px 44px rgba(40, 60, 100, 0.12);
+  --lg-float-hover:
+    0 10px 24px rgba(40, 60, 100, 0.14),
+    0 28px 64px rgba(40, 60, 100, 0.18);
+}
+
+.portfolio-page.theme-dark {
+  --lg-tint: linear-gradient(
+    147deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.05) 46%,
+    rgba(255, 255, 255, 0.015) 100%
+  );
+  --lg-bevel:
+    inset 1.8px 1.8px 1.6px -1.4px rgba(255, 255, 255, 0.60),
+    inset -1.2px -1.2px 1.2px -1.4px rgba(255, 255, 255, 0.20),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+    inset 0 1px 1px rgba(255, 255, 255, 0.26);
+  --lg-float:
+    0 8px 22px rgba(0, 0, 0, 0.40),
+    0 22px 56px rgba(0, 0, 0, 0.38);
+  --lg-float-hover:
+    0 12px 30px rgba(0, 0, 0, 0.48),
+    0 30px 72px rgba(0, 0, 0, 0.44);
+}
+
 .portfolio-page.theme-style-liquid-glass .hero-card,
 .portfolio-page.theme-style-liquid-glass .glass-card,
 .portfolio-page.theme-style-liquid-glass .project-card,
 .portfolio-page.theme-style-liquid-glass .timeline-item {
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04)),
-    var(--card-bg);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.24);
-}
-
-.portfolio-page.theme-light.theme-style-liquid-glass .hero-card,
-.portfolio-page.theme-light.theme-style-liquid-glass .glass-card,
-.portfolio-page.theme-light.theme-style-liquid-glass .project-card,
-.portfolio-page.theme-light.theme-style-liquid-glass .timeline-item {
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.52)),
-    var(--card-bg);
-  border-color: rgba(27, 55, 96, 0.14);
-  box-shadow: 0 14px 28px rgba(59, 88, 145, 0.14);
+  background: var(--lg-tint);
+  border: 1px solid transparent;
+  box-shadow: var(--lg-bevel), var(--lg-float);
 }
 
 .portfolio-page.theme-style-liquid-glass .brand,
@@ -2660,7 +2696,9 @@ body.theme-light.portfolio-page {
   }
 }
 
-/* Specular hotspot — bright top-left gloss like light on wet glass */
+/* Top sheen — a clean bright highlight along the top edge, the way
+   light grazes the curved top of a glass pane (iOS-style, no blob).
+   mask reset clears any leftover mask from earlier per-class rules. */
 .glass-card::before,
 .hero-card::before,
 .project-card::before,
@@ -2675,18 +2713,21 @@ body.theme-light.portfolio-page {
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
-  background: radial-gradient(
-    135% 100% at 12% -8%,
-    rgba(255, 255, 255, 0.55) 0%,
-    rgba(255, 255, 255, 0.10) 28%,
-    rgba(255, 255, 255, 0) 52%
+  background: linear-gradient(
+    176deg,
+    rgba(255, 255, 255, 0.40) 0%,
+    rgba(255, 255, 255, 0.08) 7%,
+    rgba(255, 255, 255, 0) 22%
   );
+  -webkit-mask: none;
+  mask: none;
   mix-blend-mode: screen;
-  opacity: 0.85;
+  opacity: 0.9;
   z-index: 0;
 }
 
-/* Chromatic edge fringe — faint cyan→violet lens dispersion */
+/* Depth — a whisper of shading at the bottom edge gives the glass
+   volume. Replaces the old rim/caustic; no rainbow, no mask. */
 .glass-card::after,
 .hero-card::after,
 .project-card::after,
@@ -2701,18 +2742,15 @@ body.theme-light.portfolio-page {
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
-  background: linear-gradient(
-    128deg,
-    rgba(120, 220, 255, 0.16) 0%,
-    rgba(255, 255, 255, 0) 16%,
-    rgba(255, 255, 255, 0) 84%,
-    rgba(170, 130, 255, 0.16) 100%
-  );
-  mix-blend-mode: screen;
-  opacity: 0.7;
-  z-index: 0;
+  background: none;
   border: none;
+  -webkit-mask: none;
   mask: none;
+  box-shadow:
+    inset 0 -10px 18px -12px rgba(8, 14, 30, 0.30),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.30);
+  opacity: 1;
+  z-index: 0;
 }
 
 /* Keep real content above the glass layers */

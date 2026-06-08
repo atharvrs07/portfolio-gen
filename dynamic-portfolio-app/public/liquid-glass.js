@@ -24,18 +24,18 @@
     '<defs>' +
       '<filter id="liquid-lens" x="-35%" y="-35%" width="170%" height="170%" ' +
         'color-interpolation-filters="linearRGB">' +
-        '<feTurbulence type="fractalNoise" baseFrequency="0.009 0.013" ' +
+        '<feTurbulence type="fractalNoise" baseFrequency="0.006 0.009" ' +
           'numOctaves="2" seed="14" result="noise"/>' +
-        '<feGaussianBlur in="noise" stdDeviation="3.4" result="noiseBlur"/>' +
-        '<feDisplacementMap in="SourceGraphic" in2="noiseBlur" scale="48" ' +
+        '<feGaussianBlur in="noise" stdDeviation="5" result="noiseBlur"/>' +
+        '<feDisplacementMap in="SourceGraphic" in2="noiseBlur" scale="22" ' +
           'xChannelSelector="R" yChannelSelector="G"/>' +
       '</filter>' +
       '<filter id="liquid-lens-soft" x="-35%" y="-35%" width="170%" height="170%" ' +
         'color-interpolation-filters="linearRGB">' +
-        '<feTurbulence type="fractalNoise" baseFrequency="0.013 0.017" ' +
+        '<feTurbulence type="fractalNoise" baseFrequency="0.008 0.011" ' +
           'numOctaves="2" seed="8" result="noise"/>' +
-        '<feGaussianBlur in="noise" stdDeviation="2.2" result="noiseBlur"/>' +
-        '<feDisplacementMap in="SourceGraphic" in2="noiseBlur" scale="26" ' +
+        '<feGaussianBlur in="noise" stdDeviation="3.4" result="noiseBlur"/>' +
+        '<feDisplacementMap in="SourceGraphic" in2="noiseBlur" scale="12" ' +
           'xChannelSelector="R" yChannelSelector="G"/>' +
       '</filter>' +
     '</defs>';

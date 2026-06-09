@@ -21,8 +21,8 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-    <link rel="stylesheet" href="/styles.css?v=9" />
-    <link rel="stylesheet" href="/ds-landing.css?v=9" />
+    <link rel="stylesheet" href="/styles.css?v=10" />
+    <link rel="stylesheet" href="/ds-landing.css?v=10" />
     <!-- Anti-FOUC: set theme before CSS renders -->
     <script>
       (function(){
@@ -53,11 +53,11 @@
           <% if (currentUser) { %>
           <a class="ds-nav__link" href="/dashboard">Dashboard</a>
           <a class="ds-nav__link" href="/analytics">Analytics</a>
-          <a class="ds-nav__link" href="/pricing">Pricing</a>
+          <a class="ds-nav__link" href="#ds-pricing">Pricing</a>
           <% } else { %>
           <a class="ds-nav__link" href="#ds-features">Features</a>
           <a class="ds-nav__link" href="#ds-steps">How it works</a>
-          <a class="ds-nav__link" href="/pricing">Pricing</a>
+          <a class="ds-nav__link" href="#ds-pricing">Pricing</a>
           <% } %>
         </div>
         <div class="ds-nav__actions">
@@ -385,6 +385,79 @@
                 <p>Understand what visitors click and optimize your profile over time.</p>
               </article>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════
+           SECTION 4.5 — PRICING
+           ═══════════════════════════════════════════════════ -->
+      <section class="ds-section ds-pricing" id="ds-pricing" data-ds-section="pricing">
+        <div class="ds-pricing__inner">
+          <p class="ds-eyebrow-label ds-reveal-line">Pricing</p>
+          <h2 class="ds-section-heading ds-reveal-line">
+            Simple, <span class="ds-text-gradient">honest pricing.</span>
+          </h2>
+          <div class="ds-pricing__grid">
+
+            <!-- Free -->
+            <article class="ds-price-card" data-ds-stagger="0">
+              <p class="ds-price-card__name">Free</p>
+              <p class="ds-price-card__price">
+                <span class="ds-price-card__amount">₹0</span>
+                <span class="ds-price-card__period">/forever</span>
+              </p>
+              <p class="ds-price-card__tagline">Everything you need to get your first page live.</p>
+              <ul class="ds-price-card__features">
+                <li>1 portfolio</li>
+                <li>Link-in-bio + portfolio hybrid</li>
+                <li>Core content editing</li>
+                <li>Built-in views &amp; click tracking</li>
+              </ul>
+              <a class="ds-btn ds-btn--ghost ds-price-card__cta" href="<%= currentUser ? '/dashboard' : '/signup' %>">
+                Start free
+              </a>
+            </article>
+
+            <!-- Plus (featured) -->
+            <article class="ds-price-card ds-price-card--featured" data-ds-stagger="1">
+              <span class="ds-price-card__badge">Most popular</span>
+              <p class="ds-price-card__name">Plus</p>
+              <p class="ds-price-card__price">
+                <span class="ds-price-card__amount">₹450</span>
+                <span class="ds-price-card__period">/month</span>
+              </p>
+              <p class="ds-price-card__tagline">Make it truly yours.</p>
+              <ul class="ds-price-card__features">
+                <li>Everything in Free</li>
+                <li>Unlimited portfolios</li>
+                <li>Theme, colors &amp; layout control</li>
+                <li>Custom typography</li>
+              </ul>
+              <a class="ds-btn ds-btn--primary ds-price-card__cta" href="<%= currentUser ? '/pricing?plan=plus' : '/signup' %>">
+                Choose Plus
+              </a>
+            </article>
+
+            <!-- Pro -->
+            <article class="ds-price-card" data-ds-stagger="2">
+              <p class="ds-price-card__name">Pro</p>
+              <p class="ds-price-card__price">
+                <span class="ds-price-card__amount">₹1,670</span>
+                <span class="ds-price-card__period">/month</span>
+              </p>
+              <p class="ds-price-card__tagline">For builders who want full control.</p>
+              <ul class="ds-price-card__features">
+                <li>Everything in Plus</li>
+                <li>Drag-and-drop website builder</li>
+                <li>Section-based site publishing</li>
+                <li>Priority support</li>
+              </ul>
+              <a class="ds-btn ds-btn--ghost ds-price-card__cta" href="<%= currentUser ? '/pricing?plan=pro' : '/signup' %>">
+                Choose Pro
+              </a>
+            </article>
+
           </div>
         </div>
       </section>

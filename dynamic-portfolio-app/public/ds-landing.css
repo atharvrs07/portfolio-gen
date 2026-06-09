@@ -2195,3 +2195,198 @@ html[data-theme="dark"] .ds-nav.is-solid .ds-nav__inner {
 html[data-theme="dark"] .ds-nav__link.is-section-active {
   color: #e6ecff;
 }
+
+/* ═══════════════════════════════════════════════════════
+   SECTION 4.5 — PRICING
+   ═══════════════════════════════════════════════════════ */
+.ds-pricing {
+  flex-direction: column;
+}
+.ds-pricing__inner {
+  width: 100%;
+  max-width: 1080px;
+}
+.ds-pricing__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem;
+  align-items: stretch;
+}
+
+.ds-price-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: 1.3rem;
+  padding: 1.9rem 1.6rem;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid transparent;
+  -webkit-backdrop-filter: blur(6px) saturate(180%) brightness(1.06);
+  backdrop-filter: blur(6px) saturate(180%) brightness(1.06);
+  box-shadow:
+    inset 1.8px 1.8px 1.6px -1.4px rgba(255, 255, 255, 0.95),
+    inset -1.4px -1.4px 1.4px -1.4px rgba(255, 255, 255, 0.55),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    0 6px 18px rgba(15, 26, 47, 0.09),
+    0 18px 44px rgba(15, 26, 47, 0.10);
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.3s ease;
+}
+.ds-price-card.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@supports (backdrop-filter: url("#liquid-lens")) or (-webkit-backdrop-filter: url("#liquid-lens")) {
+  .ds-price-card {
+    -webkit-backdrop-filter: blur(6px) saturate(180%) brightness(1.06) url("#liquid-lens");
+    backdrop-filter: blur(6px) saturate(180%) brightness(1.06) url("#liquid-lens");
+  }
+}
+
+/* Featured (Plus) — lifted, accent ring */
+.ds-price-card--featured {
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow:
+    inset 1.8px 1.8px 1.6px -1.4px rgba(255, 255, 255, 1),
+    inset 0 0 0 1.5px rgba(59, 110, 245, 0.45),
+    0 12px 30px rgba(59, 110, 245, 0.16),
+    0 26px 60px rgba(15, 26, 47, 0.14);
+}
+@media (min-width: 901px) {
+  .ds-price-card--featured {
+    transform: translateY(40px) scale(1.04);
+  }
+  .ds-price-card--featured.is-visible {
+    transform: translateY(0) scale(1.04);
+  }
+}
+
+.ds-price-card__badge {
+  position: absolute;
+  top: -0.7rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #3b6ef5;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.28rem 0.8rem;
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(59, 110, 245, 0.4);
+  white-space: nowrap;
+}
+
+.ds-price-card__name {
+  margin: 0 0 0.6rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #3b6ef5;
+}
+.ds-price-card__price {
+  margin: 0 0 0.4rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+}
+.ds-price-card__amount {
+  font-size: 2.6rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: #0f1a2f;
+  line-height: 1;
+}
+.ds-price-card__period {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #5a6a85;
+}
+.ds-price-card__tagline {
+  margin: 0 0 1.2rem;
+  font-size: 0.94rem;
+  line-height: 1.5;
+  color: #5a6a85;
+}
+.ds-price-card__features {
+  list-style: none;
+  margin: 0 0 1.6rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  flex: 1;
+}
+.ds-price-card__features li {
+  position: relative;
+  padding-left: 1.6rem;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  color: #0f1a2f;
+}
+.ds-price-card__features li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1.1rem;
+  height: 1.1rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(59, 110, 245, 0.12);
+  color: #3b6ef5;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+.ds-price-card__cta {
+  width: 100%;
+  justify-content: center;
+}
+
+/* ── Pricing — dark theme ──────────────────────────────── */
+html[data-theme="dark"] .ds-price-card {
+  background: rgba(255, 255, 255, 0.055);
+  border-color: transparent;
+  box-shadow:
+    inset 1.8px 1.8px 1.6px -1.4px rgba(255, 255, 255, 0.5),
+    inset -1.4px -1.4px 1.4px -1.4px rgba(255, 255, 255, 0.16),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.10),
+    0 8px 22px rgba(0, 0, 0, 0.42),
+    0 22px 58px rgba(0, 0, 0, 0.38);
+}
+html[data-theme="dark"] .ds-price-card--featured {
+  background: rgba(92, 135, 255, 0.10);
+  box-shadow:
+    inset 1.8px 1.8px 1.6px -1.4px rgba(255, 255, 255, 0.55),
+    inset 0 0 0 1.5px rgba(92, 135, 255, 0.5),
+    0 12px 30px rgba(92, 135, 255, 0.22),
+    0 26px 60px rgba(0, 0, 0, 0.45);
+}
+html[data-theme="dark"] .ds-price-card__name { color: #7aa8ff; }
+html[data-theme="dark"] .ds-price-card__amount { color: #e6ecff; }
+html[data-theme="dark"] .ds-price-card__period { color: #7585a8; }
+html[data-theme="dark"] .ds-price-card__tagline { color: #7585a8; }
+html[data-theme="dark"] .ds-price-card__features li { color: #c8d3ee; }
+html[data-theme="dark"] .ds-price-card__features li::before {
+  background: rgba(92, 135, 255, 0.18);
+  color: #7aa8ff;
+}
+html[data-theme="dark"] .ds-price-card__badge {
+  background: #5c87ff;
+  box-shadow: 0 4px 14px rgba(92, 135, 255, 0.45);
+}
+
+@media (max-width: 900px) {
+  .ds-pricing__grid {
+    grid-template-columns: 1fr;
+    max-width: 30rem;
+    margin: 0 auto;
+  }
+}

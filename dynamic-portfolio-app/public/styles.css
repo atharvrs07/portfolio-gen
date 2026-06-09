@@ -2872,3 +2872,47 @@ body.theme-light.portfolio-page {
 .site-header--collapsible.is-scrolled .nav-links {
   gap: 1rem;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   LIQUID NAV SPOTLIGHT (active-section indicator)
+   Injected by liquid-glass.js into the nav link list. An opaque
+   accent blob (so the #liquid-goo metaball filter works) sits in
+   a container whose opacity makes the highlight translucent.
+   ═══════════════════════════════════════════════════════════ */
+.lg-nav-goo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  filter: url("#liquid-goo");
+  transition: opacity 0.35s ease;
+}
+
+.lg-nav-spotlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-radius: 999px;
+  background: var(--accent, #3b6ef5);
+  transform: translateX(0);
+  transition:
+    transform 0.5s cubic-bezier(0.45, 0.05, 0.2, 1.1),
+    width 0.5s cubic-bezier(0.45, 0.05, 0.2, 1.1);
+  will-change: transform, width;
+}
+
+/* Portfolio nav: make the list the positioning context, links above */
+.nav-links {
+  position: relative;
+}
+.nav-links li,
+.nav-links a {
+  position: relative;
+  z-index: 1;
+}
+.nav-links a.is-section-active {
+  color: var(--accent);
+}

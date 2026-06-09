@@ -55,3 +55,86 @@
   if (document.body) inject();
   else document.addEventListener("DOMContentLoaded", inject);
 })();
+
+/* ═══════════════════════════════════════════════════════════
+   LIQUID NAV SPOTLIGHT
+   A gooey accent blob that highlights the active nav link and
+   flows between links like a drop of water — it stretches to
+   bridge the old and new link, then pulls in (metaball merge,
+   not wavy). The page feeds it the currently-active link.
+   ═══════════════════════════════════════════════════════════ */
+window.LiquidGlassNav = function (container) {
+  if (!container) return null;
+  var goo = document.createElement("span");
+  goo.className = "lg-nav-goo";
+  goo.setAttribute("aria-hidden", "true");
+  var blob = document.createElement("span");
+  blob.className = "lg-nav-spotlight";
+  goo.appendChild(blob);
+  container.appendChild(goo);
+
+  var stretchTimer = 0;
+  var visible = false;
+  var curLeft = 0;
+  var curWidth = 0;
+  var curTarget = null;
+
+  function setBox(left, width, instant) {
+    if (instant) {
+      blob.style.transition = "none";
+      blob.style.transform = "translateX(" + left + "px)";
+      blob.style.width = width + "px";
+      void blob.offsetWidth;
+      blob.style.transition = "";
+    } else {
+      /* Phase 1 — stretch to bridge old + new (liquid reaches across) */
+      var bL = Math.min(curLeft, left);
+      var bR = Math.max(curLeft + curWidth, left + width);
+      blob.style.transform = "translateX(" + bL + "px)";
+      blob.style.width = bR - bL + "px";
+      /* Phase 2 — pull in to the target (drop settles) */
+      clearTimeout(stretchTimer);
+      stretchTimer = setTimeout(function () {
+        blob.style.transform = "translateX(" + left + "px)";
+        blob.style.width = width + "px";
+      }, 200);
+    }
+    curLeft = left;
+    curWidth = width;
+  }
+
+  return {
+    /* Highlight a link element (or null to hide the spotlight). */
+    place: function (linkEl) {
+      if (!linkEl) {
+        goo.style.opacity = "0";
+        visible = false;
+        curTarget = null;
+        return;
+      }
+      if (linkEl === curTarget && visible) return;
+      /* Pad the highlight a little around the link text — gives
+         breathing room and offsets the goo filter's edge erosion. */
+      var PADX = 12, PADY = 7;
+      var cR = container.getBoundingClientRect();
+      var lR = linkEl.getBoundingClientRect();
+      blob.style.top = lR.top - cR.top - PADY + "px";
+      blob.style.height = lR.height + PADY * 2 + "px";
+      var instant = !visible;
+      goo.style.opacity = "0.32";
+      visible = true;
+      curTarget = linkEl;
+      setBox(lR.left - cR.left - PADX, lR.width + PADX * 2, instant);
+    },
+    /* Snap to the current target without animation (resize/layout). */
+    refresh: function () {
+      if (!curTarget || !visible) return;
+      var PADX = 12, PADY = 7;
+      var cR = container.getBoundingClientRect();
+      var lR = curTarget.getBoundingClientRect();
+      blob.style.top = lR.top - cR.top - PADY + "px";
+      blob.style.height = lR.height + PADY * 2 + "px";
+      setBox(lR.left - cR.left - PADX, lR.width + PADX * 2, true);
+    }
+  };
+};

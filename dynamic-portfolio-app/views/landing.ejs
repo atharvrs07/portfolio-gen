@@ -21,8 +21,8 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-    <link rel="stylesheet" href="/styles.css?v=8" />
-    <link rel="stylesheet" href="/ds-landing.css?v=8" />
+    <link rel="stylesheet" href="/styles.css?v=9" />
+    <link rel="stylesheet" href="/ds-landing.css?v=9" />
     <!-- Anti-FOUC: set theme before CSS renders -->
     <script>
       (function(){
@@ -528,6 +528,50 @@
           stepEls.forEach((el) => el.classList.add("is-active"));
         }
 
+        /* ── Liquid nav spotlight (highlights the active section) ──
+           Self-contained: its own throttled scroll loop, independent
+           of the main effects loop so it can never be frozen by it. */
+        const setupNavSpotlight = () => {
+          if (typeof window.LiquidGlassNav !== "function") return;
+          const links = document.querySelector(".ds-nav__links");
+          if (!links) return;
+          const pairs = Array.from(links.querySelectorAll("a.ds-nav__link"))
+            .map((a) => {
+              const href = a.getAttribute("href") || "";
+              if (!href.startsWith("#")) return null;
+              const sec = document.querySelector(href);
+              return sec ? { link: a, sec } : null;
+            })
+            .filter(Boolean);
+          if (!pairs.length) return;
+          const spotlight = window.LiquidGlassNav(links);
+          const update = () => {
+            const line = window.innerHeight * 0.4;
+            let active = null;
+            for (const p of pairs) {
+              const r = p.sec.getBoundingClientRect();
+              if (r.top <= line && r.bottom > line) { active = p; break; }
+            }
+            if (!active) {
+              let bestTop = -Infinity;
+              for (const p of pairs) {
+                const t = p.sec.getBoundingClientRect().top;
+                if (t <= line && t > bestTop) { bestTop = t; active = p; }
+              }
+            }
+            pairs.forEach((p) =>
+              p.link.classList.toggle("is-section-active", !!active && p.link === active.link));
+            spotlight.place(active ? active.link : null);
+          };
+          /* Direct update on scroll — cheap (a couple of rect reads)
+             and robust even if requestAnimationFrame is throttled. */
+          window.addEventListener("scroll", update, { passive: true });
+          window.addEventListener("resize", () => { spotlight.refresh(); update(); }, { passive: true });
+          update();
+        };
+        if (document.readyState === "complete") setupNavSpotlight();
+        else window.addEventListener("load", setupNavSpotlight);
+
         /* ── Scroll-driven effects ────────────────────── */
         if (!prefersReducedMotion) {
           let ticking = false;
@@ -684,7 +728,7 @@
         });
       })();
     </script>
-    <script src="/liquid-glass.js?v=3"></script>
+    <script src="/liquid-glass.js?v=4"></script>
 
     <!-- ═══════════════════════════════════════════════════
          FOOTER

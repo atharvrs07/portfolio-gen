@@ -21,8 +21,8 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-    <link rel="stylesheet" href="/styles.css?v=10" />
-    <link rel="stylesheet" href="/ds-landing.css?v=10" />
+    <link rel="stylesheet" href="/styles.css?v=11" />
+    <link rel="stylesheet" href="/ds-landing.css?v=11" />
     <!-- Anti-FOUC: set theme before CSS renders -->
     <script>
       (function(){
@@ -50,15 +50,12 @@
       <div class="ds-nav__inner">
         <a href="/" class="ds-nav__brand">Liqui<span>Link</span></a>
         <div class="ds-nav__links">
-          <% if (currentUser) { %>
-          <a class="ds-nav__link" href="/dashboard">Dashboard</a>
-          <a class="ds-nav__link" href="/analytics">Analytics</a>
-          <a class="ds-nav__link" href="#ds-pricing">Pricing</a>
-          <% } else { %>
+          <a class="ds-nav__link" href="#ds-hero">Home</a>
+          <a class="ds-nav__link" href="#ds-preview">Preview</a>
           <a class="ds-nav__link" href="#ds-features">Features</a>
           <a class="ds-nav__link" href="#ds-steps">How it works</a>
           <a class="ds-nav__link" href="#ds-pricing">Pricing</a>
-          <% } %>
+          <a class="ds-nav__link" href="#ds-contact">Contact</a>
         </div>
         <div class="ds-nav__actions">
           <!-- iOS 26-style liquid glass theme toggle -->
@@ -122,7 +119,7 @@
           </div>
 
           <!-- Product preview -->
-          <div class="ds-hero__preview">
+          <div class="ds-hero__preview" id="ds-preview">
 
             <!-- Tab switcher (liquid sliding indicator) -->
             <div class="ds-showcase__tabs" id="ds-showcase-tabs">
@@ -619,18 +616,20 @@
           if (!pairs.length) return;
           const spotlight = window.LiquidGlassNav(links);
           const update = () => {
-            const line = window.innerHeight * 0.4;
-            let active = null;
+            // Active = the last section whose top has passed the line.
+            // Handles nested anchors (Home/Preview inside the hero) and
+            // sequential sections uniformly.
+            const line = window.innerHeight * 0.35;
+            let active = null, bestTop = -Infinity;
             for (const p of pairs) {
-              const r = p.sec.getBoundingClientRect();
-              if (r.top <= line && r.bottom > line) { active = p; break; }
+              const t = p.sec.getBoundingClientRect().top;
+              if (t <= line && t > bestTop) { bestTop = t; active = p; }
             }
-            if (!active) {
-              let bestTop = -Infinity;
-              for (const p of pairs) {
-                const t = p.sec.getBoundingClientRect().top;
-                if (t <= line && t > bestTop) { bestTop = t; active = p; }
-              }
+            // Footer/last section can't reach the line — when the page is
+            // scrolled to the bottom, treat the last link as active.
+            if (window.innerHeight + window.scrollY >=
+                (document.documentElement.scrollHeight - 4)) {
+              active = pairs[pairs.length - 1];
             }
             pairs.forEach((p) =>
               p.link.classList.toggle("is-section-active", !!active && p.link === active.link));
@@ -801,12 +800,12 @@
         });
       })();
     </script>
-    <script src="/liquid-glass.js?v=4"></script>
+    <script src="/liquid-glass.js?v=5"></script>
 
     <!-- ═══════════════════════════════════════════════════
          FOOTER
          ═══════════════════════════════════════════════════ -->
-    <footer class="ds-footer">
+    <footer class="ds-footer" id="ds-contact">
       <div class="ds-footer__inner">
         <div class="ds-footer__top">
 

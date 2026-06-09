@@ -112,19 +112,30 @@ window.LiquidGlassNav = function (container) {
         curTarget = null;
         return;
       }
-      if (linkEl === curTarget && visible) return;
       /* Pad the highlight a little around the link text — gives
          breathing room and offsets the goo filter's edge erosion. */
       var PADX = 12, PADY = 7;
       var cR = container.getBoundingClientRect();
       var lR = linkEl.getBoundingClientRect();
+      var left = lR.left - cR.left - PADX;
+      var width = lR.width + PADX * 2;
       blob.style.top = lR.top - cR.top - PADY + "px";
       blob.style.height = lR.height + PADY * 2 + "px";
+      if (linkEl === curTarget && visible) {
+        /* Same link — the active section hasn't changed, but the nav
+           layout may have (e.g. it collapsed into a pill on scroll).
+           Keep the highlight locked to the link, snapping instantly
+           with no liquid stretch. */
+        if (Math.abs(left - curLeft) > 0.5 || Math.abs(width - curWidth) > 0.5) {
+          setBox(left, width, true);
+        }
+        return;
+      }
       var instant = !visible;
       goo.style.opacity = "0.32";
       visible = true;
       curTarget = linkEl;
-      setBox(lR.left - cR.left - PADX, lR.width + PADX * 2, instant);
+      setBox(left, width, instant);
     },
     /* Snap to the current target without animation (resize/layout). */
     refresh: function () {

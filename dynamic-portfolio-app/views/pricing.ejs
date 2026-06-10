@@ -37,6 +37,26 @@
         margin: 0.8rem 0 1rem;
         padding-left: 1.1rem;
       }
+      .pricing-badge {
+        display: inline-block;
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 0.2rem 0.55rem;
+        border-radius: 999px;
+        margin-bottom: 0.35rem;
+      }
+      .pricing-badge--beta {
+        background: rgba(120, 60, 220, 0.18);
+        color: #b48fff;
+        border: 1px solid rgba(160, 100, 255, 0.35);
+      }
+      .pricing-beta-note {
+        margin: 0.45rem 0 0;
+        font-size: 0.78rem;
+        color: rgba(255, 255, 255, 0.42);
+      }
       .purchase-popup-overlay {
         position: fixed;
         inset: 0;
@@ -221,6 +241,7 @@
             </article>
 
             <article class="pricing-card <%= currentPlan === 'pro' ? 'pricing-card--active' : '' %>">
+              <span class="pricing-badge pricing-badge--beta">Beta</span>
               <p class="eyebrow">Pro</p>
               <p class="pricing-price">Rs <%= proPriceINR %> <span style="font-size:0.9rem;font-weight:500;">/30d</span></p>
               <ul class="pricing-list">
@@ -231,7 +252,8 @@
               <% if (currentPlan === "pro") { %>
                 <button class="btn btn-ghost" type="button" disabled>Current plan</button>
               <% } else { %>
-                <button class="btn btn-primary" type="button" onclick="openPurchasePopup('pro')">Choose Pro</button>
+                <a class="btn btn-primary" href="https://docs.google.com/forms/d/e/1FAIpQLSedZAKYmlIEeJLCGnOpULYOMquD1w-TLaYlIAdv_NclznnOmA/viewform" target="_blank" rel="noopener noreferrer">Apply for Beta access</a>
+                <p class="pricing-beta-note">Free during beta &middot; Limited spots</p>
               <% } %>
             </article>
           </div>

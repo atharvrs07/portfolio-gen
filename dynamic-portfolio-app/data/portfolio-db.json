@@ -109,7 +109,7 @@
       "updatedAt": "2026-05-12T05:52:37.121Z",
       "styleTheme": "liquid-glass",
       "analytics": {
-        "views": 204,
+        "views": 205,
         "linkClicks": 4,
         "daily": {
           "2026-04-14": {
@@ -139,22 +139,26 @@
           "2026-06-08": {
             "views": 5,
             "linkClicks": 0
+          },
+          "2026-06-10": {
+            "views": 1,
+            "linkClicks": 0
           }
         },
         "referrers": {
           "Direct": 43,
           "Internal Portfolio": 167,
-          "Internal": 157
+          "Internal": 158
         },
         "devices": {
-          "Desktop": 367
+          "Desktop": 368
         },
         "browsers": {
           "Firefox": 333,
-          "Chrome": 34
+          "Chrome": 35
         },
         "operatingSystems": {
-          "Windows": 367
+          "Windows": 368
         },
         "links": {},
         "utmSources": {},
@@ -162,6 +166,7 @@
         "utmCampaigns": {},
         "hourly": {
           "9": 2,
+          "10": 1,
           "11": 10,
           "12": 2,
           "13": 70,
@@ -171,6 +176,24 @@
           "19": 4
         },
         "events": [
+          {
+            "type": "view",
+            "at": "2026-06-10T05:14:57.381Z",
+            "day": "2026-06-10",
+            "hour": 10,
+            "referrer": "Internal",
+            "device": "Desktop",
+            "browser": "Chrome",
+            "os": "Windows",
+            "target": "",
+            "visitorId": "v_j62mz9zqmq7m73z8",
+            "sessionId": "",
+            "utmSource": "",
+            "utmMedium": "",
+            "utmCampaign": "",
+            "engagedMs": 0,
+            "scrollDepth": 0
+          },
           {
             "type": "engagement",
             "at": "2026-06-08T13:38:02.546Z",
@@ -6780,7 +6803,7 @@
         ],
         "totalEngagedMs": 900064,
         "maxScrollDepth": 100,
-        "lastSeenAt": "2026-06-08T13:38:02.546Z"
+        "lastSeenAt": "2026-06-10T05:14:57.381Z"
       },
       "builder": {
         "enabled": false,
@@ -7288,9 +7311,9 @@
       "email": "atharvrs2010@gmail.com",
       "passwordHash": "$2a$10$oTGV2KqiofYM7UuC7vblgutDsA735jU/xR1uletb0FtJz9NPkBQo2",
       "createdAt": "2026-03-26T08:11:38.603Z",
-      "plan": "pro",
-      "planStatus": "active",
-      "planExpiresAt": "2026-06-09T09:45:40.184Z",
+      "plan": "free",
+      "planStatus": "expired",
+      "planExpiresAt": null,
       "proActivatedAt": "2026-04-08T10:12:55.806Z",
       "uploadedAssets": [
         {

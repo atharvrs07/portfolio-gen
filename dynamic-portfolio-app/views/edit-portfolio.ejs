@@ -561,6 +561,16 @@
         </div>
       </article>
     </template>
+    <div id="saveToast" style="
+      position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;
+      background:#1a2b1a;border:1px solid rgba(100,200,100,0.4);
+      color:#a3f0a3;padding:0.75rem 1.25rem;border-radius:10px;
+      font-size:0.9rem;font-weight:600;box-shadow:0 4px 24px rgba(0,0,0,0.4);
+      display:none;align-items:center;gap:0.5rem;
+    ">
+      <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+      Changes saved successfully.
+    </div>
     <script src="/portfolio-live-preview.js"></script>
     <script>
       (function () {
@@ -812,6 +822,23 @@
       })();
     </script>
     <%- include('partials/ai-modal') %>
+    <script>
+      (function () {
+        var params = new URLSearchParams(window.location.search);
+        if (params.get('saved') === '1') {
+          var toast = document.getElementById('saveToast');
+          if (toast) {
+            toast.style.display = 'flex';
+            setTimeout(function () {
+              toast.style.transition = 'opacity 0.4s';
+              toast.style.opacity = '0';
+              setTimeout(function () { toast.style.display = 'none'; toast.style.opacity = ''; }, 420);
+            }, 3000);
+          }
+          history.replaceState(null, '', window.location.pathname);
+        }
+      })();
+    </script>
     <script src="/liquid-glass.js?v=5"></script>
   </body>
 </html>

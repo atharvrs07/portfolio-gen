@@ -136,15 +136,27 @@
           </article>
           <article class="analytics-chart-card">
             <h2>Top UTM sources</h2>
+            <% if (!analytics.charts.utmSources || !analytics.charts.utmSources.length) { %>
+            <div class="empty-state" style="padding:1.5rem 0;">
+              <p>No UTM source data yet. Add <code>?utm_source=</code> to your portfolio URLs to track traffic origins.</p>
+            </div>
+            <% } else { %>
             <div class="analytics-chart-canvas">
               <canvas id="utmSourceChart" aria-label="UTM source chart"></canvas>
             </div>
+            <% } %>
           </article>
           <article class="analytics-chart-card">
             <h2>Top UTM campaigns</h2>
+            <% if (!analytics.charts.utmCampaigns || !analytics.charts.utmCampaigns.length) { %>
+            <div class="empty-state" style="padding:1.5rem 0;">
+              <p>No UTM campaign data yet. Add <code>?utm_campaign=</code> to your portfolio URLs to track campaigns.</p>
+            </div>
+            <% } else { %>
             <div class="analytics-chart-canvas">
               <canvas id="utmCampaignChart" aria-label="UTM campaign chart"></canvas>
             </div>
+            <% } %>
           </article>
           <article class="analytics-chart-card analytics-chart-card--wide">
             <h2>Top clicked destinations</h2>
@@ -393,7 +405,7 @@
       });
 
       buildChart(document.getElementById("browserChart"), {
-        type: "polarArea",
+        type: "doughnut",
         data: {
           labels: analyticsCharts.browsers.map((item) => item.label),
           datasets: [
@@ -405,15 +417,10 @@
         },
         options: {
           maintainAspectRatio: false,
+          rotation: 0,
+          circumference: 360,
           plugins: {
             legend: { labels: { color: chartFontColor } }
-          },
-          scales: {
-            r: {
-              grid: { color: chartGridColor },
-              pointLabels: { color: chartFontColor },
-              ticks: { color: chartFontColor, backdropColor: "transparent" }
-            }
           }
         }
       });
@@ -442,7 +449,7 @@
         }
       });
 
-      buildChart(document.getElementById("utmSourceChart"), {
+      if (document.getElementById("utmSourceChart")) buildChart(document.getElementById("utmSourceChart"), {
         type: "bar",
         data: {
           labels: labelsFromEntries(analyticsCharts.utmSources),
@@ -467,7 +474,7 @@
         }
       });
 
-      buildChart(document.getElementById("utmCampaignChart"), {
+      if (document.getElementById("utmCampaignChart")) buildChart(document.getElementById("utmCampaignChart"), {
         type: "bar",
         data: {
           labels: labelsFromEntries(analyticsCharts.utmCampaigns),

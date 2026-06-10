@@ -41,7 +41,7 @@
             </nav>
           </div>
           <div class="dashboard-actions">
-            <a href="/form.html" class="btn btn-primary">Create New Portfolio</a>
+            <a href="/form.html" class="btn btn-primary" id="createPortfolioBtn">Create New Portfolio</a>
             <a href="<%= viewAllPlansHref %>" class="btn btn-ghost">View All Plans</a>
             <% if (showRestorePreviousPlanBtn) { %>
             <form action="/account/restore-previous-plan" method="POST">
@@ -133,6 +133,53 @@
         <% } %>
       </section>
     </main>
+    <!-- Upgrade modal for Free users hitting portfolio limit -->
+    <div id="upgradeModal" style="
+      display:none;position:fixed;inset:0;z-index:9000;
+      background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);
+      align-items:center;justify-content:center;
+    ">
+      <section style="
+        background:#0d1526;border:1px solid rgba(136,179,255,0.22);
+        border-radius:1.25rem;padding:2rem 2rem 1.5rem;max-width:420px;width:90%;
+        box-shadow:0 8px 48px rgba(0,0,0,0.6);
+      " role="dialog" aria-modal="true" aria-labelledby="upgradeModalTitle">
+        <p class="eyebrow">Free plan limit</p>
+        <h2 id="upgradeModalTitle" style="margin:0.3rem 0 0.65rem;">Unlock unlimited portfolios</h2>
+        <p class="hero-text" style="margin-bottom:1.25rem;">
+          Free plan includes 1 portfolio. Upgrade to Plus to create unlimited portfolios, unlock themes, custom colors, and more.
+        </p>
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+          <a href="/pricing?reason=create&plan=plus&next=%2Fform.html" class="btn btn-primary">See all plans</a>
+          <button type="button" class="btn btn-ghost" id="upgradeModalClose">Not now</button>
+        </div>
+      </section>
+    </div>
+    <script>
+      (function () {
+        var isPaid = <%= isPaidPlan ? 'true' : 'false' %>;
+        var portfolioCount = <%= portfolios.length %>;
+        var btn = document.getElementById('createPortfolioBtn');
+        var modal = document.getElementById('upgradeModal');
+        var closeBtn = document.getElementById('upgradeModalClose');
+        if (!btn || !modal) return;
+        if (!isPaid && portfolioCount >= 1) {
+          btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            modal.style.display = 'flex';
+          });
+        }
+        if (closeBtn) {
+          closeBtn.addEventListener('click', function () { modal.style.display = 'none'; });
+        }
+        modal.addEventListener('click', function (e) {
+          if (e.target === modal) modal.style.display = 'none';
+        });
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && modal.style.display === 'flex') modal.style.display = 'none';
+        });
+      })();
+    </script>
     <script src="/liquid-glass.js?v=5"></script>
   </body>
 </html>

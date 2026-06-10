@@ -147,11 +147,26 @@
 
 html {
   scroll-behavior: smooth;
+  /* Subpixel antialiasing off — same as iOS/macOS which renders fonts
+     thinner and crisper; single biggest premium typography win */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  /* Prevent iOS auto-zoom on input focus while keeping layout intact */
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
-  font-family: "Inter", sans-serif;
+  /* SF Pro on Apple devices, Inter on everything else — Apple users get
+     the literal iOS/macOS font; Inter is essentially the same design */
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI Variable",
+    "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  /* Contextual alternates + ligatures give Inter the same refinement
+     as SF Pro's OpenType features */
+  font-feature-settings: "calt" 1, "rlig" 1;
+  /* Slight negative tracking throughout — matches iOS text style */
+  letter-spacing: -0.011em;
   color: var(--text);
   background-color: var(--bg);
   background-image: var(--bg-image, radial-gradient(circle at 20% 15%, #dce8ff 0%, var(--bg) 55%));
@@ -360,7 +375,7 @@ body.theme-light .mono {
   margin: 0 0 0.8rem;
   color: var(--accent-2);
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   font-size: 0.75rem;
   font-weight: 700;
 }
@@ -368,8 +383,19 @@ body.theme-light .mono {
 h1 {
   margin: 0;
   font-size: clamp(2rem, 5vw, 3.8rem);
-  line-height: 1.1;
-  letter-spacing: -0.03em;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+}
+
+/* General heading defaults — tighter tracking matches iOS SF Pro Display */
+h2 {
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+h3 {
+  letter-spacing: -0.018em;
+  line-height: 1.25;
 }
 
 h1 span {
@@ -437,6 +463,8 @@ h1 span {
   border-radius: 999px;
   padding: 0.75rem 1.25rem;
   font-weight: 600;
+  font-size: 0.925rem;
+  letter-spacing: -0.01em;
   border: none;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
@@ -2922,6 +2950,14 @@ body.theme-light.portfolio-page {
    Applied on top of existing breakpoints to fix layout issues
    on phones and small tablets.
    ═══════════════════════════════════════════════════════════ */
+
+/* ── Tabular numbers for all stat / metric displays ─────── */
+.dashboard-stat__value,
+.analytics-summary-card__value,
+.metric-number,
+.pricing-price {
+  font-variant-numeric: tabular-nums;
+}
 
 /* ── Touch-friendly button height ────────────────────────── */
 @media (max-width: 768px) {

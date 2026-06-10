@@ -139,13 +139,13 @@
 .ds-nav__link {
   color: rgba(15, 26, 47, 0.6);
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 500;
+  letter-spacing: -0.01em;
   padding: 0.4rem 0.72rem;
   border-radius: 999px;
   white-space: nowrap;
   transition: color 0.2s ease, background 0.2s ease;
-  white-space: nowrap;
 }
 
 .ds-nav__link:hover {
@@ -236,7 +236,7 @@
   margin: 0 0 0.8rem;
   text-align: center;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.08em;
   font-size: 0.72rem;
   font-weight: 700;
   color: #3b6ef5;
@@ -266,7 +266,8 @@
   border-radius: 999px;
   padding: 0.78rem 1.5rem;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.925rem;
+  letter-spacing: -0.01em;
   transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
   border: none;
   cursor: pointer;
@@ -372,6 +373,7 @@
   margin: 1.2rem 0 0;
   font-size: clamp(1.1rem, 2.5vw, 1.5rem);
   font-weight: 500;
+  letter-spacing: -0.018em;
   line-height: 1.3;
   color: #5a6a85;
   opacity: 0;
@@ -1059,6 +1061,7 @@
   margin: 0 0 0.5rem;
   font-size: 1.15rem;
   font-weight: 700;
+  letter-spacing: -0.02em;
   color: #0f1a2f;
 }
 
@@ -1128,6 +1131,7 @@
   margin: 0 0 0.6rem;
   font-size: 1.15rem;
   font-weight: 700;
+  letter-spacing: -0.02em;
   color: #0f1a2f;
 }
 
@@ -1218,6 +1222,7 @@
   margin: 0 0 0.4rem;
   font-size: 1.05rem;
   font-weight: 700;
+  letter-spacing: -0.018em;
   color: #0f1a2f;
 }
 

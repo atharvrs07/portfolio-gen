@@ -2902,34 +2902,47 @@ body.theme-light.portfolio-page {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   LIQUID NAV SPOTLIGHT (active-section indicator)
-   Injected by liquid-glass.js into the nav link list. An opaque
-   accent blob (so the #liquid-goo metaball filter works) sits in
-   a container whose opacity makes the highlight translucent.
+   LIQUID NAV PILL (active-section indicator)
+   Injected by liquid-glass.js into the nav link list.
+   Pure Liquid Glass capsule — frosted, refractive, with a
+   Dynamic Island spring animation. No goo filter, no setTimeout
+   race conditions. rAF coalescing handles fast scroll safely.
    ═══════════════════════════════════════════════════════════ */
-.lg-nav-goo {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0;
-  filter: url("#liquid-goo");
-  transition: opacity 0.35s ease;
-}
-
-.lg-nav-spotlight {
+.lg-nav-pill {
   position: absolute;
   top: 0;
   left: 0;
   width: 0;
   height: 0;
+  z-index: 0;
+  pointer-events: none;
   border-radius: 999px;
-  background: var(--accent, #3b6ef5);
-  transform: translateX(0);
+  opacity: 0;
+
+  /* Liquid Glass material: frosted blue-white capsule */
+  background: linear-gradient(
+    155deg,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(100, 145, 255, 0.28) 48%,
+    rgba(80, 120, 255, 0.12) 100%
+  );
+  -webkit-backdrop-filter: blur(10px) saturate(180%) brightness(1.12);
+  backdrop-filter: blur(10px) saturate(180%) brightness(1.12);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.58),
+    inset 0 -0.5px 0 rgba(0, 0, 0, 0.08),
+    0 0 18px rgba(88, 130, 255, 0.28),
+    0 2px 6px rgba(0, 0, 0, 0.10);
+
+  /* Spring easing — overshoots then settles like a water drop.
+     transform spring gives the Dynamic Island lateral morph;
+     width uses a gentler ease so it doesn't flare awkwardly. */
   transition:
-    transform 0.5s cubic-bezier(0.45, 0.05, 0.2, 1.1),
-    width 0.5s cubic-bezier(0.45, 0.05, 0.2, 1.1);
-  will-change: transform, width;
+    transform 0.46s cubic-bezier(0.34, 1.56, 0.64, 1),
+    width     0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity   0.22s ease;
+  will-change: transform, width, opacity;
 }
 
 /* Portfolio nav: make the list the positioning context, links above */

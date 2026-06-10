@@ -2186,7 +2186,7 @@ html[data-theme="dark"] .ds-nav.is-solid .ds-nav__inner {
   }
 }
 
-/* ── Liquid nav spotlight positioning for the landing nav ── */
+/* ── Liquid nav pill — landing nav positioning context ────── */
 .ds-nav__links {
   position: relative;
 }
@@ -2194,12 +2194,37 @@ html[data-theme="dark"] .ds-nav.is-solid .ds-nav__inner {
   position: relative;
   z-index: 1;
 }
-/* Active link text stays crisp above the translucent accent blob */
+
+/* Active link stays crisp above the glass pill */
 .ds-nav__link.is-section-active {
-  color: #0f1a2f;
+  color: #fff;          /* white on dark glass pill (default dark nav) */
 }
+
+/* Scrolled white nav: pill has no backdrop blur (parent has one),
+   switch to a crisp accent-tinted fill + accent text. */
+.ds-nav.is-solid .lg-nav-pill {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: linear-gradient(
+    155deg,
+    rgba(255, 255, 255, 0.72) 0%,
+    rgba(59, 110, 245, 0.12) 100%
+  );
+  border-color: rgba(59, 110, 245, 0.20);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.90),
+    inset 0 -0.5px 0 rgba(59, 110, 245, 0.08),
+    0 2px 8px rgba(59, 110, 245, 0.12);
+}
+.ds-nav.is-solid .ds-nav__link.is-section-active {
+  color: #1a3a8f;       /* deep blue on white glass pill (solid nav) */
+}
+
 html[data-theme="dark"] .ds-nav__link.is-section-active {
   color: #e6ecff;
+}
+html[data-theme="dark"] .ds-nav.is-solid .ds-nav__link.is-section-active {
+  color: #b8d0ff;
 }
 
 /* ═══════════════════════════════════════════════════════

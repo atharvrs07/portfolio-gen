@@ -57,95 +57,100 @@
 })();
 
 /* ═══════════════════════════════════════════════════════════
-   LIQUID NAV SPOTLIGHT
-   A gooey accent blob that highlights the active nav link and
-   flows between links like a drop of water — it stretches to
-   bridge the old and new link, then pulls in (metaball merge,
-   not wavy). The page feeds it the currently-active link.
+   LIQUID NAV PILL
+   A pure Liquid Glass capsule that flows between nav links
+   like the iOS Dynamic Island — spring-eased, water-like.
+
+   Design decisions vs. the old gooey blob approach:
+   • Single element (no wrapper + blob + goo filter stacking)
+   • requestAnimationFrame coalesces rapid scroll calls so the
+     pill can never get stuck mid-stretch during fast scrolling
+   • Spring cubic-bezier naturally overshoots and settles,
+     giving the Dynamic Island "water drop morphing" feel
+     without any fragile setTimeout two-phase hack
    ═══════════════════════════════════════════════════════════ */
 window.LiquidGlassNav = function (container) {
   if (!container) return null;
-  var goo = document.createElement("span");
-  goo.className = "lg-nav-goo";
-  goo.setAttribute("aria-hidden", "true");
-  var blob = document.createElement("span");
-  blob.className = "lg-nav-spotlight";
-  goo.appendChild(blob);
-  container.appendChild(goo);
 
-  var stretchTimer = 0;
+  var pill = document.createElement("span");
+  pill.className = "lg-nav-pill";
+  pill.setAttribute("aria-hidden", "true");
+  container.appendChild(pill);
+
   var visible = false;
-  var curLeft = 0;
-  var curWidth = 0;
   var curTarget = null;
+  var rafId = 0;
+  var pendingEl = null;
 
-  function setBox(left, width, instant) {
+  function applyPos(linkEl, instant) {
+    var PADX = 12, PADY = 6;
+    var cR = container.getBoundingClientRect();
+    var lR = linkEl.getBoundingClientRect();
+    var left   = lR.left   - cR.left - PADX;
+    var width  = lR.width  + PADX * 2;
+    var top    = lR.top    - cR.top  - PADY;
+    var height = lR.height + PADY * 2;
+
+    pill.style.top    = top    + "px";
+    pill.style.height = height + "px";
+
     if (instant) {
-      blob.style.transition = "none";
-      blob.style.transform = "translateX(" + left + "px)";
-      blob.style.width = width + "px";
-      void blob.offsetWidth;
-      blob.style.transition = "";
+      /* Temporarily suppress transition so the pill snaps to position
+         before becoming visible — avoids flying-in from (0,0). */
+      var saved = pill.style.transition;
+      pill.style.transition = "none";
+      pill.style.transform  = "translateX(" + left  + "px)";
+      pill.style.width      = width + "px";
+      void pill.offsetWidth; // force reflow
+      pill.style.transition = saved;
     } else {
-      /* Phase 1 — stretch to bridge old + new (liquid reaches across) */
-      var bL = Math.min(curLeft, left);
-      var bR = Math.max(curLeft + curWidth, left + width);
-      blob.style.transform = "translateX(" + bL + "px)";
-      blob.style.width = bR - bL + "px";
-      /* Phase 2 — pull in to the target (drop settles) */
-      clearTimeout(stretchTimer);
-      stretchTimer = setTimeout(function () {
-        blob.style.transform = "translateX(" + left + "px)";
-        blob.style.width = width + "px";
-      }, 200);
+      pill.style.transform = "translateX(" + left  + "px)";
+      pill.style.width     = width + "px";
     }
-    curLeft = left;
-    curWidth = width;
   }
 
   return {
-    /* Highlight a link element (or null to hide the spotlight). */
     place: function (linkEl) {
       if (!linkEl) {
-        goo.style.opacity = "0";
-        visible = false;
-        curTarget = null;
+        pill.style.opacity = "0";
+        visible    = false;
+        curTarget  = null;
+        cancelAnimationFrame(rafId);
+        pendingEl  = null;
         return;
       }
-      /* Pad the highlight a little around the link text — gives
-         breathing room and offsets the goo filter's edge erosion. */
-      var PADX = 12, PADY = 7;
-      var cR = container.getBoundingClientRect();
-      var lR = linkEl.getBoundingClientRect();
-      var left = lR.left - cR.left - PADX;
-      var width = lR.width + PADX * 2;
-      blob.style.top = lR.top - cR.top - PADY + "px";
-      blob.style.height = lR.height + PADY * 2 + "px";
-      if (linkEl === curTarget && visible) {
-        /* Same link — the active section hasn't changed, but the nav
-           layout may have (e.g. it collapsed into a pill on scroll).
-           Keep the highlight locked to the link, snapping instantly
-           with no liquid stretch. */
-        if (Math.abs(left - curLeft) > 0.5 || Math.abs(width - curWidth) > 0.5) {
-          setBox(left, width, true);
+
+      /* Coalesce rapid calls (e.g. many scroll events per frame)
+         into a single paint — prevents the glitch where the pill
+         gets stuck in an intermediate stretch during fast scrolling. */
+      pendingEl = linkEl;
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(function () {
+        var el = pendingEl;
+        pendingEl = null;
+        if (!el) return;
+
+        if (!visible) {
+          /* First appearance: snap to position then fade in so the
+             pill doesn't animate in from nowhere. */
+          applyPos(el, true);
+          void pill.offsetWidth; // flush so opacity transition starts fresh
+          pill.style.opacity = "1";
+          visible = true;
+        } else {
+          /* Subsequent moves: spring-animated. The bezier naturally
+             overshoots transform and width, creating the Dynamic
+             Island "water connecting and leaving" morph feel. */
+          applyPos(el, false);
         }
-        return;
-      }
-      var instant = !visible;
-      goo.style.opacity = "0.32";
-      visible = true;
-      curTarget = linkEl;
-      setBox(left, width, instant);
+        curTarget = el;
+      });
     },
-    /* Snap to the current target without animation (resize/layout). */
+
     refresh: function () {
+      cancelAnimationFrame(rafId);
       if (!curTarget || !visible) return;
-      var PADX = 12, PADY = 7;
-      var cR = container.getBoundingClientRect();
-      var lR = curTarget.getBoundingClientRect();
-      blob.style.top = lR.top - cR.top - PADY + "px";
-      blob.style.height = lR.height + PADY * 2 + "px";
-      setBox(lR.left - cR.left - PADX, lR.width + PADX * 2, true);
+      applyPos(curTarget, true);
     }
   };
 };

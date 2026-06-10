@@ -45,6 +45,13 @@ const razorpay =
     : null;
 
 const PLAN_SCHEMA_VERSION = 2;
+
+const OWNER_EMAIL = 'atharvrs2010@gmail.com';
+
+function getEffectivePlan(user) {
+  if (user && user.email === OWNER_EMAIL) return 'pro';
+  return user ? normalizePlanKey(user.plan) : 'free';
+}
 const PLAN_DEFINITIONS = {
   free: {
     key: "free",
@@ -560,6 +567,7 @@ function isPaidPlanKey(planKey) {
 
 function resolveCurrentPlan(user) {
   if (!user) return "free";
+  if (user.email === OWNER_EMAIL) return "pro";
   const normalizedPlan = normalizePlanKey(user.plan);
   if (!isPaidPlanKey(normalizedPlan)) return "free";
   if (user.planStatus !== "active") return "free";

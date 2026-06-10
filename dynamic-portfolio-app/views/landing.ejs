@@ -74,8 +74,41 @@
           <a class="ds-nav__cta" href="/signup">Get started free</a>
           <% } %>
         </div>
+
+        <!-- Hamburger: visible only on mobile (≤640px) -->
+        <button class="ds-nav__hamburger" id="ds-nav-hamburger" aria-label="Open navigation menu" aria-expanded="false" aria-controls="ds-mobile-menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
       </div>
     </nav>
+
+    <!-- ─── Mobile navigation menu ─── -->
+    <div class="ds-mobile-menu" id="ds-mobile-menu" aria-hidden="true">
+      <div class="ds-mobile-menu__backdrop" id="ds-mobile-backdrop"></div>
+      <div class="ds-mobile-menu__panel">
+        <nav class="ds-mobile-menu__links" aria-label="Mobile navigation">
+          <a class="ds-mobile-menu__link" href="#ds-hero">Home</a>
+          <a class="ds-mobile-menu__link" href="#ds-preview">Preview</a>
+          <a class="ds-mobile-menu__link" href="#ds-features">Features</a>
+          <a class="ds-mobile-menu__link" href="#ds-steps">How it works</a>
+          <a class="ds-mobile-menu__link" href="#ds-pricing">Pricing</a>
+          <a class="ds-mobile-menu__link" href="#ds-contact">Contact</a>
+        </nav>
+        <div class="ds-mobile-menu__actions">
+          <% if (currentUser) { %>
+          <form action="/logout" method="POST">
+            <button type="submit" class="ds-btn ds-btn--ghost">Log out</button>
+          </form>
+          <a class="ds-btn ds-btn--primary" href="/form.html">New portfolio</a>
+          <% } else { %>
+          <a class="ds-btn ds-btn--ghost" href="/login">Log in</a>
+          <a class="ds-btn ds-btn--primary" href="/signup">Get started free</a>
+          <% } %>
+        </div>
+      </div>
+    </div>
 
     <main class="ds-main">
 
@@ -798,6 +831,45 @@
             }
           });
         });
+
+        /* ── Mobile hamburger menu ───────────────────── */
+        const hamburger = document.getElementById('ds-nav-hamburger');
+        const mobileMenu = document.getElementById('ds-mobile-menu');
+        const mobileBackdrop = document.getElementById('ds-mobile-backdrop');
+
+        const openMobileMenu = () => {
+          hamburger.setAttribute('aria-expanded', 'true');
+          hamburger.classList.add('is-open');
+          mobileMenu.classList.add('is-open');
+          mobileMenu.setAttribute('aria-hidden', 'false');
+          document.body.style.overflow = 'hidden';
+        };
+
+        const closeMobileMenu = () => {
+          hamburger.setAttribute('aria-expanded', 'false');
+          hamburger.classList.remove('is-open');
+          mobileMenu.classList.remove('is-open');
+          mobileMenu.setAttribute('aria-hidden', 'true');
+          document.body.style.overflow = '';
+        };
+
+        if (hamburger && mobileMenu) {
+          hamburger.addEventListener('click', () => {
+            hamburger.classList.contains('is-open') ? closeMobileMenu() : openMobileMenu();
+          });
+
+          mobileBackdrop && mobileBackdrop.addEventListener('click', closeMobileMenu);
+
+          // Close when tapping a menu link (smooth scroll handles navigation)
+          mobileMenu.querySelectorAll('.ds-mobile-menu__link').forEach(link => {
+            link.addEventListener('click', closeMobileMenu);
+          });
+
+          // Close when viewport grows past mobile breakpoint
+          window.addEventListener('resize', () => {
+            if (window.innerWidth > 640) closeMobileMenu();
+          }, { passive: true });
+        }
       })();
     </script>
     <script src="/liquid-glass.js?v=5"></script>

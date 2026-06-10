@@ -2391,3 +2391,184 @@ html[data-theme="dark"] .ds-price-card__badge {
     margin: 0 auto;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   MOBILE NAV — HAMBURGER + SLIDE-DOWN MENU
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Hamburger button (hidden on desktop) ──────────────── */
+.ds-nav__hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.45rem;
+  border-radius: 0.55rem;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+
+.ds-nav__hamburger:hover {
+  background: rgba(15, 26, 47, 0.06);
+}
+
+.ds-nav__hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: #0f1a2f;
+  border-radius: 999px;
+  transform-origin: center;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.25s ease,
+              width 0.35s ease;
+}
+
+/* Animate to × when open */
+.ds-nav__hamburger.is-open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.ds-nav__hamburger.is-open span:nth-child(2) {
+  opacity: 0;
+  width: 0;
+}
+.ds-nav__hamburger.is-open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+html[data-theme="dark"] .ds-nav__hamburger span {
+  background: #e6ecff;
+}
+html[data-theme="dark"] .ds-nav__hamburger:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Mobile slide-down menu ────────────────────────────── */
+.ds-mobile-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  pointer-events: none;
+}
+
+.ds-mobile-menu__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 10, 22, 0.48);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.ds-mobile-menu.is-open {
+  pointer-events: auto;
+}
+
+.ds-mobile-menu.is-open .ds-mobile-menu__backdrop {
+  opacity: 1;
+}
+
+.ds-mobile-menu__panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  padding: 4.5rem 1.5rem 2rem;
+  box-shadow: 0 24px 64px rgba(15, 26, 47, 0.18);
+  border-bottom: 1px solid rgba(15, 26, 47, 0.10);
+  transform: translateY(-100%);
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ds-mobile-menu.is-open .ds-mobile-menu__panel {
+  transform: translateY(0);
+}
+
+.ds-mobile-menu__links {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid rgba(15, 26, 47, 0.07);
+  margin-bottom: 1.5rem;
+}
+
+.ds-mobile-menu__link {
+  display: block;
+  padding: 0.9rem 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: rgba(15, 26, 47, 0.72);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(15, 26, 47, 0.07);
+  font-family: "Inter", sans-serif;
+  transition: color 0.2s ease, padding-left 0.2s ease;
+}
+
+.ds-mobile-menu__link:last-child {
+  border-bottom: none;
+}
+
+.ds-mobile-menu__link:hover {
+  color: #3b6ef5;
+  padding-left: 0.5rem;
+}
+
+.ds-mobile-menu__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.ds-mobile-menu__actions .ds-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.ds-mobile-menu__actions form {
+  display: block;
+}
+
+.ds-mobile-menu__actions form .ds-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Dark mode mobile menu */
+html[data-theme="dark"] .ds-mobile-menu__panel {
+  background: rgba(10, 13, 26, 0.97);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme="dark"] .ds-mobile-menu__links {
+  border-top-color: rgba(255, 255, 255, 0.07);
+}
+
+html[data-theme="dark"] .ds-mobile-menu__link {
+  color: rgba(230, 236, 255, 0.62);
+  border-bottom-color: rgba(255, 255, 255, 0.07);
+}
+
+html[data-theme="dark"] .ds-mobile-menu__link:hover {
+  color: #7aa8ff;
+}
+
+/* ── Activate hamburger on mobile, hide desktop nav links ── */
+@media (max-width: 640px) {
+  .ds-nav__hamburger {
+    display: flex;
+  }
+
+  /* Nav links already hidden in existing 640px breakpoint above;
+     also hide the login / CTA text buttons — they live in the mobile menu */
+  .ds-nav__actions .ds-nav__login-btn,
+  .ds-nav__actions .ds-nav__cta,
+  .ds-nav__actions > form {
+    display: none;
+  }
+}

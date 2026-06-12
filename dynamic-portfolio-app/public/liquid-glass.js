@@ -124,16 +124,31 @@ window.LiquidGlassNav = function (container) {
      The nav itself animates (it collapses into / expands out of a
      pill on scroll), which moves the links AFTER scroll events stop
      firing. Scroll-driven placement alone leaves the pill stranded.
-     This loop re-measures the active link every frame and snaps the
-     pill onto it the moment the geometry drifts — so the pill is
-     ALWAYS on the right link. The liquid spring is reserved for real
-     section switches (guarded by lockUntil). */
+     This loop re-measures the active link every frame:
+
+     • Idle (no spring in flight): snap instantly the moment the
+       geometry drifts — the pill is ALWAYS on the right link.
+     • Spring in flight (lockUntil active): if the destination moves
+       (e.g. a Home↔Preview switch happens while the nav is still
+       collapsing/expanding near the top), RE-AIM the spring at the
+       live position instead of letting it land stale and snap back.
+       CSS transitions retarget from the current interpolated value,
+       so the pill liquidly follows the moving link and settles
+       exactly on it. Static-destination switches (all other tabs)
+       never drift mid-flight, so their behavior is unchanged. */
   function pin() {
-    if (visible && curTarget && performance.now() > lockUntil) {
+    if (visible && curTarget) {
       var m = measure(curTarget);
-      if (Math.abs(m.left - lastL) > 0.5 || Math.abs(m.width  - lastW) > 0.5 ||
-          Math.abs(m.top  - lastT) > 0.5 || Math.abs(m.height - lastH) > 0.5) {
-        applyPos(curTarget, true);
+      var drifted =
+        Math.abs(m.left - lastL) > 0.5 || Math.abs(m.width  - lastW) > 0.5 ||
+        Math.abs(m.top  - lastT) > 0.5 || Math.abs(m.height - lastH) > 0.5;
+      if (drifted) {
+        if (performance.now() > lockUntil) {
+          applyPos(curTarget, true);            /* idle: hard pin */
+        } else {
+          lockUntil = performance.now() + 520;  /* spring in flight: re-aim */
+          applyPos(curTarget, false);
+        }
       }
     }
     requestAnimationFrame(pin);

@@ -1,220 +1,334 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Aria Sterling | Apple Developer Portfolio</title>
-    <meta
-      name="description"
-      content="Portfolio of Aria Sterling, Developer at Apple. Building beautiful, performant, human-centered digital experiences."
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <div class="aurora aurora--one"></div>
-    <div class="aurora aurora--two"></div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Atharv Raj Sharma - Portfolio</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg:#07080f; --bg2:#0d0f1c; --text:#eeeef5; --muted:#7a7a99;
+      --card:rgba(255,255,255,0.04); --border:rgba(255,255,255,0.07);
+      --grad:linear-gradient(135deg,#7c3aed 0%,#06b6d4 100%);
+      --cyan:#06b6d4; --green:#22c55e;
+    }
+    html { scroll-behavior: smooth; }
+    body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,-apple-system,sans-serif; line-height:1.65; overflow-x:hidden; }
+    ::-webkit-scrollbar { width:5px; } ::-webkit-scrollbar-track { background:var(--bg); } ::-webkit-scrollbar-thumb { background:#7c3aed55; border-radius:10px; }
 
-    <header class="site-header">
-      <nav class="container nav">
-        <p class="brand">AS<span>.</span></p>
-        <ul class="nav-links">
-          <li><a href="#about">About</a></li>
-          <li><a href="#projects">Projects</a></li>
-          <li><a href="#experience">Experience</a></li>
-          <li><a href="#contact">Contact</a></li>
-        </ul>
-      </nav>
-    </header>
+    nav { position:fixed; top:0; width:100%; z-index:200; display:flex; justify-content:space-between; align-items:center; padding:1.1rem 2.5rem; backdrop-filter:blur(22px); background:rgba(7,8,15,0.55); border-bottom:1px solid var(--border); transition:background .3s; }
+    .logo { font-size:1.2rem; font-weight:900; letter-spacing:-.03em; background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .nav-links { list-style:none; display:flex; gap:2rem; }
+    .nav-links a { color:var(--muted); text-decoration:none; font-size:.85rem; font-weight:500; transition:color .25s; }
+    .nav-links a:hover { color:var(--text); }
 
-    <main>
-      <section class="hero container">
-        <div class="hero-content">
-          <p class="eyebrow">Developer at Apple</p>
-          <h1>
-            Crafting elegant software
-            <span>that feels magical.</span>
-          </h1>
-          <p class="hero-text">
-            I design and engineer high-performance product experiences with a
-            strong focus on motion, clarity, and user delight.
-          </p>
-          <div class="hero-actions">
-            <a class="btn btn-primary" href="#projects">View Work</a>
-            <a class="btn btn-ghost" href="#contact">Let’s Connect</a>
-          </div>
-        </div>
+    .hero { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:8rem 2rem 5rem; position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; inset:0; background: linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px), linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px); background-size:55px 55px; pointer-events:none; }
+    .orb { position:absolute; border-radius:50%; filter:blur(100px); opacity:.12; pointer-events:none; }
+    .orb-1 { width:620px; height:620px; background:radial-gradient(circle,#7c3aed,transparent); top:-160px; left:-160px; animation:drift 11s ease-in-out infinite; }
+    .orb-2 { width:480px; height:480px; background:radial-gradient(circle,#06b6d4,transparent); bottom:-120px; right:-120px; animation:drift 13s ease-in-out infinite reverse; }
+    .orb-3 { width:340px; height:340px; background:radial-gradient(circle,#a855f7,transparent); top:42%; left:46%; animation:drift 9s ease-in-out infinite 2s; }
+    @keyframes drift { 0%,100%{transform:translate(0,0);} 33%{transform:translate(28px,-18px);} 66%{transform:translate(-18px,22px);} }
+    .hero-inner { position:relative; z-index:1; }
+    .status-badge { display:inline-flex; align-items:center; gap:.5rem; padding:.4rem 1rem; border:1px solid var(--border); border-radius:50px; font-size:.75rem; font-weight:500; letter-spacing:.04em; color:var(--muted); background:rgba(255,255,255,.03); backdrop-filter:blur(8px); margin-bottom:2rem; }
+    .green-dot { width:7px; height:7px; border-radius:50%; background:var(--green); animation:ping 2.2s ease-in-out infinite; }
+    @keyframes ping { 0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.55);} 50%{box-shadow:0 0 0 6px rgba(34,197,94,0);} }
+    h1 { font-size:clamp(3rem,9vw,6.8rem); font-weight:900; letter-spacing:-.04em; line-height:1; margin-bottom:.6rem; background:linear-gradient(155deg,#fff 0%,#c4b5fd 42%,#67e8f9 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .hero-sub { font-size:1rem; color:var(--muted); margin-bottom:.9rem; letter-spacing:.02em; }
+    .hero-sub strong { color:rgba(255,255,255,.75); font-weight:600; }
+    .hero-role { font-size:clamp(1rem,2.5vw,1.5rem); font-weight:600; color:var(--text); margin-bottom:.9rem; }
+    .hero-tagline { font-size:1.05rem; color:var(--muted); max-width:530px; margin:0 auto 2.5rem; line-height:1.75; }
+    .hero-tagline em { font-style:normal; color:#c4b5fd; }
+    .btn-row { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; }
+    .btn { padding:.8rem 1.9rem; border-radius:10px; font-size:.93rem; font-weight:600; text-decoration:none; transition:all .3s ease; border:none; cursor:pointer; }
+    .btn-fill { background:var(--grad); color:#fff; box-shadow:0 0 32px rgba(124,58,237,.3); }
+    .btn-fill:hover { box-shadow:0 0 55px rgba(124,58,237,.55); transform:translateY(-2px); }
+    .btn-outline { background:rgba(255,255,255,.04); color:var(--text); border:1px solid var(--border); }
+    .btn-outline:hover { background:rgba(255,255,255,.09); transform:translateY(-2px); }
+    .scroll-hint { position:absolute; bottom:2.2rem; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:.35rem; color:var(--muted); font-size:.68rem; text-transform:uppercase; letter-spacing:.12em; animation:bob 2.8s ease-in-out infinite; }
+    .scroll-hint svg { width:16px; height:16px; opacity:.4; }
+    @keyframes bob { 0%,100%{transform:translateX(-50%) translateY(0);} 50%{transform:translateX(-50%) translateY(7px);} }
 
-        <aside class="hero-card">
-          <p class="card-label">Now Shipping</p>
-          <h2>Apple Ecosystem Features</h2>
-          <p>
-            Leading cross-platform experiences for iOS, macOS, and visionOS
-            with clean architecture and consistent performance.
-          </p>
-          <ul>
-            <li>SwiftUI + UIKit integration</li>
-            <li>Performance-first interaction design</li>
-            <li>Accessibility at enterprise scale</li>
-          </ul>
-        </aside>
-      </section>
+    .wrap { max-width:1080px; margin:0 auto; padding:5.5rem 2rem; }
+    .dark-band { background:var(--bg2); }
+    .eyebrow { font-size:.7rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:var(--cyan); margin-bottom:.5rem; }
+    .sec-title { font-size:clamp(1.9rem,4vw,2.6rem); font-weight:800; letter-spacing:-.025em; line-height:1.1; margin-bottom:.85rem; }
+    .rule { width:46px; height:3px; background:var(--grad); border-radius:2px; margin-bottom:1.5rem; }
+    .sec-desc { color:var(--muted); max-width:560px; margin-bottom:3rem; font-size:1rem; }
 
-      <section id="about" class="container section">
-        <div class="section-title">
-          <p>About</p>
-          <h2>Human-centered engineering, pixel-perfect execution.</h2>
-        </div>
-        <div class="about-grid">
-          <article class="glass-card">
-            <h3>Design + Code</h3>
-            <p>
-              I bridge product, design, and engineering to deliver interfaces
-              that are intuitive, beautiful, and technically robust.
-            </p>
-          </article>
-          <article class="glass-card">
-            <h3>Performance Obsessed</h3>
-            <p>
-              From launch-time optimization to fluid animations, I focus on
-              measurable quality and polished user interactions.
-            </p>
-          </article>
-          <article class="glass-card">
-            <h3>Mentorship</h3>
-            <p>
-              I mentor teams on architecture, UI craftsmanship, and modern app
-              standards across Apple platforms.
-            </p>
-          </article>
-        </div>
-      </section>
+    .about-grid { display:grid; grid-template-columns:1.15fr 1fr; gap:3rem; align-items:start; }
+    .about-text p { color:var(--muted); margin-bottom:1rem; font-size:1.03rem; line-height:1.85; }
+    .about-text p strong { color:var(--text); }
+    .about-text p em { font-style:normal; color:#c4b5fd; }
+    .stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:.9rem; }
+    .stat-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:1.5rem 1.2rem; text-align:center; transition:all .3s; }
+    .stat-card:hover { border-color:rgba(124,58,237,.35); background:rgba(124,58,237,.05); transform:translateY(-4px); }
+    .stat-num { font-size:2.1rem; font-weight:900; line-height:1; background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:.35rem; }
+    .stat-lbl { font-size:.78rem; color:var(--muted); }
 
-      <section id="projects" class="container section">
-        <div class="section-title">
-          <p>Featured Projects</p>
-          <h2>Selected work that blends precision and creativity.</h2>
-        </div>
-        <div class="project-grid">
-          <article class="project-card">
-            <div class="project-head">
-              <p>01</p>
-              <span>iOS</span>
-            </div>
-            <h3>Health Insight Dashboard</h3>
-            <p>
-              Developed a real-time health analytics interface with dynamic
-              charts, meaningful animations, and robust offline behavior.
-            </p>
-          </article>
-          <article class="project-card">
-            <div class="project-head">
-              <p>02</p>
-              <span>macOS</span>
-            </div>
-            <h3>Creative Workspace Suite</h3>
-            <p>
-              Built a modular productivity suite with seamless continuity and
-              advanced keyboard-first workflow optimization.
-            </p>
-          </article>
-          <article class="project-card">
-            <div class="project-head">
-              <p>03</p>
-              <span>visionOS</span>
-            </div>
-            <h3>Spatial Interaction Lab</h3>
-            <p>
-              Prototyped immersive UI patterns for spatial computing, focusing
-              on depth, gesture feedback, and intuitive navigation.
-            </p>
-          </article>
-        </div>
-      </section>
+    .skills-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:1rem; }
+    .skill-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.2rem 1rem; text-align:center; transition:all .3s; cursor:default; }
+    .skill-card:hover { border-color:rgba(6,182,212,.45); background:rgba(6,182,212,.05); transform:translateY(-4px); box-shadow:0 10px 28px rgba(6,182,212,.07); }
+    .skill-ico { font-size:1.9rem; display:block; margin-bottom:.55rem; }
+    .skill-name { font-size:.82rem; font-weight:600; color:var(--text); }
 
-      <section id="experience" class="container section">
-        <div class="section-title">
-          <p>Experience</p>
-          <h2>Shaping products used by millions worldwide.</h2>
-        </div>
-        <div class="timeline">
-          <article class="timeline-item">
-            <p class="timeline-date">2022 - Present</p>
-            <h3>Senior Developer, Apple</h3>
-            <p>
-              Leading feature engineering initiatives across flagship consumer
-              apps and driving performance standards across teams.
-            </p>
-          </article>
-          <article class="timeline-item">
-            <p class="timeline-date">2019 - 2022</p>
-            <h3>Software Engineer, Product Innovation</h3>
-            <p>
-              Delivered next-generation interaction patterns and collaborated on
-              design systems for multi-device consistency.
-            </p>
-          </article>
-          <article class="timeline-item">
-            <p class="timeline-date">2016 - 2019</p>
-            <h3>Frontend Engineer, Creative Tech Studio</h3>
-            <p>
-              Built premium digital experiences for global brands, emphasizing
-              craftsmanship, motion, and performance.
-            </p>
-          </article>
-        </div>
-      </section>
-    </main>
+    .proj-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(305px,1fr)); gap:1.5rem; }
+    .proj-card { background:var(--card); border:1px solid var(--border); border-radius:18px; padding:2rem; position:relative; overflow:hidden; transition:all .35s; }
+    .proj-card::after { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--grad); opacity:0; transition:opacity .3s; }
+    .proj-card:hover { border-color:rgba(124,58,237,.3); transform:translateY(-8px); box-shadow:0 24px 60px rgba(0,0,0,.5); }
+    .proj-card:hover::after { opacity:1; }
+    .proj-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.2rem; }
+    .proj-ico { font-size:2.1rem; }
+    .live-badge { display:inline-flex; align-items:center; gap:.4rem; font-size:.72rem; font-weight:700; padding:.28rem .72rem; border-radius:20px; background:rgba(34,197,94,.08); color:#4ade80; border:1px solid rgba(34,197,94,.22); }
+    .live-dot { width:6px; height:6px; border-radius:50%; background:#4ade80; animation:pulse 2.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.25} }
+    .proj-name { font-size:1.3rem; font-weight:800; margin-bottom:.55rem; }
+    .proj-desc { color:var(--muted); font-size:.9rem; line-height:1.65; margin-bottom:1.4rem; }
+    .tags { display:flex; flex-wrap:wrap; gap:.45rem; margin-bottom:1.4rem; }
+    .tag { font-size:.71rem; font-weight:600; padding:.24rem .65rem; border-radius:5px; background:rgba(124,58,237,.1); color:#c4b5fd; border:1px solid rgba(124,58,237,.22); }
+    .proj-link { display:inline-flex; align-items:center; gap:.45rem; color:var(--cyan); text-decoration:none; font-size:.87rem; font-weight:600; transition:gap .2s; }
+    .proj-link:hover { gap:.7rem; }
+    .proj-link svg { width:14px; height:14px; }
 
-    <footer id="contact" class="footer">
-      <div class="container footer-content">
-        <div>
-          <p class="eyebrow">Contact</p>
-          <h2>Let’s build something extraordinary.</h2>
-          <p class="footer-note">
-            Open to speaking engagements, mentorship, and product collaborations.
-          </p>
-        </div>
-        <div class="contact-links">
-          <a href="mailto:aria@portfolio.dev"
-            ><i class="fa-solid fa-envelope" aria-hidden="true"></i>Email</a
-          >
-          <a href="https://www.linkedin.com" target="_blank" rel="noreferrer"
-            ><i class="fa-brands fa-linkedin" aria-hidden="true"></i>LinkedIn</a
-          >
-          <a
-            href="https://www.youtube.com/@example"
-            target="_blank"
-            rel="noreferrer"
-            ><i class="fa-brands fa-youtube" aria-hidden="true"></i>YouTube</a
-          >
-          <a
-            href="https://www.instagram.com/example"
-            target="_blank"
-            rel="noreferrer"
-            ><i class="fa-brands fa-instagram" aria-hidden="true"></i>Instagram</a
-          >
-          <a href="https://x.com/example" target="_blank" rel="noreferrer"
-            ><i class="fa-brands fa-x-twitter" aria-hidden="true"></i>Twitter</a
-          >
-          <a href="https://github.com/example" target="_blank" rel="noreferrer"
-            ><i class="fa-brands fa-github" aria-hidden="true"></i>GitHub</a
-          >
-        </div>
+    .hobby-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1.25rem; }
+    .hcard { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:1.9rem 1.4rem; text-align:center; transition:all .3s; }
+    .hcard:hover { border-color:rgba(6,182,212,.3); background:rgba(6,182,212,.04); transform:translateY(-5px); }
+    .hcard-ico { font-size:2.5rem; display:block; margin-bottom:.9rem; }
+    .hcard-name { font-size:1rem; font-weight:700; color:var(--text); margin-bottom:.35rem; }
+    .hcard-detail { font-size:.77rem; color:var(--muted); line-height:1.55; }
+
+    .contact-box { background:var(--card); border:1px solid var(--border); border-radius:22px; padding:4rem 2rem; text-align:center; position:relative; overflow:hidden; }
+    .contact-box::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 0%,rgba(124,58,237,.07),transparent 65%); pointer-events:none; }
+    .contact-heading { font-size:clamp(1.5rem,3vw,2.1rem); font-weight:800; margin-bottom:.7rem; }
+    .contact-sub { color:var(--muted); max-width:450px; margin:0 auto 2.5rem; font-size:1rem; }
+    .contact-row { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; }
+    .ci { display:flex; align-items:center; gap:.65rem; padding:.85rem 1.55rem; background:rgba(255,255,255,.04); border:1px solid var(--border); border-radius:12px; color:var(--text); text-decoration:none; font-size:.92rem; font-weight:500; transition:all .3s; }
+    .ci:hover { background:rgba(255,255,255,.09); border-color:rgba(124,58,237,.45); transform:translateY(-3px); }
+
+    footer { text-align:center; padding:2.5rem 2rem; border-top:1px solid var(--border); color:var(--muted); font-size:.8rem; }
+    footer strong { color:rgba(255,255,255,.65); }
+
+    .reveal { opacity:0; transform:translateY(28px); transition:opacity .7s ease,transform .7s ease; }
+    .reveal.in { opacity:1; transform:none; }
+
+    @media(max-width:768px) { .about-grid{grid-template-columns:1fr;} .nav-links{display:none;} .wrap{padding:4rem 1.5rem;} .contact-box{padding:2.5rem 1.5rem;} }
+  </style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="logo">Atharv.</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#beyond">Beyond Code</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="hero-inner">
+    <div class="status-badge">
+      <div class="green-dot"></div>
+      <span id="badge-msg">Open to collaboration</span>
+    </div>
+    <h1>Atharv Raj Sharma</h1>
+    <p class="hero-sub">Bareilly, India &middot; Class 10 CBSE</p>
+    <p class="hero-role">Teenage Founder &amp; Full-Stack Developer</p>
+    <p class="hero-tagline">
+      Co-founder of <em>XevoNet</em> &amp; founder of <em>LiquiLink</em>.
+      I build <em>production-grade software</em> from scratch &mdash; real products, real users, no tutorials.
+    </p>
+    <div class="btn-row">
+      <a href="#projects" class="btn btn-fill">View My Work</a>
+      <a href="#contact" class="btn btn-outline">Get in Touch</a>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 9l-7 7-7-7"/>
+    </svg>
+    Scroll
+  </div>
+</section>
+
+<div class="wrap" id="about">
+  <div class="reveal">
+    <div class="eyebrow">Who I am</div>
+    <h2 class="sec-title">About Me</h2>
+    <div class="rule"></div>
+  </div>
+  <div class="about-grid reveal">
+    <div class="about-text">
+      <p>I'm <strong>Atharv Raj Sharma</strong> &mdash; a self-taught full-stack developer and teenage entrepreneur from Bareilly, India. I'm in Class 10, but I've already shipped two <em>live, production companies</em>.</p>
+      <p>I'm the sole engineer behind <strong>XevoNet</strong>, a full SaaS productivity suite, and the founder &amp; engineer of <strong>LiquiLink</strong>, a live link-in-bio platform. I handle everything: architecture, auth, databases, frontend, and deployment.</p>
+      <p>I didn't take a course. I built things, broke them, and fixed them until they were good enough to ship. I write code that real people use &mdash; at 15.</p>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num">2</div><div class="stat-lbl">Live Companies</div></div>
+      <div class="stat-card"><div class="stat-num">15</div><div class="stat-lbl">Years Old</div></div>
+      <div class="stat-card"><div class="stat-num">100%</div><div class="stat-lbl">Self-Taught</div></div>
+      <div class="stat-card"><div class="stat-num">&infin;</div><div class="stat-lbl">Drive to Build</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="dark-band" id="skills">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow">What I use</div>
+      <h2 class="sec-title">Tech Stack</h2>
+      <div class="rule"></div>
+      <p class="sec-desc">The tools I reach for every day to ship production software.</p>
+    </div>
+    <div class="skills-grid reveal">
+      <div class="skill-card"><span class="skill-ico">&#x1F7E2;</span><div class="skill-name">Node.js</div></div>
+      <div class="skill-card"><span class="skill-ico">&#x26A1;</span><div class="skill-name">Express</div></div>
+      <div class="skill-card"><span class="skill-ico">&#x1F40D;</span><div class="skill-name">Python</div></div>
+      <div class="skill-card"><span class="skill-ico">&#x1F5C4;&#xFE0F;</span><div class="skill-name">SQLite / SQL</div></div>
+      <div class="skill-card"><span class="skill-ico">&#x1F3A8;</span><div class="skill-name">HTML / CSS</div></div>
+      <div class="skill-card"><span class="skill-ico">&#x1F7E8;</span><div class="skill-name">JavaScript</div></div>
+      <div class="skill-card"><span class="skill-ico">&#x1F510;</span><div class="skill-name">JWT Auth</div></div>
+      <div class="skill-card"><span class="skill-ico">&#x270F;&#xFE0F;</span><div class="skill-name">Tiptap</div></div>
+      <div class="skill-card"><span class="skill-ico">&#x1F4E6;</span><div class="skill-name">esbuild</div></div>
+      <div class="skill-card"><span class="skill-ico">&#x1F916;</span><div class="skill-name">Puppeteer</div></div>
+      <div class="skill-card"><span class="skill-ico">&#x1F500;</span><div class="skill-name">Git</div></div>
+      <div class="skill-card"><span class="skill-ico">&#x1F310;</span><div class="skill-name">REST APIs</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap" id="projects">
+  <div class="reveal">
+    <div class="eyebrow">What I have built</div>
+    <h2 class="sec-title">Projects</h2>
+    <div class="rule"></div>
+    <p class="sec-desc">Production-grade products &mdash; live, used, and entirely engineered by me.</p>
+  </div>
+  <div class="proj-grid">
+    <div class="proj-card reveal">
+      <div class="proj-top">
+        <div class="proj-ico">&#x1F310;</div>
+        <div class="live-badge"><div class="live-dot"></div>Live</div>
       </div>
-      <p class="copyright">© 2026 Aria Sterling. All rights reserved.</p>
-    </footer>
-  </body>
+      <div class="proj-name">XevoNet</div>
+      <div class="proj-desc">A complete SaaS productivity suite &mdash; Docs, Drive, Spreadsheets, Slides, PDF tools, CRM, and digital business cards. Every module built from scratch, production-deployed, with real auth, file storage, and users.</div>
+      <div class="tags">
+        <span class="tag">Node.js</span><span class="tag">Express</span><span class="tag">SQLite</span>
+        <span class="tag">Tiptap</span><span class="tag">JWT</span><span class="tag">Puppeteer</span><span class="tag">Vanilla JS</span>
+      </div>
+      <a href="https://ecard.xevonet.com" target="_blank" rel="noopener" class="proj-link">
+        ecard.xevonet.com
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+    <div class="proj-card reveal">
+      <div class="proj-top">
+        <div class="proj-ico">&#x1F517;</div>
+        <div class="live-badge"><div class="live-dot"></div>Live</div>
+      </div>
+      <div class="proj-name">LiquiLink</div>
+      <div class="proj-desc">A fully custom link-in-bio platform built solo from the ground up. Fast, clean UI, and serving real users. Think Linktree, but engineered entirely by me.</div>
+      <div class="tags">
+        <span class="tag">Node.js</span><span class="tag">Express</span><span class="tag">SQLite</span>
+        <span class="tag">Vanilla JS</span><span class="tag">esbuild</span>
+      </div>
+      <a href="https://liquilink.in" target="_blank" rel="noopener" class="proj-link">
+        liquilink.in
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="dark-band" id="beyond">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow">Outside the IDE</div>
+      <h2 class="sec-title">Beyond Code</h2>
+      <div class="rule"></div>
+      <p class="sec-desc">I'm a competitive athlete, martial artist, and musician &mdash; not just a developer.</p>
+    </div>
+    <div class="hobby-grid">
+      <div class="hcard reveal">
+        <span class="hcard-ico">&#x1F3BE;</span>
+        <div class="hcard-name">Tennis</div>
+        <div class="hcard-detail">AITA U18 Competitive Player<br>One-handed backhand<br>Federer &amp; Sampras inspired</div>
+      </div>
+      <div class="hcard reveal">
+        <span class="hcard-ico">&#x1F94B;</span>
+        <div class="hcard-name">Taekwondo</div>
+        <div class="hcard-detail">Black Belt Dan 1<br>Certified martial artist</div>
+      </div>
+      <div class="hcard reveal">
+        <span class="hcard-ico">&#x1F3B8;</span>
+        <div class="hcard-name">Guitar</div>
+        <div class="hcard-detail">Electric &amp; Acoustic<br>Self-taught musician</div>
+      </div>
+      <div class="hcard reveal">
+        <span class="hcard-ico">&#x26F8;&#xFE0F;</span>
+        <div class="hcard-name">Skating</div>
+        <div class="hcard-detail">Recreational skater</div>
+      </div>
+      <div class="hcard reveal">
+        <span class="hcard-ico">&#x1F3CA;</span>
+        <div class="hcard-name">Swimming</div>
+        <div class="hcard-detail">Passionate swimmer</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap" id="contact">
+  <div class="reveal">
+    <div class="eyebrow">Let's talk</div>
+    <h2 class="sec-title">Get in Touch</h2>
+    <div class="rule"></div>
+  </div>
+  <div class="contact-box reveal">
+    <h3 class="contact-heading">Have a project or idea? I'm all ears.</h3>
+    <p class="contact-sub">Whether it is a collaboration, a cool problem to solve, or just a conversation about building things &mdash; reach out.</p>
+    <div class="contact-row">
+      <a href="mailto:atharvrs2010@gmail.com" class="ci">&#x1F4E7; atharvrs2010@gmail.com</a>
+      <a href="tel:+917817834370" class="ci">&#x1F4F1; +91 78178 34370</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>Built by <strong>Atharv Raj Sharma</strong> &nbsp;&middot;&nbsp; Bareilly, India &nbsp;&middot;&nbsp; 2025</p>
+  <p style="margin-top:.3rem;font-size:.73rem;opacity:.55;">Class 10 Student &nbsp;&middot;&nbsp; Teenage Founder &nbsp;&middot;&nbsp; Full-Stack Developer</p>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('in'), i * 65);
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.style.background = scrollY > 60 ? 'rgba(7,8,15,0.97)' : 'rgba(7,8,15,0.55)';
+  });
+
+  const msgs = ['Open to collaboration','Building the future at 15','Founder - Developer - Athlete','Based in Bareilly, India'];
+  let mi = 0;
+  const el = document.getElementById('badge-msg');
+  setInterval(() => {
+    mi = (mi + 1) % msgs.length;
+    el.style.transition = 'opacity .4s';
+    el.style.opacity = '0';
+    setTimeout(() => { el.textContent = msgs[mi]; el.style.opacity = '1'; }, 400);
+  }, 3000);
+</script>
+</body>
 </html>

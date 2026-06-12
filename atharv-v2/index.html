@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atharv Raj Sharma — Builder & Athlete</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===== LANDING SPLIT ===== -->
+<div id="landing">
+  <div class="split tech-side" id="techSplit" onclick="enterSide('tech')" role="button" tabindex="0">
+    <div class="split-bg-grid"></div>
+    <div class="split-glow tech-glow"></div>
+    <div class="split-content">
+      <div class="split-eyebrow tech-eyebrow">ENTER</div>
+      <div class="split-label tech-label">TECH</div>
+      <div class="split-hint">bunny@atharv:~$&nbsp;<span class="landing-cursor">█</span></div>
+      <p class="split-sub">Builder. Founder. 15.</p>
+    </div>
+    <div class="enter-hint">Click to enter →</div>
+  </div>
+
+  <div class="split-divider"></div>
+
+  <div class="split athletic-side" id="athleticSplit" onclick="enterSide('athletic')" role="button" tabindex="0">
+    <div class="split-glow athletic-glow"></div>
+    <div class="split-content">
+      <div class="split-eyebrow athletic-eyebrow">ENTER</div>
+      <div class="split-label athletic-label">ATHLETE</div>
+      <div class="split-hint">AITA · TKD Black Belt · Guitar</div>
+      <p class="split-sub">On and off the court.</p>
+    </div>
+    <div class="enter-hint">Click to enter →</div>
+  </div>
+</div>
+
+<!-- ===== TECH SECTION ===== -->
+<div id="techSection" class="main-section" aria-hidden="true">
+  <nav class="section-nav tech-nav">
+    <span class="nav-logo tech-nav-logo">ATHARV.DEV</span>
+    <div class="nav-right">
+      <span class="nav-status"><span class="status-dot"></span>online</span>
+      <button class="back-btn tech-back" onclick="goBack()">← exit</button>
+    </div>
+  </nav>
+
+  <div id="terminalWrapper">
+    <div class="scanlines" aria-hidden="true"></div>
+    <div id="terminal" onclick="focusTerminal()">
+      <div id="terminalOutput"></div>
+      <div class="terminal-input-row" id="inputRow">
+        <span class="prompt">bunny@atharv:~$&nbsp;</span>
+        <div class="input-area" id="inputArea">
+          <span id="inputBefore"></span><span class="cursor" id="cursor">█</span><span id="inputAfter"></span>
+        </div>
+        <input type="text" id="terminalInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Terminal input">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ATHLETIC SECTION ===== -->
+<div id="athleticSection" class="main-section" aria-hidden="true">
+  <nav class="section-nav athletic-nav">
+    <span class="nav-logo athletic-nav-logo">BUNNY</span>
+    <div class="athletic-tabs" id="athleticTabs">
+      <button class="tab-btn active" data-tab="overview">Overview</button>
+      <button class="tab-btn" data-tab="tennis">Tennis</button>
+      <button class="tab-btn" data-tab="martial">Martial Arts</button>
+      <button class="tab-btn" data-tab="music">Music &amp; More</button>
+    </div>
+    <button class="back-btn athletic-back" onclick="goBack()">← Back</button>
+  </nav>
+
+  <!-- OVERVIEW TAB -->
+  <div class="tab-content active" id="tab-overview">
+    <div class="overview-header">
+      <div class="overview-intro">
+        <h1 class="overview-name">Atharv Raj Sharma</h1>
+        <p class="overview-goes-by">goes by <span>Bunny</span></p>
+        <p class="overview-loc">📍 Bareilly, India · Age 15</p>
+      </div>
+    </div>
+    <div class="overview-grid">
+      <div class="stat-card card-tennis">
+        <div class="stat-card-icon">🎾</div>
+        <div class="stat-card-title">Tennis</div>
+        <div class="stat-card-value">AITA U18</div>
+        <div class="stat-card-desc">Wilson RF01 racquet. One-handed backhand. Federer &amp; Sampras inspired. Competitive U18 circuit.</div>
+      </div>
+      <div class="stat-card card-tkd">
+        <div class="stat-card-icon">🥋</div>
+        <div class="stat-card-title">Taekwondo</div>
+        <div class="stat-card-value">Black Belt · Dan 1</div>
+        <div class="stat-card-desc">First Dan black belt. Discipline, precision, and a kick that ends rallies.</div>
+      </div>
+      <div class="stat-card card-guitar">
+        <div class="stat-card-icon">🎸</div>
+        <div class="stat-card-title">Guitar</div>
+        <div class="stat-card-value">Electric &amp; Acoustic</div>
+        <div class="stat-card-desc">Plays both electric and acoustic. Started casually, now a regular thing.</div>
+      </div>
+      <div class="stat-card card-skate">
+        <div class="stat-card-icon">🛹</div>
+        <div class="stat-card-title">Skating</div>
+        <div class="stat-card-value">Skater</div>
+        <div class="stat-card-desc">Hobby skater. Bareilly streets, whenever there's time.</div>
+      </div>
+      <div class="stat-card card-swim">
+        <div class="stat-card-icon">🏊</div>
+        <div class="stat-card-title">Swimming</div>
+        <div class="stat-card-value">Fitness Routine</div>
+        <div class="stat-card-desc">Part of the athletic training stack. Complements tennis conditioning.</div>
+      </div>
+      <div class="stat-card card-yt">
+        <div class="stat-card-icon">📹</div>
+        <div class="stat-card-title">YouTube</div>
+        <div class="stat-card-value">grape.</div>
+        <div class="stat-card-desc">@grapedot — minimal vlog-style, POV headband cam. Life between the builds and the courts.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TENNIS TAB -->
+  <div class="tab-content" id="tab-tennis">
+    <div class="tennis-wrapper">
+      <div id="scoreBoard">
+        <div class="score-player">
+          <div class="score-name">YOU</div>
+          <div class="score-pts" id="playerPoints">0</div>
+          <div class="score-games" id="playerGames">Sets: <span id="playerSets">0</span></div>
+        </div>
+        <div class="score-divider">
+          <div class="set-scores" id="setScores"></div>
+          <div class="score-vs">VS</div>
+        </div>
+        <div class="score-player">
+          <div class="score-name">BUNNY</div>
+          <div class="score-pts" id="bunnyPoints">0</div>
+          <div class="score-games" id="bunnyGames">Sets: <span id="bunnySets">0</span></div>
+        </div>
+      </div>
+      <div id="gameStatus">Press SPACE to serve</div>
+      <canvas id="tennisCanvas" width="600" height="500"></canvas>
+      <div id="commentary"></div>
+      <div id="tennisControls">
+        ← → Arrow keys or mouse to move · SPACE to serve · Touch: drag to move
+      </div>
+    </div>
+  </div>
+
+  <!-- MARTIAL ARTS TAB -->
+  <div class="tab-content" id="tab-martial">
+    <div class="martial-content">
+      <div class="martial-header">
+        <div class="belt-display">
+          <div class="belt-icon">🥋</div>
+          <div class="belt-rank">BLACK BELT · DAN 1</div>
+        </div>
+      </div>
+      <h2 class="martial-title">Taekwondo</h2>
+      <p class="martial-subtitle">First Dan · Active competitor</p>
+      <div class="martial-body">
+        <p>Started training before the tennis obsession took hold. Taekwondo taught what no textbook could: discipline isn't motivation — it's what you do when motivation runs out.</p>
+        <br>
+        <p>Earned Dan 1 black belt through years of consistent training. The patterns, the sparring, the conditioning — it's not a hobby. It's a foundation. The footwork from TKD translates directly to court movement. The mental discipline carries over to late-night builds.</p>
+        <br>
+        <p>Competition-tested. Pattern-precise. Still training.</p>
+      </div>
+      <div class="kick-animation-wrapper">
+        <svg class="kick-figure" viewBox="0 0 200 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Head -->
+          <circle class="kick-head" cx="100" cy="28" r="22" fill="none" stroke="#e2a04a" stroke-width="3"/>
+          <!-- Body -->
+          <line class="kick-body" x1="100" y1="50" x2="100" y2="130" stroke="#e2a04a" stroke-width="3" stroke-linecap="round"/>
+          <!-- Arms -->
+          <line class="kick-arm-left" x1="100" y1="70" x2="65" y2="105" stroke="#e2a04a" stroke-width="3" stroke-linecap="round"/>
+          <line class="kick-arm-right" x1="100" y1="70" x2="140" y2="90" stroke="#e2a04a" stroke-width="3" stroke-linecap="round"/>
+          <!-- Standing leg -->
+          <line class="kick-leg-stand" x1="100" y1="130" x2="90" y2="200" stroke="#e2a04a" stroke-width="3" stroke-linecap="round"/>
+          <line x1="90" y1="200" x2="78" y2="230" stroke="#e2a04a" stroke-width="3" stroke-linecap="round"/>
+          <!-- Kicking leg -->
+          <line class="kick-leg-up" x1="100" y1="130" x2="145" y2="105" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
+          <line class="kick-foot" x1="145" y1="105" x2="185" y2="80" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
+          <!-- Impact lines -->
+          <line class="impact-1" x1="190" y1="75" x2="210" y2="60" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" opacity="0"/>
+          <line class="impact-2" x1="192" y1="82" x2="215" y2="82" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" opacity="0"/>
+          <line class="impact-3" x1="190" y1="89" x2="210" y2="104" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" opacity="0"/>
+        </svg>
+      </div>
+      <div class="martial-stats">
+        <div class="martial-stat"><span class="mstat-label">Style</span><span class="mstat-val">Taekwondo (WTF)</span></div>
+        <div class="martial-stat"><span class="mstat-label">Rank</span><span class="mstat-val">1st Dan Black Belt</span></div>
+        <div class="martial-stat"><span class="mstat-label">Focus</span><span class="mstat-val">Sparring + Patterns</span></div>
+        <div class="martial-stat"><span class="mstat-label">Status</span><span class="mstat-val">Active</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MUSIC & MORE TAB -->
+  <div class="tab-content" id="tab-music">
+    <div class="music-content">
+      <h2 class="music-section-title">Beyond the courts &amp; compiler</h2>
+      <p class="music-section-sub">The other layers.</p>
+      <div class="music-grid">
+        <div class="music-card music-card-guitar">
+          <div class="music-card-icon">🎸</div>
+          <div class="music-card-title">Electric Guitar</div>
+          <div class="music-card-desc">Started casually. Now part of the daily rhythm. Rock-leaning.</div>
+          <div class="music-card-tag">Regular</div>
+        </div>
+        <div class="music-card music-card-acoustic">
+          <div class="music-card-icon">🪕</div>
+          <div class="music-card-title">Acoustic Guitar</div>
+          <div class="music-card-desc">Late nights. Quiet focus. The acoustic comes out when the terminal goes dark.</div>
+          <div class="music-card-tag">Regular</div>
+        </div>
+        <div class="music-card music-card-skate">
+          <div class="music-card-icon">🛹</div>
+          <div class="music-card-title">Skating</div>
+          <div class="music-card-desc">Bareilly streets. Hobby, not sport. The kind of thing that clears your head.</div>
+          <div class="music-card-tag">Hobby</div>
+        </div>
+        <div class="music-card music-card-swim">
+          <div class="music-card-icon">🏊</div>
+          <div class="music-card-title">Swimming</div>
+          <div class="music-card-desc">Athletic conditioning. Part of the tennis training routine.</div>
+          <div class="music-card-tag">Training</div>
+        </div>
+        <div class="music-card music-card-gaming">
+          <div class="music-card-icon">🎮</div>
+          <div class="music-card-title">Forza Horizon 6</div>
+          <div class="music-card-desc">Wind-down after tennis. The only time slowing down feels fast.</div>
+          <div class="music-card-tag">Wind-down</div>
+        </div>
+        <div class="music-card music-card-yt">
+          <div class="music-card-icon">📹</div>
+          <div class="music-card-title">YouTube: grape.</div>
+          <div class="music-card-desc">@grapedot — vlog-style, minimal aesthetic. POV headband cam. Raw, unfiltered.</div>
+          <div class="music-card-tag">@grapedot</div>
+        </div>
+      </div>
+      <div class="music-vibe">
+        <h3 class="vibe-title">The vibe</h3>
+        <div class="vibe-blocks">
+          <div class="vibe-block" style="--c:#e2a04a">Building</div>
+          <div class="vibe-block" style="--c:#38bdf8">Playing</div>
+          <div class="vibe-block" style="--c:#a78bfa">Making</div>
+          <div class="vibe-block" style="--c:#34d399">Moving</div>
+          <div class="vibe-block" style="--c:#f87171">Competing</div>
+          <div class="vibe-block" style="--c:#fb923c">Filming</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end athleticSection -->
+
+<script src="terminal.js"></script>
+<script src="tennis.js"></script>
+<script src="athletic.js"></script>
+
+<script>
+// Core navigation
+let currentSide = null;
+
+function enterSide(side) {
+  currentSide = side;
+  const landing = document.getElementById('landing');
+  landing.classList.add('exiting');
+
+  setTimeout(() => {
+    landing.style.display = 'none';
+    if (side === 'tech') {
+      const sec = document.getElementById('techSection');
+      sec.classList.add('visible');
+      sec.removeAttribute('aria-hidden');
+      setTimeout(() => initTerminal(), 100);
+    } else {
+      const sec = document.getElementById('athleticSection');
+      sec.classList.add('visible');
+      sec.removeAttribute('aria-hidden');
+      initAthletic();
+    }
+  }, 550);
+}
+
+function goBack() {
+  const techSec = document.getElementById('techSection');
+  const athSec = document.getElementById('athleticSection');
+  techSec.classList.remove('visible');
+  athSec.classList.remove('visible');
+  techSec.setAttribute('aria-hidden', 'true');
+  athSec.setAttribute('aria-hidden', 'true');
+
+  const landing = document.getElementById('landing');
+  landing.style.display = 'flex';
+  setTimeout(() => landing.classList.remove('exiting'), 30);
+  currentSide = null;
+}
+
+// Keyboard support for landing
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !currentSide) {
+    const focused = document.activeElement;
+    if (focused.id === 'techSplit') enterSide('tech');
+    else if (focused.id === 'athleticSplit') enterSide('athletic');
+  }
+});
+</script>
+</body>
+</html>

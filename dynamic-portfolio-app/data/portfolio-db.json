@@ -109,7 +109,7 @@
       "updatedAt": "2026-05-12T05:52:37.121Z",
       "styleTheme": "liquid-glass",
       "analytics": {
-        "views": 205,
+        "views": 206,
         "linkClicks": 4,
         "daily": {
           "2026-04-14": {
@@ -143,22 +143,28 @@
           "2026-06-10": {
             "views": 1,
             "linkClicks": 0
+          },
+          "2026-06-12": {
+            "views": 1,
+            "linkClicks": 0
           }
         },
         "referrers": {
-          "Direct": 43,
+          "Direct": 44,
           "Internal Portfolio": 167,
           "Internal": 158
         },
         "devices": {
-          "Desktop": 368
+          "Desktop": 369
         },
         "browsers": {
           "Firefox": 333,
-          "Chrome": 35
+          "Chrome": 35,
+          "Other": 1
         },
         "operatingSystems": {
-          "Windows": 368
+          "Windows": 368,
+          "Other": 1
         },
         "links": {},
         "utmSources": {},
@@ -167,7 +173,7 @@
         "hourly": {
           "9": 2,
           "10": 1,
-          "11": 10,
+          "11": 11,
           "12": 2,
           "13": 70,
           "15": 8,
@@ -176,6 +182,24 @@
           "19": 4
         },
         "events": [
+          {
+            "type": "view",
+            "at": "2026-06-12T05:36:37.804Z",
+            "day": "2026-06-12",
+            "hour": 11,
+            "referrer": "Direct",
+            "device": "Desktop",
+            "browser": "Other",
+            "os": "Other",
+            "target": "",
+            "visitorId": "v_s5daml7imqahuoq3",
+            "sessionId": "",
+            "utmSource": "",
+            "utmMedium": "",
+            "utmCampaign": "",
+            "engagedMs": 0,
+            "scrollDepth": 0
+          },
           {
             "type": "view",
             "at": "2026-06-10T05:14:57.381Z",
@@ -6803,7 +6827,7 @@
         ],
         "totalEngagedMs": 900064,
         "maxScrollDepth": 100,
-        "lastSeenAt": "2026-06-10T05:14:57.381Z"
+        "lastSeenAt": "2026-06-12T05:36:37.804Z"
       },
       "builder": {
         "enabled": false,
@@ -6900,36 +6924,61 @@
       "profileImageUrl": "",
       "companyLogoUrl": "",
       "analytics": {
-        "views": 5,
+        "views": 6,
         "linkClicks": 0,
         "daily": {
           "2026-06-08": {
             "views": 5,
             "linkClicks": 0
+          },
+          "2026-06-12": {
+            "views": 1,
+            "linkClicks": 0
           }
         },
         "referrers": {
-          "Direct": 5,
+          "Direct": 6,
           "Internal Portfolio": 14
         },
         "devices": {
-          "Desktop": 19
+          "Desktop": 20
         },
         "browsers": {
-          "Chrome": 19
+          "Chrome": 19,
+          "Other": 1
         },
         "operatingSystems": {
-          "Windows": 19
+          "Windows": 19,
+          "Other": 1
         },
         "links": {},
         "utmSources": {},
         "utmMediums": {},
         "utmCampaigns": {},
         "hourly": {
+          "11": 1,
           "12": 2,
           "18": 17
         },
         "events": [
+          {
+            "type": "view",
+            "at": "2026-06-12T05:36:37.898Z",
+            "day": "2026-06-12",
+            "hour": 11,
+            "referrer": "Direct",
+            "device": "Desktop",
+            "browser": "Other",
+            "os": "Other",
+            "target": "",
+            "visitorId": "v_76nexpezmqahuosp",
+            "sessionId": "",
+            "utmSource": "",
+            "utmMedium": "",
+            "utmCampaign": "",
+            "engagedMs": 0,
+            "scrollDepth": 0
+          },
           {
             "type": "engagement",
             "at": "2026-06-08T13:17:52.912Z",
@@ -7275,7 +7324,7 @@
         ],
         "totalEngagedMs": 839442,
         "maxScrollDepth": 100,
-        "lastSeenAt": "2026-06-08T13:17:52.912Z"
+        "lastSeenAt": "2026-06-12T05:36:37.898Z"
       },
       "builder": {
         "enabled": false,

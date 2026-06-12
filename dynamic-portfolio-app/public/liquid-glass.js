@@ -81,33 +81,64 @@ window.LiquidGlassNav = function (container) {
   var curTarget = null;
   var rafId = 0;
   var pendingEl = null;
+  /* While a deliberate link-switch spring is playing, the pin loop
+     must not interrupt it. Matches the 0.46s CSS transform spring. */
+  var lockUntil = 0;
+  var lastL = 0, lastW = 0, lastT = 0, lastH = 0;
 
-  function applyPos(linkEl, instant) {
+  function measure(linkEl) {
     var PADX = 12, PADY = 6;
     var cR = container.getBoundingClientRect();
     var lR = linkEl.getBoundingClientRect();
-    var left   = lR.left   - cR.left - PADX;
-    var width  = lR.width  + PADX * 2;
-    var top    = lR.top    - cR.top  - PADY;
-    var height = lR.height + PADY * 2;
+    return {
+      left:   lR.left   - cR.left - PADX,
+      width:  lR.width  + PADX * 2,
+      top:    lR.top    - cR.top  - PADY,
+      height: lR.height + PADY * 2
+    };
+  }
 
-    pill.style.top    = top    + "px";
-    pill.style.height = height + "px";
+  function applyPos(linkEl, instant) {
+    var m = measure(linkEl);
+    lastL = m.left; lastW = m.width; lastT = m.top; lastH = m.height;
+
+    pill.style.top    = m.top    + "px";
+    pill.style.height = m.height + "px";
 
     if (instant) {
       /* Temporarily suppress transition so the pill snaps to position
          before becoming visible — avoids flying-in from (0,0). */
       var saved = pill.style.transition;
       pill.style.transition = "none";
-      pill.style.transform  = "translateX(" + left  + "px)";
-      pill.style.width      = width + "px";
+      pill.style.transform  = "translateX(" + m.left  + "px)";
+      pill.style.width      = m.width + "px";
       void pill.offsetWidth; // force reflow
       pill.style.transition = saved;
     } else {
-      pill.style.transform = "translateX(" + left  + "px)";
-      pill.style.width     = width + "px";
+      pill.style.transform = "translateX(" + m.left  + "px)";
+      pill.style.width     = m.width + "px";
     }
   }
+
+  /* ── Per-frame pinning ─────────────────────────────────────
+     The nav itself animates (it collapses into / expands out of a
+     pill on scroll), which moves the links AFTER scroll events stop
+     firing. Scroll-driven placement alone leaves the pill stranded.
+     This loop re-measures the active link every frame and snaps the
+     pill onto it the moment the geometry drifts — so the pill is
+     ALWAYS on the right link. The liquid spring is reserved for real
+     section switches (guarded by lockUntil). */
+  function pin() {
+    if (visible && curTarget && performance.now() > lockUntil) {
+      var m = measure(curTarget);
+      if (Math.abs(m.left - lastL) > 0.5 || Math.abs(m.width  - lastW) > 0.5 ||
+          Math.abs(m.top  - lastT) > 0.5 || Math.abs(m.height - lastH) > 0.5) {
+        applyPos(curTarget, true);
+      }
+    }
+    requestAnimationFrame(pin);
+  }
+  requestAnimationFrame(pin);
 
   return {
     place: function (linkEl) {
@@ -119,6 +150,10 @@ window.LiquidGlassNav = function (container) {
         pendingEl  = null;
         return;
       }
+
+      /* Same link → nothing to animate; the pin loop keeps the pill
+         glued to it through any nav layout changes. */
+      if (linkEl === curTarget && visible) return;
 
       /* Coalesce rapid calls (e.g. many scroll events per frame)
          into a single paint — prevents the glitch where the pill
@@ -140,7 +175,9 @@ window.LiquidGlassNav = function (container) {
         } else {
           /* Subsequent moves: spring-animated. The bezier naturally
              overshoots transform and width, creating the Dynamic
-             Island "water connecting and leaving" morph feel. */
+             Island "water connecting and leaving" morph feel.
+             Lock the pin loop out until the spring settles. */
+          lockUntil = performance.now() + 520;
           applyPos(el, false);
         }
         curTarget = el;
